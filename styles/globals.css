@@ -149,4 +149,22 @@
     text-transform: uppercase;
     color: var(--forest-light);
   }
+
+  /* Form inputs */
+  .form-input {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    background-color: rgba(253, 250, 244, 0.5);
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-family: var(--font-body);
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .form-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.15);
+    border-color: var(--forest);
+  }
 }

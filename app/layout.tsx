@@ -4,6 +4,7 @@ import '@/styles/globals.css'
 import Nav from '@/components/layout/Nav'
 import UrgencyBanner from '@/components/layout/UrgencyBanner'
 import Footer from '@/components/layout/Footer'
+import { AuthProvider } from '@/lib/auth-context'
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -60,13 +61,15 @@ export default function RootLayout({
       className={`${playfairDisplay.variable} ${dmSans.variable}`}
     >
       <body className="font-body bg-cream text-text antialiased">
-        <a href="#main" className="skip-to-content">
-          Skip to main content
-        </a>
-        <UrgencyBanner />
-        <Nav />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <a href="#main" className="skip-to-content">
+            Skip to main content
+          </a>
+          <UrgencyBanner />
+          <Nav />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   )
