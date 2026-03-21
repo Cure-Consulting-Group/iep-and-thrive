@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { contactSchema, type ContactFormData } from '@/lib/validations'
+import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -27,7 +28,7 @@ export default function ContactPage() {
     setIsSubmitting(true)
     setSubmitError(null)
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(CLOUD_FUNCTIONS.contact, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

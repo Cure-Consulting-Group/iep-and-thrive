@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { enrollmentSchema, type EnrollmentFormData } from '@/lib/validations'
+import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -58,7 +59,7 @@ export default function EnrollmentForm() {
     setServerError('')
 
     try {
-      const res = await fetch('/api/enroll', {
+      const res = await fetch(CLOUD_FUNCTIONS.enroll, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

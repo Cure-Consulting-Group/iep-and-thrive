@@ -1,4 +1,7 @@
-import Link from 'next/link'
+'use client'
+
+import { useState } from 'react'
+import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
 
 const checkIcon = (
   <svg className="w-4 h-4 text-forest-light flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -18,12 +21,31 @@ interface ProgramCardProps {
   description: string
   price: string
   ctaLabel: string
-  ctaHref: string
+  program: string
   includes: string[]
   featured?: boolean
 }
 
-function ProgramCard({ tag, title, description, price, ctaLabel, ctaHref, includes, featured = false }: ProgramCardProps) {
+function ProgramCard({ tag, title, description, price, ctaLabel, program, includes, featured = false }: ProgramCardProps) {
+  const [loading, setLoading] = useState(false)
+
+  const handleCheckout = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`${CLOUD_FUNCTIONS.stripeCheckout}?program=${program}`)
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert('Unable to start checkout. Please try again.')
+      }
+    } catch {
+      alert('Network error. Please check your connection and try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div
       className={`rounded-[20px] p-8 flex flex-col transition-all duration-200 hover:-translate-y-[3px] hover:shadow-[0_8px_32px_rgba(27,67,50,0.10)] ${
@@ -77,16 +99,17 @@ function ProgramCard({ tag, title, description, price, ctaLabel, ctaHref, includ
       </ul>
 
       {/* CTA */}
-      <Link
-        href={ctaHref}
-        className={`block text-center font-body font-semibold text-[15px] py-3.5 rounded-full transition-colors duration-200 ${
+      <button
+        onClick={handleCheckout}
+        disabled={loading}
+        className={`block text-center font-body font-semibold text-[15px] py-3.5 rounded-full transition-colors duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-wait ${
           featured
             ? 'bg-white text-forest hover:bg-sage-pale'
             : 'bg-forest text-white hover:bg-forest-mid'
         }`}
       >
-        {ctaLabel}
-      </Link>
+        {loading ? 'Redirecting to checkout...' : ctaLabel}
+      </button>
     </div>
   )
 }
@@ -99,7 +122,7 @@ const programs: ProgramCardProps[] = [
       'Structured literacy, phonics, decoding, and fluency. Ideal for students with dyslexia, phonological processing challenges, or reading delays.',
     price: '$3,500',
     ctaLabel: 'Enroll — $875 Deposit',
-    ctaHref: '/api/stripe/checkout?program=reading',
+    program: 'reading',
     includes: [
       '4 hrs/day, Mon–Thu',
       'Orton-Gillingham framework',
@@ -115,7 +138,7 @@ const programs: ProgramCardProps[] = [
       'Literacy + math intervention + executive function + SEL. The complete program, designed to prevent summer regression and build for fall success.',
     price: '$4,000',
     ctaLabel: 'Enroll — $1,000 Deposit',
-    ctaHref: '/api/stripe/checkout?program=full',
+    program: 'full',
     includes: [
       '4 hrs/day, Mon–Thu',
       'Literacy + math + SEL blocks',
@@ -133,7 +156,7 @@ const programs: ProgramCardProps[] = [
       'Number sense, numeracy, word problems, and applied math. For students with dyscalculia, math anxiety, or IEP goals targeting math fluency.',
     price: '$3,500',
     ctaLabel: 'Enroll — $875 Deposit',
-    ctaHref: '/api/stripe/checkout?program=math',
+    program: 'math',
     includes: [
       '4 hrs/day, Mon–Thu',
       'Concrete-representational-abstract method',
@@ -170,3 +193,4 @@ export default function ProgramCards() {
     </section>
   )
 }
+

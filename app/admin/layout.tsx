@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth-context'
 const adminLinks = [
   { label: 'Dashboard', href: '/admin', icon: '📊' },
   { label: 'Students', href: '/admin/students', icon: '🎓' },
+  { label: 'Pipeline', href: '/admin/pipeline', icon: '🔀' },
   { label: 'Bookings', href: '/admin/bookings', icon: '📅' },
   { label: 'Slots', href: '/admin/slots', icon: '🕐' },
   { label: 'Resources', href: '/admin/resources', icon: '📁' },
