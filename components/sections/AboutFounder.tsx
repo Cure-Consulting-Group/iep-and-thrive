@@ -10,7 +10,7 @@ const credentials = [
 
 export default function AboutFounder() {
   return (
-    <section id="about" className="bg-cream px-8 py-12 md:px-20 md:py-20">
+    <section id="about" className="bg-cream px-8 py-12 md:px-[5rem] md:py-[5rem]">
       <SectionHeader
         eyebrow="About the Founder"
         title="A SPED interventionist who built this for the families she couldn't stop thinking about."
@@ -29,7 +29,7 @@ export default function AboutFounder() {
             <span className="font-display text-[1.4rem] font-bold text-sage">
               8+
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/70">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/70">
               Years in NYC SPED
             </span>
           </div>

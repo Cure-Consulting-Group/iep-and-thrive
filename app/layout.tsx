@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, DM_Sans } from 'next/font/google'
 import '@/styles/globals.css'
+import Nav from '@/components/layout/Nav'
+import UrgencyBanner from '@/components/layout/UrgencyBanner'
+import Footer from '@/components/layout/Footer'
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -17,6 +20,7 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://iepandthrive.com'),
   title: 'IEP & Thrive | SPED Summer Intensive — Long Island, NY',
   description:
     'An evidence-based summer intensive for students with IEPs and learning differences on Long Island. Led by a credentialed NYC SPED interventionist. Small groups, IEP-aligned, 6 weeks.',
@@ -34,6 +38,14 @@ export const metadata: Metadata = {
     siteName: 'IEP & Thrive',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1024,
+        height: 1024,
+        alt: 'IEP & Thrive — SPED Summer Intensive · Long Island, NY',
+      },
+    ],
   },
 }
 
@@ -51,7 +63,10 @@ export default function RootLayout({
         <a href="#main" className="skip-to-content">
           Skip to main content
         </a>
+        <UrgencyBanner />
+        <Nav />
         {children}
+        <Footer />
       </body>
     </html>
   )

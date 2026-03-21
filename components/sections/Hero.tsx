@@ -27,7 +27,7 @@ export default function Hero() {
         <div className="flex flex-col justify-center px-8 py-12 md:pl-20 md:pr-16 md:py-0">
           {/* Eyebrow Pill */}
           <div className="animate-fade-up animation-delay-100">
-            <span className="inline-flex items-center gap-2 rounded-full bg-sage-pale px-4 py-1.5 text-forest text-[13px] font-medium">
+            <span className="inline-flex items-center gap-2 rounded-full bg-sage-pale px-4 py-1.5 text-forest text-[10px] font-semibold uppercase tracking-[0.1em]">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-forest-light" />
               SPED Summer Intensive &middot; Long Island, NY
             </span>

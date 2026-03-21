@@ -38,7 +38,7 @@ function Stars() {
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="bg-forest px-8 py-12 md:px-20 md:py-20">
+    <section id="testimonials" className="bg-forest px-8 py-12 md:px-[5rem] md:py-[5rem]">
       <SectionHeader
         eyebrow="Parent Stories"
         title="What families are saying."
@@ -61,7 +61,7 @@ export default function Testimonials() {
           >
             <Stars />
 
-            <blockquote className="mt-5 flex-1 font-display text-[1.05rem] italic leading-[1.55] text-white/90">
+            <blockquote className="mt-5 flex-1 font-display text-[1.15rem] italic leading-[1.5] text-white/90">
               &ldquo;{t.quote}&rdquo;
             </blockquote>
 

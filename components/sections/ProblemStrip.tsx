@@ -18,17 +18,17 @@ export default function ProblemStrip() {
   ];
 
   return (
-    <section id="problem" className="bg-forest text-white px-8 py-12 md:px-20 md:py-12">
+    <section id="problem" className="bg-forest text-white px-8 py-12 md:px-20 md:py-[3rem]">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 max-w-7xl mx-auto">
         {stats.map((s) => (
           <div key={s.title}>
             <p className="font-display text-[3rem] font-bold text-sage leading-none">
               {s.number}
             </p>
-            <h3 className="mt-3 font-display text-[1.25rem] font-semibold text-white">
+            <h3 className="mt-3 font-display text-[1.5rem] font-semibold text-white">
               {s.title}
             </h3>
-            <p className="mt-2 text-[14px] leading-[1.65] text-white/65">
+            <p className="mt-2 text-[15px] leading-[1.6] text-white/65">
               {s.desc}
             </p>
           </div>

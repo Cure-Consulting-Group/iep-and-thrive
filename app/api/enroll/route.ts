@@ -1,11 +1,23 @@
 import { NextResponse } from 'next/server'
 import { enrollmentSchema } from '@/lib/validations'
 import { getResend } from '@/lib/resend'
+import { escapeHtml } from '@/lib/escapeHtml'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const data = enrollmentSchema.parse(body)
+
+    // Sanitize all user inputs for email HTML
+    const safe = {
+      parentName: escapeHtml(data.parentName),
+      email: escapeHtml(data.email),
+      phone: escapeHtml(data.phone),
+      childGrade: escapeHtml(data.childGrade),
+      programInterest: escapeHtml(data.programInterest),
+      learningChallenge: escapeHtml(data.learningChallenge),
+      notes: data.notes ? escapeHtml(data.notes) : undefined,
+    }
 
     const operatorEmail = process.env.OPERATOR_EMAIL || 'hello@iepandthrive.com'
 
@@ -22,33 +34,33 @@ export async function POST(request: Request) {
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Parent/Guardian</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.parentName}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.parentName}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Email</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.email}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.email}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Phone</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.phone}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.phone}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Child&rsquo;s Grade</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.childGrade}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.childGrade}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Program Interest</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.programInterest}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.programInterest}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Primary Learning Challenge</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.learningChallenge}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.learningChallenge}</td>
             </tr>
             ${
-              data.notes
+              safe.notes
                 ? `<tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Additional Notes</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.notes}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.notes}</td>
             </tr>`
                 : ''
             }
@@ -67,9 +79,9 @@ export async function POST(request: Request) {
       subject: 'We received your enrollment inquiry — IEP & Thrive',
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #1B4332;">Thank you, ${data.parentName}!</h2>
+          <h2 style="color: #1B4332;">Thank you, ${safe.parentName}!</h2>
           <p style="color: #1C1917; line-height: 1.6;">
-            We&rsquo;ve received your enrollment inquiry for the <strong>${data.programInterest}</strong> program.
+            We&rsquo;ve received your enrollment inquiry for the <strong>${safe.programInterest}</strong> program.
             Our team will review your submission and reach out within 24 hours to discuss
             program fit and next steps.
           </p>

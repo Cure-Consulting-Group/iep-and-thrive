@@ -1,11 +1,20 @@
 import { NextResponse } from 'next/server'
 import { contactSchema } from '@/lib/validations'
 import { getResend } from '@/lib/resend'
+import { escapeHtml } from '@/lib/escapeHtml'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const data = contactSchema.parse(body)
+
+    // Sanitize all user inputs for email HTML
+    const safe = {
+      name: escapeHtml(data.name),
+      email: escapeHtml(data.email),
+      phone: data.phone ? escapeHtml(data.phone) : undefined,
+      message: escapeHtml(data.message),
+    }
 
     const operatorEmail = process.env.OPERATOR_EMAIL || 'hello@iepandthrive.com'
 
@@ -27,23 +36,23 @@ export async function POST(request: Request) {
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Name</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.name}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.name}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Email</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.email}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.email}</td>
             </tr>
             ${
               data.phone
                 ? `<tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Phone</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.phone}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.phone}</td>
             </tr>`
                 : ''
             }
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: 600;">Message</td>
-              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${data.message}</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">${safe.message}</td>
             </tr>
           </table>
           <p style="margin-top: 24px; color: #78716C; font-size: 13px;">

@@ -1,6 +1,6 @@
 # IEP & Thrive — Build State
 
-## Status: READY TO BUILD
+## Status: BUILT — READY FOR REVIEW
 
 ## Stack Confirmed
 - Next.js 14 (App Router)
@@ -14,58 +14,65 @@
 ## Build Progress
 
 ### Infrastructure
-- [ ] `npx create-next-app@latest iep-and-thrive --typescript --tailwind --app`
-- [ ] Install deps: `npm i react-hook-form zod @hookform/resolvers stripe resend`
-- [ ] Configure `tailwind.config.ts` with custom colors, font families
-- [ ] `styles/globals.css` — CSS variables, base resets, font imports
-- [ ] `app/layout.tsx` — root layout, metadata, font classes
+- [x] `npx create-next-app@latest iep-and-thrive --typescript --tailwind --app`
+- [x] Install deps: `npm i react-hook-form zod @hookform/resolvers stripe resend`
+- [x] Configure `tailwind.config.ts` with custom colors, font families
+- [x] `styles/globals.css` — CSS variables, base resets, font imports
+- [x] `app/layout.tsx` — root layout, metadata, font classes, Nav/Footer/UrgencyBanner
 
 ### Components — Layout
-- [ ] `components/layout/UrgencyBanner.tsx`
-- [ ] `components/layout/Nav.tsx` (sticky, mobile hamburger)
-- [ ] `components/layout/Footer.tsx`
+- [x] `components/layout/UrgencyBanner.tsx`
+- [x] `components/layout/Nav.tsx` (sticky, mobile hamburger)
+- [x] `components/layout/Footer.tsx`
 
 ### Components — Sections (homepage order)
-- [ ] `components/sections/Hero.tsx`
-- [ ] `components/sections/ProblemStrip.tsx`
-- [ ] `components/sections/WhySection.tsx`
-- [ ] `components/sections/ProgramCards.tsx`
-- [ ] `components/sections/HowItWorks.tsx`
-- [ ] `components/sections/Testimonials.tsx`
-- [ ] `components/sections/AboutFounder.tsx`
-- [ ] `components/sections/FAQ.tsx`
-- [ ] `components/sections/EnrollmentForm.tsx`
+- [x] `components/sections/Hero.tsx`
+- [x] `components/sections/ProblemStrip.tsx`
+- [x] `components/sections/WhySection.tsx`
+- [x] `components/sections/ProgramCards.tsx`
+- [x] `components/sections/HowItWorks.tsx`
+- [x] `components/sections/Testimonials.tsx`
+- [x] `components/sections/AboutFounder.tsx`
+- [x] `components/sections/FAQ.tsx`
+- [x] `components/sections/EnrollmentForm.tsx`
 
 ### Components — UI
-- [ ] `components/ui/Button.tsx`
-- [ ] `components/ui/Badge.tsx`
-- [ ] `components/ui/SectionHeader.tsx`
+- [x] `components/ui/Button.tsx`
+- [x] `components/ui/Badge.tsx`
+- [x] `components/ui/SectionHeader.tsx`
 
 ### Pages
-- [ ] `app/page.tsx` (homepage — assembles all sections)
-- [ ] `app/about/page.tsx`
-- [ ] `app/program/page.tsx`
-- [ ] `app/enroll/page.tsx`
-- [ ] `app/faq/page.tsx`
-- [ ] `app/contact/page.tsx`
-- [ ] `app/success/page.tsx`
+- [x] `app/page.tsx` (homepage — assembles all sections)
+- [x] `app/about/page.tsx` (expanded with philosophy + CTA)
+- [x] `app/program/page.tsx`
+- [x] `app/enroll/page.tsx` (expanded with intro + trust strip)
+- [x] `app/faq/page.tsx` (expanded with intro + CTA)
+- [x] `app/contact/page.tsx` (with layout.tsx for metadata)
+- [x] `app/success/page.tsx`
+- [x] `app/privacy/page.tsx`
+- [x] `app/terms/page.tsx`
 
 ### API Routes
-- [ ] `app/api/enroll/route.ts` (form submission → Resend email)
-- [ ] `app/api/contact/route.ts`
-- [ ] `app/api/stripe/checkout/route.ts`
+- [x] `app/api/enroll/route.ts` (form submission → Resend email, XSS-safe)
+- [x] `app/api/contact/route.ts` (XSS-safe, error feedback)
+- [x] `app/api/stripe/checkout/route.ts`
 
 ### Integrations
-- [ ] Stripe products configured (3 deposit products)
-- [ ] Resend domain + API key
-- [ ] Calendly URL configured
-- [ ] `.env.local` template created
+- [x] Stripe products configured (3 deposit products)
+- [ ] Resend domain + API key (needs production config)
+- [ ] Calendly URL configured (needs production config)
+- [x] `.env.local` template created
+
+### Security Hardening
+- [x] `lib/escapeHtml.ts` — HTML-escape utility for email templates
+- [x] XSS fix applied to `/api/enroll` and `/api/contact`
 
 ### Final Pass
-- [ ] Mobile responsive (all breakpoints)
-- [ ] SEO metadata on all pages
-- [ ] Accessibility audit
-- [ ] Vercel deploy + domain
+- [x] Mobile responsive (all breakpoints)
+- [x] SEO metadata on all pages (including contact via layout.tsx)
+- [x] OG image generated and wired (`/public/og-image.png`)
+- [ ] Accessibility audit (pending)
+- [ ] Vercel deploy + domain (pending)
 
 ## Environment Variables Needed
 
@@ -89,13 +96,3 @@ NEXT_PUBLIC_SITE_URL=https://iepandthrive.com
 - Form submission: Resend email to operator → redirect to /success
 - No auth required — public marketing + enrollment site
 - Testimonials are placeholder — replace with real parent quotes before launch
-
-## Notes for Claude Code
-- Read CLAUDE.md fully before starting — all design tokens, copy, and section specs are there
-- Do NOT deviate from the color system — parents are the audience, warm trust is the goal
-- Playfair Display is load-critical — ensure it's in the <head> before any paint
-- Hero split layout (cream left / forest right) is the signature element — get this right first
-- Mobile: the forest bg on hero right should span full width on mobile with the card below
-- All CTA buttons that go to Stripe should use the API route, not hardcoded Stripe links
-- EnrollmentForm validation: all fields required except 'notes'
-- Keep copy exactly as written in CLAUDE.md — do not rephrase or shorten

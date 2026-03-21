@@ -24,7 +24,7 @@ const contactLinks = [
 export default function Footer() {
   return (
     <footer className="bg-[#111810] text-white/60" role="contentinfo">
-      <div className="mx-auto max-w-7xl px-8 py-12 md:px-12 lg:px-20">
+      <div className="mx-auto max-w-7xl px-8 py-10 md:py-[3rem] md:px-12 lg:px-[5rem]">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
           {/* Column 1 — Logo + description */}
           <div>
@@ -101,7 +101,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-8 py-5 text-xs md:flex-row md:px-12 lg:px-20">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-8 py-6 text-xs md:flex-row md:px-12 lg:px-[5rem]">
           <p>
             &copy; 2026 IEP &amp; Thrive &middot; A Cure Consulting Group
             program &middot; All rights reserved.

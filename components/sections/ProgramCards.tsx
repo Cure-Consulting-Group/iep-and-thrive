@@ -69,7 +69,7 @@ function ProgramCard({ tag, title, description, price, ctaLabel, ctaHref, includ
       {/* Includes list */}
       <ul className="space-y-3 mb-8 flex-1">
         {includes.map((item, i) => (
-          <li key={i} className="flex items-start gap-2.5 text-[14px] leading-snug">
+          <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug">
             {featured ? checkIconWhite : checkIcon}
             <span className={featured ? 'text-white/80' : 'text-text'}>{item}</span>
           </li>

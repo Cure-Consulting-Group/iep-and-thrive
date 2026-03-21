@@ -79,7 +79,7 @@ export default function HowItWorks() {
                 </span>
 
                 <div>
-                  <h3 className="font-body text-[1.1rem] font-bold text-text mb-2">
+                  <h3 className="font-display text-[1.15rem] font-bold text-text mb-2">
                     {step.title}
                   </h3>
                   <p className="text-[15px] leading-relaxed text-warm-gray mb-3">
@@ -102,7 +102,7 @@ export default function HowItWorks() {
               </h3>
               <ul className="space-y-3.5">
                 {includedItems.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[14px] leading-snug text-text">
+                  <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-text">
                     {checkIcon}
                     <span>{item}</span>
                   </li>
@@ -120,9 +120,10 @@ export default function HowItWorks() {
                 program fit. No sales pressure — just an honest conversation.
               </p>
               <Link
-                href={process.env.NEXT_PUBLIC_CALENDLY_URL || '#contact'}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={process.env.NEXT_PUBLIC_CALENDLY_URL || '#enroll'}
+                {...(process.env.NEXT_PUBLIC_CALENDLY_URL
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : {})}
                 className="inline-block font-body font-semibold text-[15px] bg-white text-forest px-6 py-3.5 rounded-full transition-colors duration-200 hover:bg-sage-pale"
               >
                 Book a Free Discovery Call &rarr;

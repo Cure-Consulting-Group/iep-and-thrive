@@ -31,7 +31,7 @@ export default function WhySection() {
   ];
 
   return (
-    <section id="why" className="bg-cream px-8 py-16 md:px-20 md:py-20">
+    <section id="why" className="bg-cream px-8 py-12 md:px-20 md:py-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-12">
@@ -54,7 +54,7 @@ export default function WhySection() {
                   <h4 className="font-display font-bold text-[1.25rem] text-text">
                     {f.title}
                   </h4>
-                  <p className="mt-1.5 text-[15px] leading-[1.65] text-warm-gray">
+                  <p className="mt-1.5 text-[15px] leading-[1.6] text-warm-gray">
                     {f.desc}
                   </p>
                 </div>
@@ -80,7 +80,7 @@ export default function WhySection() {
 
             {/* Card 2 — Credentials */}
             <div className="rounded-[16px] bg-sage-pale p-7">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-forest-light mb-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-forest-light mb-4">
                 Credentials &amp; Training
               </p>
               <ul className="space-y-3">
@@ -103,7 +103,7 @@ export default function WhySection() {
                         />
                       </svg>
                     </span>
-                    <span className="text-[14px] text-forest font-medium">
+                    <span className="text-[15px] text-forest font-medium">
                       {c}
                     </span>
                   </li>

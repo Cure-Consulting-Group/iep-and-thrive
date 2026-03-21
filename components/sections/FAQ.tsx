@@ -93,7 +93,7 @@ function FAQCard({
         }}
       >
         <div className="overflow-hidden">
-          <p className="pt-3 text-[14px] leading-[1.65] text-warm-gray">
+          <p className="pt-3 text-[15px] leading-[1.6] text-warm-gray">
             {answer}
           </p>
         </div>
@@ -114,7 +114,7 @@ export default function FAQ() {
   const rightFaqs = faqs.slice(4);
 
   return (
-    <section id="faq" className="bg-cream-deep px-8 py-12 md:px-20 md:py-20">
+    <section id="faq" className="bg-cream-deep px-8 py-12 md:px-[5rem] md:py-[5rem]">
       <SectionHeader
         eyebrow="Common Questions"
         title="Everything parents ask before enrolling."

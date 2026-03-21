@@ -1,5 +1,7 @@
 'use client'
 
+// NOTE: metadata for this page is in app/contact/layout.tsx
+
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,6 +10,7 @@ import { contactSchema, type ContactFormData } from '@/lib/validations'
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const {
     register,
@@ -22,6 +25,7 @@ export default function ContactPage() {
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true)
+    setSubmitError(null)
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -30,9 +34,11 @@ export default function ContactPage() {
       })
       if (res.ok) {
         setSubmitted(true)
+      } else {
+        setSubmitError('Something went wrong. Please try again or email us directly.')
       }
     } catch {
-      // Handle error silently
+      setSubmitError('Network error. Please check your connection and try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -202,6 +208,9 @@ export default function ContactPage() {
                     >
                       {isSubmitting ? 'Sending...' : 'Send Message →'}
                     </button>
+                    {submitError && (
+                      <p className="text-red-600 text-sm text-center mt-2">{submitError}</p>
+                    )}
                   </div>
                 </form>
               )}
