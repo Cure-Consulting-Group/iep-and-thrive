@@ -6,6 +6,7 @@ import { enrollmentSchema, type EnrollmentFormData } from '@/lib/validations'
 import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { trackEnrollmentSubmit } from '@/lib/analytics'
 
 const gradeOptions = [
   { value: 'K', label: 'Kindergarten' },
@@ -70,6 +71,7 @@ export default function EnrollmentForm() {
         throw new Error(result.error || 'Something went wrong')
       }
 
+      trackEnrollmentSubmit(data.programInterest)
       router.push('/success')
     } catch (err) {
       setServerError(
@@ -142,11 +144,13 @@ export default function EnrollmentForm() {
                     id="parentName"
                     type="text"
                     {...register('parentName')}
+                    aria-invalid={errors.parentName ? 'true' : undefined}
+                    aria-describedby={errors.parentName ? 'error-parentName' : undefined}
                     className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-text placeholder:text-text-muted/50 outline-none focus:ring-2 focus:ring-forest-mid transition-all duration-200"
                     placeholder="Full name"
                   />
                   {errors.parentName && (
-                    <p className="mt-1 text-xs text-red-600">{errors.parentName.message}</p>
+                    <p id="error-parentName" className="mt-1 text-xs text-red-600">{errors.parentName.message}</p>
                   )}
                 </div>
                 <div>
@@ -157,11 +161,13 @@ export default function EnrollmentForm() {
                     id="email"
                     type="email"
                     {...register('email')}
+                    aria-invalid={errors.email ? 'true' : undefined}
+                    aria-describedby={errors.email ? 'error-email' : undefined}
                     className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-text placeholder:text-text-muted/50 outline-none focus:ring-2 focus:ring-forest-mid transition-all duration-200"
                     placeholder="you@email.com"
                   />
                   {errors.email && (
-                    <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
+                    <p id="error-email" className="mt-1 text-xs text-red-600">{errors.email.message}</p>
                   )}
                 </div>
               </div>
@@ -176,11 +182,13 @@ export default function EnrollmentForm() {
                     id="phone"
                     type="tel"
                     {...register('phone')}
+                    aria-invalid={errors.phone ? 'true' : undefined}
+                    aria-describedby={errors.phone ? 'error-phone' : undefined}
                     className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-text placeholder:text-text-muted/50 outline-none focus:ring-2 focus:ring-forest-mid transition-all duration-200"
                     placeholder="(555) 000-0000"
                   />
                   {errors.phone && (
-                    <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>
+                    <p id="error-phone" className="mt-1 text-xs text-red-600">{errors.phone.message}</p>
                   )}
                 </div>
                 <div>
@@ -190,6 +198,8 @@ export default function EnrollmentForm() {
                   <select
                     id="childGrade"
                     {...register('childGrade')}
+                    aria-invalid={errors.childGrade ? 'true' : undefined}
+                    aria-describedby={errors.childGrade ? 'error-childGrade' : undefined}
                     className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-text outline-none focus:ring-2 focus:ring-forest-mid transition-all duration-200 appearance-none"
                     defaultValue=""
                   >
@@ -203,7 +213,7 @@ export default function EnrollmentForm() {
                     ))}
                   </select>
                   {errors.childGrade && (
-                    <p className="mt-1 text-xs text-red-600">{errors.childGrade.message}</p>
+                    <p id="error-childGrade" className="mt-1 text-xs text-red-600">{errors.childGrade.message}</p>
                   )}
                 </div>
               </div>
@@ -216,6 +226,8 @@ export default function EnrollmentForm() {
                 <select
                   id="programInterest"
                   {...register('programInterest')}
+                  aria-invalid={errors.programInterest ? 'true' : undefined}
+                  aria-describedby={errors.programInterest ? 'error-programInterest' : undefined}
                   className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-text outline-none focus:ring-2 focus:ring-forest-mid transition-all duration-200 appearance-none"
                   defaultValue=""
                 >
@@ -229,7 +241,7 @@ export default function EnrollmentForm() {
                   ))}
                 </select>
                 {errors.programInterest && (
-                  <p className="mt-1 text-xs text-red-600">{errors.programInterest.message}</p>
+                  <p id="error-programInterest" className="mt-1 text-xs text-red-600">{errors.programInterest.message}</p>
                 )}
               </div>
 
@@ -241,6 +253,8 @@ export default function EnrollmentForm() {
                 <select
                   id="learningChallenge"
                   {...register('learningChallenge')}
+                  aria-invalid={errors.learningChallenge ? 'true' : undefined}
+                  aria-describedby={errors.learningChallenge ? 'error-learningChallenge' : undefined}
                   className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-text outline-none focus:ring-2 focus:ring-forest-mid transition-all duration-200 appearance-none"
                   defaultValue=""
                 >
@@ -254,7 +268,7 @@ export default function EnrollmentForm() {
                   ))}
                 </select>
                 {errors.learningChallenge && (
-                  <p className="mt-1 text-xs text-red-600">{errors.learningChallenge.message}</p>
+                  <p id="error-learningChallenge" className="mt-1 text-xs text-red-600">{errors.learningChallenge.message}</p>
                 )}
               </div>
 

@@ -5,6 +5,7 @@ import Nav from '@/components/layout/Nav'
 import UrgencyBanner from '@/components/layout/UrgencyBanner'
 import Footer from '@/components/layout/Footer'
 import { AuthProvider } from '@/lib/auth-context'
+import GoogleAnalytics from '@/components/layout/GoogleAnalytics'
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -42,11 +43,16 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/og-image.png',
-        width: 1024,
-        height: 1024,
+        width: 1200,
+        height: 630,
         alt: 'IEP & Thrive — SPED Summer Intensive · Long Island, NY',
       },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'IEP & Thrive — SPED Summer Intensive',
+    description: 'Your child deserves a summer that builds — not breaks.',
   },
 }
 
@@ -61,6 +67,7 @@ export default function RootLayout({
       className={`${playfairDisplay.variable} ${dmSans.variable}`}
     >
       <body className="font-body bg-cream text-text antialiased">
+        <GoogleAnalytics />
         <AuthProvider>
           <a href="#main" className="skip-to-content">
             Skip to main content

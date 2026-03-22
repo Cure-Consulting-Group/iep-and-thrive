@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import SectionHeader from "../ui/SectionHeader";
+import { trackFAQItemOpened } from "@/lib/analytics";
 
 const faqs = [
   {
@@ -51,18 +52,22 @@ function FAQCard({
   answer,
   isOpen,
   onToggle,
+  index,
 }: {
   question: string;
   answer: string;
   isOpen: boolean;
   onToggle: () => void;
+  index: number;
 }) {
+  const answerId = `faq-answer-${index}`;
   return (
     <div className="rounded-[14px] bg-white p-5 transition-shadow duration-200 hover:shadow-[0_8px_32px_rgba(27,67,50,0.10)]">
       <button
         onClick={onToggle}
         className="flex w-full items-start justify-between gap-3 text-left"
         aria-expanded={isOpen}
+        aria-controls={answerId}
       >
         <span className="text-[15px] font-bold leading-snug text-text">
           {question}
@@ -87,6 +92,8 @@ function FAQCard({
         </span>
       </button>
       <div
+        id={answerId}
+        role="region"
         className="grid transition-[grid-template-rows] duration-200 ease-in-out"
         style={{
           gridTemplateRows: isOpen ? "1fr" : "0fr",
@@ -106,6 +113,9 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const handleToggle = (index: number) => {
+    if (openIndex !== index) {
+      trackFAQItemOpened(faqs[index].question);
+    }
     setOpenIndex(openIndex === index ? null : index);
   };
 
@@ -130,6 +140,7 @@ export default function FAQ() {
               answer={faq.answer}
               isOpen={openIndex === i}
               onToggle={() => handleToggle(i)}
+              index={i}
             />
           ))}
         </div>
@@ -141,6 +152,7 @@ export default function FAQ() {
               answer={faq.answer}
               isOpen={openIndex === i + 4}
               onToggle={() => handleToggle(i + 4)}
+              index={i + 4}
             />
           ))}
         </div>

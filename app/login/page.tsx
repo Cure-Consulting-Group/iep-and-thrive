@@ -13,6 +13,22 @@ export default function LoginPage() {
   const { signIn, signInWithGoogle } = useAuth()
   const router = useRouter()
 
+  const redirectAfterLogin = async () => {
+    // Check Firestore profile to determine redirect
+    const { doc, getDoc } = await import('firebase/firestore')
+    const { db } = await import('@/lib/firebase')
+    const { auth: firebaseAuth } = await import('@/lib/firebase')
+    const uid = firebaseAuth.currentUser?.uid
+    if (uid) {
+      const snap = await getDoc(doc(db, 'users', uid))
+      if (snap.exists() && snap.data().role === 'admin') {
+        router.push('/admin')
+        return
+      }
+    }
+    router.push('/portal')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -20,7 +36,7 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password)
-      router.push('/portal')
+      await redirectAfterLogin()
     } catch (err: unknown) {
       const firebaseError = err as { code?: string }
       if (firebaseError.code === 'auth/user-not-found' || firebaseError.code === 'auth/wrong-password' || firebaseError.code === 'auth/invalid-credential') {
@@ -39,7 +55,7 @@ export default function LoginPage() {
     setError('')
     try {
       await signInWithGoogle()
-      router.push('/portal')
+      await redirectAfterLogin()
     } catch {
       setError('Google sign-in failed. Please try again.')
     }

@@ -4,6 +4,7 @@ export const metadata = {
   title: 'Privacy Policy | IEP & Thrive',
   description:
     'Privacy policy for the IEP & Thrive website — how we collect, use, and protect your personal information.',
+  robots: 'noindex',
 }
 
 export default function PrivacyPage() {

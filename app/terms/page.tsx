@@ -4,6 +4,7 @@ export const metadata = {
   title: 'Terms of Service | IEP & Thrive',
   description:
     'Terms of service for the IEP & Thrive website and SPED summer intensive program.',
+  robots: 'noindex',
 }
 
 export default function TermsPage() {

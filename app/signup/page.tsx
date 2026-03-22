@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { trackSignupCompleted } from '@/lib/analytics'
 
 export default function SignUpPage() {
   const [name, setName] = useState('')
@@ -32,6 +33,7 @@ export default function SignUpPage() {
     setLoading(true)
     try {
       await signUp(email, password, name)
+      trackSignupCompleted()
       router.push('/portal')
     } catch (err: unknown) {
       const firebaseError = err as { code?: string }

@@ -41,7 +41,7 @@ export default function Footer() {
           </div>
 
           {/* Column 2 — Program */}
-          <div>
+          <nav aria-label="Program links">
             <h4 className="mb-4 text-sm font-semibold text-white/80 font-body">
               Program
             </h4>
@@ -57,10 +57,10 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Column 3 — Enroll */}
-          <div>
+          <nav aria-label="Enrollment links">
             <h4 className="mb-4 text-sm font-semibold text-white/80 font-body">
               Enroll
             </h4>
@@ -76,10 +76,10 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Column 4 — Contact */}
-          <div>
+          <nav aria-label="Contact links">
             <h4 className="mb-4 text-sm font-semibold text-white/80 font-body">
               Contact
             </h4>
@@ -95,7 +95,7 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
         </div>
       </div>
 

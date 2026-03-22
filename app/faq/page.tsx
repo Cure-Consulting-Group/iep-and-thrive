@@ -7,9 +7,84 @@ export const metadata = {
     'Common questions about IEP & Thrive summer intensive programs — enrollment, cohort grouping, deposits, location, progress reports, and more.',
 }
 
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Does my child need to have an IEP to enroll?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. Students with active IEPs, 504 Plans, or documented learning differences are all welcome. We\'ll discuss the right fit on your discovery call.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How are cohorts grouped?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'We group by learning profile and primary intervention need — not just grade level. A 3rd and 4th grader with similar reading goals will have a better experience together than two 3rd graders with very different needs.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the deposit and refund policy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A 25% non-refundable deposit holds your spot. The remaining balance is due 2 weeks before program start. If we cancel a session due to an emergency, we credit or reschedule.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Where is the program located?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'We operate out of a dedicated community space on Long Island (Nassau/Suffolk). Exact location provided upon enrollment. We are not a home-based program.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Will the progress reports help at my child\'s IEP meeting?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes — that\'s by design. Weekly reports track goal attainment using the same language and format districts use. The final report gives you documented summer progress data that schools must consider.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I use FSA or HSA funds?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Educational therapy for a diagnosed learning disability may qualify as a medical expense. We recommend confirming with your benefits administrator. We provide itemized receipts for all payments.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What if my child needs 1:1 support?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Our group program is designed for students who can work in small groups (2–6 peers). If your child requires 1:1 instruction, we offer a limited number of individual sessions — ask about availability on your discovery call.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'When does Summer 2026 enrollment close?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Early enrollment closes April 30, 2026. Cohorts typically fill by May. We recommend reserving early — once a cohort reaches 6 students, it is closed and families go to a waitlist.',
+      },
+    },
+  ],
+}
+
 export default function FAQPage() {
   return (
     <main id="main">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* Intro */}
       <section className="bg-cream py-16 px-4 md:px-20">
         <div className="max-w-3xl mx-auto text-center">

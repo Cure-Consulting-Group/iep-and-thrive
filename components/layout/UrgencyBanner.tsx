@@ -25,6 +25,8 @@ export default function UrgencyBanner() {
     <div
       className="bg-amber text-white font-body"
       style={{ fontSize: '13px', fontWeight: 500, padding: '10px 2rem' }}
+      role="status"
+      aria-label="Enrollment announcement"
     >
       <div className="mx-auto flex items-center justify-between max-w-7xl">
         <p className="text-center flex-1">
@@ -35,7 +37,7 @@ export default function UrgencyBanner() {
         </p>
         <button
           onClick={handleDismiss}
-          aria-label="Dismiss banner"
+          aria-label="Dismiss announcement"
           className="ml-4 flex-shrink-0 text-white/80 hover:text-white transition-colors duration-200"
         >
           <svg

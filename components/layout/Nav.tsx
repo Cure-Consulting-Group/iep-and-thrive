@@ -98,7 +98,7 @@ export default function Nav() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-40 bg-cream">
+        <div className="md:hidden fixed inset-0 top-16 z-40 bg-cream" role="dialog" aria-label="Navigation menu">
           <div className="flex flex-col items-center justify-center gap-8 pt-16">
             {navLinks.map((link) => (
               <a

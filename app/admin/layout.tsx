@@ -12,6 +12,7 @@ const adminLinks = [
   { label: 'Pipeline', href: '/admin/pipeline', icon: '🔀' },
   { label: 'Bookings', href: '/admin/bookings', icon: '📅' },
   { label: 'Slots', href: '/admin/slots', icon: '🕐' },
+  { label: 'Curriculum', href: '/admin/curriculum', icon: '📖' },
   { label: 'Resources', href: '/admin/resources', icon: '📁' },
   { label: 'Reports', href: '/admin/reports', icon: '📈' },
 ]
@@ -57,7 +58,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           {/* Sidebar */}
           <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-border bg-white min-h-[calc(100vh-4rem)] p-4 gap-1">
             {adminLinks.map((link) => {
-              const isActive = pathname === link.href
+              const isActive = pathname === link.href || (link.href !== '/admin' && pathname.startsWith(link.href))
               return (
                 <Link
                   key={link.href}

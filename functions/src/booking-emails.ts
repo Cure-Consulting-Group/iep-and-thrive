@@ -15,6 +15,10 @@ import {
   bookingReminderTemplate,
   bookingCancellationTemplate,
 } from "./email-templates";
+import {
+  createCalendarEvent,
+  deleteCalendarEvent,
+} from "./calendar-sync";
 
 // ─── On Booking Created → Send Confirmation ───
 
@@ -61,6 +65,18 @@ export const onBookingCreated = onDocumentCreated(
       "booking_confirmation",
       sent
     );
+
+    // Create Google Calendar event
+    await createCalendarEvent({
+      bookingId: event.params.bookingId,
+      parentName: booking.parentName || "Parent",
+      studentName: booking.studentName || "Student",
+      parentEmail,
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+      type: booking.type || "consultation",
+    });
   }
 );
 
@@ -102,6 +118,11 @@ export const onBookingUpdated = onDocumentUpdated(
         "booking_cancellation",
         sent
       );
+
+      // Delete Google Calendar event if one exists
+      if (afterData.calendarEventId) {
+        await deleteCalendarEvent(afterData.calendarEventId);
+      }
     }
   }
 );

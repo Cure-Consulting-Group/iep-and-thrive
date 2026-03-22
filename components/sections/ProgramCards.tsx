@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
+import { trackStripeCheckoutClick } from '@/lib/analytics'
 
 const checkIcon = (
   <svg className="w-4 h-4 text-forest-light flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -31,6 +32,7 @@ function ProgramCard({ tag, title, description, price, ctaLabel, program, includ
 
   const handleCheckout = async () => {
     setLoading(true)
+    trackStripeCheckoutClick(program)
     try {
       const res = await fetch(`${CLOUD_FUNCTIONS.stripeCheckout}?program=${program}`)
       const data = await res.json()
@@ -53,6 +55,7 @@ function ProgramCard({ tag, title, description, price, ctaLabel, program, includ
           ? 'bg-forest text-white'
           : 'bg-white'
       }`}
+      aria-label={`${title} program`}
     >
       {/* Tag */}
       <span
@@ -76,11 +79,11 @@ function ProgramCard({ tag, title, description, price, ctaLabel, program, includ
       </p>
 
       {/* Price */}
-      <div className="mb-6">
-        <span className={`font-display text-[1.6rem] font-bold ${featured ? 'text-sage' : 'text-forest'}`}>
+      <div className="mb-6" aria-label={`Price: ${price} per student for 6 weeks`}>
+        <span className={`font-display text-[1.6rem] font-bold ${featured ? 'text-sage' : 'text-forest'}`} aria-hidden="true">
           {price}
         </span>
-        <span className={`text-[13px] ml-2 ${featured ? 'text-white/50' : 'text-text-muted'}`}>
+        <span className={`text-[13px] ml-2 ${featured ? 'text-white/50' : 'text-text-muted'}`} aria-hidden="true">
           per student · 6 weeks
         </span>
       </div>

@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { trackDiscoveryCallClick } from '@/lib/analytics'
 
 const checkIcon = (
   <svg className="w-4 h-4 text-forest-light flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -124,6 +127,7 @@ export default function HowItWorks() {
                 {...(process.env.NEXT_PUBLIC_CALENDLY_URL
                   ? { target: '_blank', rel: 'noopener noreferrer' }
                   : {})}
+                onClick={() => trackDiscoveryCallClick('how_it_works')}
                 className="inline-block font-body font-semibold text-[15px] bg-white text-forest px-6 py-3.5 rounded-full transition-colors duration-200 hover:bg-sage-pale"
               >
                 Book a Free Discovery Call &rarr;

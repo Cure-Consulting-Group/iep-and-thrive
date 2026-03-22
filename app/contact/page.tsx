@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { contactSchema, type ContactFormData } from '@/lib/validations'
 import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
+import { trackContactSubmit, trackDiscoveryCallClick } from '@/lib/analytics'
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -34,6 +35,7 @@ export default function ContactPage() {
         body: JSON.stringify(data),
       })
       if (res.ok) {
+        trackContactSubmit(data.type)
         setSubmitted(true)
       } else {
         setSubmitError('Something went wrong. Please try again or email us directly.')
@@ -98,6 +100,7 @@ export default function ContactPage() {
                     href={calendlyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackDiscoveryCallClick('contact_page')}
                     className="inline-block bg-forest text-white font-semibold text-sm px-6 py-3 rounded-full hover:bg-forest-mid transition-colors duration-200"
                   >
                     Book a Discovery Call →

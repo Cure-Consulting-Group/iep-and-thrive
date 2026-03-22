@@ -22,7 +22,8 @@ export default function AboutFounder() {
           <div
             className="w-full rounded-[20px] bg-sage-pale"
             style={{ aspectRatio: "4 / 5" }}
-            aria-label="Founder photo placeholder"
+            role="img"
+            aria-label="Founder portrait placeholder"
           />
           {/* Floating Badge */}
           <div className="absolute bottom-4 right-4 flex flex-col items-center rounded-[16px] bg-forest px-5 py-4 text-white shadow-lg">

@@ -28,7 +28,7 @@ export default function Hero() {
           {/* Eyebrow Pill */}
           <div className="animate-fade-up animation-delay-100">
             <span className="inline-flex items-center gap-2 rounded-full bg-sage-pale px-4 py-1.5 text-forest text-[10px] font-semibold uppercase tracking-[0.1em]">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-forest-light" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-forest-light" aria-hidden="true" />
               SPED Summer Intensive &middot; Long Island, NY
             </span>
           </div>
@@ -84,7 +84,7 @@ export default function Hero() {
         </div>
 
         {/* Right Column — Forest Panel */}
-        <div className="bg-forest flex items-center justify-center px-8 py-12 md:px-10 md:py-16">
+        <div className="bg-forest flex items-center justify-center px-8 py-12 md:px-10 md:py-16" aria-label="Program overview and statistics">
           <div
             className="w-full max-w-md rounded-[20px] p-8"
             style={{

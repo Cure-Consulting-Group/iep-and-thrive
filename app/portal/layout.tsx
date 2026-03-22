@@ -36,6 +36,17 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
             </div>
 
             <div className="flex items-center gap-4">
+              {profile?.role === 'admin' && (
+                <>
+                  <Link
+                    href="/admin"
+                    className="text-sm font-body font-semibold text-forest hover:text-forest-mid transition-colors"
+                  >
+                    Admin Dashboard
+                  </Link>
+                  <span className="text-text-muted/30">|</span>
+                </>
+              )}
               <span className="hidden sm:inline text-sm font-body text-text-muted">
                 {profile?.displayName || profile?.email}
               </span>
