@@ -5,6 +5,7 @@ import ProgramCards from '@/components/sections/ProgramCards'
 import HowItWorks from '@/components/sections/HowItWorks'
 import Testimonials from '@/components/sections/Testimonials'
 import AboutFounder from '@/components/sections/AboutFounder'
+import SummerGuideCTA from '@/components/sections/SummerGuideCTA'
 import FAQ from '@/components/sections/FAQ'
 import EnrollmentForm from '@/components/sections/EnrollmentForm'
 
@@ -40,6 +41,7 @@ export default function Home() {
       <ProgramCards />
       <HowItWorks />
       <Testimonials />
+      <SummerGuideCTA />
       <AboutFounder />
       <FAQ />
       <EnrollmentForm />
