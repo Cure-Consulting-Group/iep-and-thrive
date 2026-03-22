@@ -24,6 +24,9 @@ export type EmailTemplateType =
   | "booking_confirmation"
   | "booking_reminder"
   | "booking_cancellation"
+  | "guide_delivery"
+  | "guide_drip_2"
+  | "guide_drip_3"
   | "general";
 
 // ─── Gmail API Setup ───

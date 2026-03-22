@@ -19,3 +19,7 @@ export {
   onBookingUpdated,
   sendBookingReminders,
 } from "./booking-emails";
+
+// ─── Summer Guide Lead Capture + Drip ───
+export { summerGuideCapture } from "./summer-guide-capture";
+export { summerGuideDrip } from "./summer-guide-drip";
