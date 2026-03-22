@@ -12,6 +12,7 @@ admin.initializeApp();
 export { contact } from "./contact";
 export { enroll } from "./enroll";
 export { stripeCheckout } from "./stripe-checkout";
+export { stripeWebhook } from "./stripe-webhook";
 
 // ─── S4-02: Booking Email Triggers ───
 export {

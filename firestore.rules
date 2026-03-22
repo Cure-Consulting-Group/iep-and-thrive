@@ -67,5 +67,11 @@ service cloud.firestore {
     match /emailLog/{emailId} {
       allow read, write: if isAdmin();
     }
+
+    // Guide leads — server-only (Cloud Functions use Admin SDK, bypassing rules)
+    // Deny all client-side access; no public reads or writes
+    match /guideLeads/{leadId} {
+      allow read, write: if false;
+    }
   }
 }

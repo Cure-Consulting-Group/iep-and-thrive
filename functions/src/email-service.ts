@@ -27,6 +27,9 @@ export type EmailTemplateType =
   | "guide_delivery"
   | "guide_drip_2"
   | "guide_drip_3"
+  | "deposit_confirmation"
+  | "balance_confirmation"
+  | "operator_payment_notification"
   | "general";
 
 // ─── Gmail API Setup ───
