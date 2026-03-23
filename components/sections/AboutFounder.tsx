@@ -14,7 +14,7 @@ export default function AboutFounder() {
     <section id="about" className="bg-cream px-8 py-12 md:px-[5rem] md:py-[5rem]">
       <SectionHeader
         eyebrow="About the Founder"
-        title="A SPED interventionist who built this for the families she couldn't stop thinking about."
+        title="She left the system. She didn't leave the families."
       />
 
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 md:grid-cols-2">
@@ -44,23 +44,24 @@ export default function AboutFounder() {
         <div className="flex flex-col justify-center">
           <div className="space-y-5 text-[15px] leading-[1.7] text-warm-gray">
             <p>
-              After 8+ years as a Special Education Interventionist with the NYC
-              Department of Education, I&apos;ve sat at more CSE tables than I can
-              count. I&apos;ve written hundreds of IEPs, advocated for students in
-              meetings, and watched families walk away not knowing what their
-              children were actually entitled to.
+              Eight years inside the NYC Department of Education. Hundreds of
+              IEPs written. More CSE meetings than I can count. And one thing I
+              could never shake: the look on a parent&apos;s face when they
+              realized nobody was going to fight for their child the way they
+              needed.
             </p>
             <p>
-              I built IEP &amp; Thrive because every summer, I watched the progress
-              we&apos;d made during the school year disappear by September. The kids
-              who needed continuity the most were getting nothing — or worse, generic
-              tutoring that didn&apos;t speak their language.
+              Every June, I watched the same story repeat. A child who had
+              finally started to click — reading with confidence, solving problems
+              independently — would come back in September as if the year had
+              never happened. The regression was predictable. The lack of summer
+              options was inexcusable.
             </p>
             <p>
-              This program is what I wish I could have handed every family I worked
-              with. Small groups. Real evidence-based methods. Aligned to your
-              child&apos;s actual IEP. And a final report you can walk into
-              September with.
+              So I built the program I wished I could have handed every family
+              who sat across from me at that table. Small groups. Evidence-based
+              methods. Curriculum mapped to your child&apos;s actual IEP. And a
+              final report that makes the school team take notice.
             </p>
           </div>
 

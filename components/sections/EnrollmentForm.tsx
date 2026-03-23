@@ -30,11 +30,11 @@ const challengeOptions = [
 ]
 
 const features = [
-  { icon: '\u{1F4C5}', text: 'Program dates: July 7 \u2013 August 15, 2026 \u00B7 Mon\u2013Fri, 9am\u20131pm' },
-  { icon: '\u{1F4CD}', text: 'Long Island, NY \u00B7 Nassau/Suffolk \u00B7 Exact location shared upon enrollment' },
-  { icon: '\u{1F4B3}', text: 'Secure Stripe payment \u00B7 25% deposit to hold spot \u00B7 Balance due June 23' },
-  { icon: '\u{1F4DE}', text: 'Not ready to commit? Book a free discovery call instead \u2014 no pressure' },
-  { icon: '\u{1F3E2}', text: 'A program of IEP & Thrive, powered by Cure Consulting Group' },
+  { icon: '\u{1F4C5}', text: 'July 7 \u2013 August 15, 2026 \u00B7 Mon\u2013Fri, 9 AM\u20131 PM \u00B7 120 hours of direct instruction' },
+  { icon: '\u{1F4CD}', text: 'Long Island, NY \u00B7 Nassau/Suffolk \u00B7 Location details shared upon enrollment' },
+  { icon: '\u{1F4B3}', text: '25% deposit reserves your seat \u00B7 Balance due June 23 \u00B7 Secure payment via Stripe' },
+  { icon: '\u{1F4DE}', text: 'Not sure yet? Book a free 20-minute discovery call \u2014 zero commitment, real answers' },
+  { icon: '\u{1F3E2}', text: 'A program of IEP & Thrive, operated by Cure Consulting Group' },
 ]
 
 export default function EnrollmentForm() {
@@ -97,11 +97,16 @@ export default function EnrollmentForm() {
             <h2 className="font-display text-white font-bold tracking-tight leading-tight mb-4"
               style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', letterSpacing: '-0.025em', lineHeight: 1.18 }}
             >
-              Reserve your child&rsquo;s spot for Summer 2026.
+              This is the summer your child stops falling behind.
             </h2>
+            <p className="text-base leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.80)' }}>
+              Every September, parents of children with IEPs face the same question: <em style={{ color: '#B7E4C7' }}>How much did we lose?</em> This
+              program exists so you never have to ask it again.
+            </p>
             <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.65)' }}>
-              Cohorts fill quickly. Complete the form and we&rsquo;ll reach out within 24 hours to
-              confirm fit and send your deposit link.
+              Six seats. Six weeks. One credentialed interventionist who has already read
+              your child&rsquo;s IEP before day one. Complete the inquiry below and
+              we&rsquo;ll be in touch within 24 hours to talk about fit &mdash; not to sell you anything.
             </p>
 
             <ul className="space-y-4">
@@ -125,7 +130,7 @@ export default function EnrollmentForm() {
               className="font-display font-bold mb-6"
               style={{ fontSize: '1.3rem' }}
             >
-              Student Enrollment Inquiry
+              Start Your Child&rsquo;s Enrollment
             </h3>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -299,9 +304,9 @@ export default function EnrollmentForm() {
 
               {/* Note */}
               <p className="text-xs text-text-muted leading-relaxed text-center">
-                By submitting, you agree to be contacted about program availability.
-                A 25% deposit will be required to confirm enrollment. Spots are not
-                held without a deposit.
+                This is an inquiry &mdash; not a commitment. We&rsquo;ll reach out to discuss
+                your child&rsquo;s needs before any payment is requested. A 25% deposit
+                holds your seat once we&rsquo;ve confirmed fit together.
               </p>
             </form>
           </div>

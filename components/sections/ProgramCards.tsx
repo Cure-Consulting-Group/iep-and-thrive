@@ -122,7 +122,7 @@ const programs: ProgramCardProps[] = [
     tag: 'Literacy Focus',
     title: 'Reading & Language Intensive',
     description:
-      'Structured literacy, phonics, decoding, and fluency. Ideal for students with dyslexia, phonological processing challenges, or reading delays.',
+      'For the child who struggles to decode, freezes at new words, or reads far below grade level. Structured literacy through Orton-Gillingham — the approach the research actually supports.',
     price: '$3,500',
     ctaLabel: 'Enroll — $875 Deposit',
     program: 'reading',
@@ -138,7 +138,7 @@ const programs: ProgramCardProps[] = [
     tag: 'Most Popular',
     title: 'Full Academic Intensive',
     description:
-      'Literacy + math intervention + executive function + SEL. The complete program, designed to prevent summer regression and build for fall success.',
+      'Reading, math, executive function, and social-emotional learning — the full intervention your child needs to walk into September stronger than they left in June.',
     price: '$4,000',
     ctaLabel: 'Enroll — $1,000 Deposit',
     program: 'full',
@@ -157,7 +157,7 @@ const programs: ProgramCardProps[] = [
     tag: 'Math Focus',
     title: 'Math & Numeracy Intensive',
     description:
-      'Number sense, numeracy, word problems, and applied math. For students with dyscalculia, math anxiety, or IEP goals targeting math fluency.',
+      'For the child who shuts down at word problems, counts on fingers past third grade, or has math goals the school year barely touched. Concrete tools, real understanding.',
     price: '$3,500',
     ctaLabel: 'Enroll — $875 Deposit',
     program: 'math',
@@ -180,11 +180,11 @@ export default function ProgramCards() {
           Summer 2026 Programs
         </span>
         <h2 className="font-display text-[clamp(1.8rem,3vw,2.6rem)] font-bold tracking-[-0.025em] leading-[1.18] text-text mb-4">
-          Choose the right fit for your child.
+          Three programs. One standard: your child&apos;s IEP goals.
         </h2>
         <p className="text-[16px] leading-[1.7] text-warm-gray max-w-2xl mx-auto">
-          All programs are IEP-aligned, small-group, and led by a credentialed SPED
-          interventionist. Grouped by learning profile.
+          Every track is small-group, evidence-based, and led by a credentialed SPED
+          interventionist. Students are grouped by learning profile — not just age.
         </p>
       </div>
 

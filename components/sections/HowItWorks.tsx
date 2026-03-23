@@ -19,31 +19,31 @@ const checkIconWhite = (
 const steps = [
   {
     number: '01',
-    title: 'Book a free 20-minute discovery call',
+    title: 'A real conversation — not a sales call',
     description:
-      'We talk through your child\'s current IEP, their goals, and what hasn\'t been working. No commitment — just a real conversation with someone who understands the system.',
+      'Twenty minutes on Zoom or phone. You tell us what\'s not working. We tell you honestly whether this program is the right fit. No pitch, no pressure — just someone who\'s been on your side of the CSE table.',
     tag: 'Free · 20 minutes · Zoom or phone',
   },
   {
     number: '02',
-    title: 'We review your child\'s IEP',
+    title: 'We read the IEP before your child walks in',
     description:
-      'You share the current IEP. We identify the right cohort placement, confirm the program match, and map your child\'s annual goals to the summer curriculum.',
+      'You share the current IEP. We map every annual goal to the summer curriculum, identify the right grouping, and build a plan that starts working on day one — not day five.',
     tag: 'IEP review included with enrollment',
   },
   {
     number: '03',
-    title: 'Reserve your spot with a deposit',
+    title: 'A deposit holds your child\'s seat',
     description:
-      'A 25% non-refundable deposit holds your child\'s place in their cohort. Remaining balance due 2 weeks before program start. Secure online payment via Stripe.',
-    tag: 'Stripe secure payment · 25% deposit',
+      '25% secures the spot. The remaining balance is due two weeks before the program starts. Simple, secure, and transparent — no hidden fees, no surprises.',
+    tag: 'Secure payment · 25% deposit',
   },
   {
     number: '04',
-    title: 'Summer — and a stronger September',
+    title: 'Six weeks that change the trajectory',
     description:
-      '6 weeks of structured intervention. Weekly progress updates. A student portfolio and final report that documents growth against IEP goals — presented at our Family Showcase and ready for fall CSE season.',
-    tag: 'Program runs July 7 – August 15, 2026',
+      '120 hours of structured intervention. Weekly data you can see. A student portfolio and comprehensive final report — presented at our Family Showcase on the last day, and ready to hand to the school team in September.',
+    tag: 'July 7 – August 15, 2026',
   },
 ]
 
@@ -69,7 +69,7 @@ export default function HowItWorks() {
             How It Works
           </span>
           <h2 className="font-display text-[clamp(1.8rem,3vw,2.6rem)] font-bold tracking-[-0.025em] leading-[1.18] text-text">
-            From first call to first day — here&apos;s the path.
+            Four steps between now and a different kind of September.
           </h2>
         </div>
 
@@ -130,11 +130,12 @@ export default function HowItWorks() {
             {/* Card 2 — Discovery Call CTA */}
             <div className="bg-forest rounded-[20px] p-8 text-white">
               <h3 className="font-display text-[1.25rem] font-bold text-white mb-3">
-                Questions before enrolling?
+                Still weighing it?
               </h3>
               <p className="text-[15px] leading-relaxed text-white/65 mb-6">
-                We offer a free 20-minute call to review your child&apos;s IEP and discuss
-                program fit. No sales pressure — just an honest conversation.
+                Talk to someone who has read hundreds of IEPs and sat through more
+                CSE meetings than most administrators. Twenty minutes, no obligation,
+                real answers.
               </p>
               <Link
                 href={process.env.NEXT_PUBLIC_CALENDLY_URL || '#enroll'}

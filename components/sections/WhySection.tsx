@@ -4,23 +4,23 @@ export default function WhySection() {
   const features = [
     {
       icon: "\uD83D\uDCCB",
-      title: "Your child\u2019s actual IEP goals \u2014 not generic content",
-      desc: "Before the program starts, we review your child\u2019s IEP and map every session to their annual goals. This is what districts charge $85K salaries for \u2014 now available privately.",
+      title: "We read the IEP before we meet your child",
+      desc: "Every session is mapped to your child\u2019s actual annual goals \u2014 not a pre-packaged curriculum. This is the kind of individualized planning districts pay $85K salaries for. Now it\u2019s yours.",
     },
     {
       icon: "\uD83D\uDCD6",
-      title: "Evidence-based structured literacy",
-      desc: "Orton-Gillingham framework. The same approach that private specialists charge $150\u2013175/hr for \u2014 embedded in every literacy block, every session.",
+      title: "The gold standard in structured literacy",
+      desc: "Orton-Gillingham isn\u2019t a buzzword here \u2014 it\u2019s the framework. The same evidence-based approach private specialists charge $150\u2013175 an hour for, built into every session.",
     },
     {
       icon: "\uD83D\uDCCA",
-      title: "Weekly progress reports you can use in September",
-      desc: "Every Friday, you receive a 2-page progress summary with specific skill data. At program end, a full report you can hand to your child\u2019s new teacher or bring to a CSE meeting.",
+      title: "Progress reports that actually mean something",
+      desc: "Every Friday, a two-page summary with real skill data lands in your inbox. By August, you\u2019ll have a CSE-ready report that makes the school team sit up and listen.",
     },
     {
       icon: "\uD83D\uDC65",
-      title: "Small groups. Maximum impact.",
-      desc: "Never more than 6 students. Grouped intentionally by learning profile, not just grade. Your child isn\u2019t lost in a classroom \u2014 they\u2019re seen, heard, and challenged at the right level.",
+      title: "Six students. That\u2019s it.",
+      desc: "No overflow. No waitlist shuffling. Six children, grouped by learning profile, working with one interventionist who knows every name, every goal, and every breakthrough.",
     },
   ];
 
@@ -39,7 +39,7 @@ export default function WhySection() {
         <div className="mb-12">
           <p className="eyebrow">Why IEP &amp; Thrive</p>
           <h2 className="mt-3 font-display font-bold">
-            Built by someone who knows the system from the inside.
+            Built by someone who sat at the CSE table — and saw what families were missing.
           </h2>
         </div>
 
@@ -69,10 +69,10 @@ export default function WhySection() {
             {/* Card 1 — Pull Quote */}
             <div className="rounded-[20px] bg-cream-deep border-l-4 border-forest p-7">
               <p className="font-display italic text-[1.3rem] leading-[1.4] text-text">
-                &ldquo;I spent years inside NYC&apos;s special education system
-                writing IEPs, attending CSE meetings, and fighting for kids who
-                deserved more. This program is what I wish had existed for those
-                families.&rdquo;
+                &ldquo;I spent years writing IEPs, sitting in CSE meetings,
+                and watching families leave confused about what their children
+                were entitled to. I built this program for every parent I
+                couldn&apos;t follow home.&rdquo;
               </p>
               <p className="mt-4 text-[13px] text-text-muted font-medium">
                 — Program Founder, SPED Interventionist, NYC DOE &middot; 8+

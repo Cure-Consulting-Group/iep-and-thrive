@@ -6,44 +6,44 @@ import { trackFAQItemOpened } from "@/lib/analytics";
 
 const faqs = [
   {
-    question: "Does my child need to have an IEP to enroll?",
+    question: "Does my child need an IEP to enroll?",
     answer:
-      "No. Students with active IEPs, 504 Plans, or documented learning differences are all welcome. We\u2019ll discuss the right fit on your discovery call.",
+      "No. Children with active IEPs, 504 Plans, or documented learning differences are all welcome. We\u2019ll talk through fit on your discovery call \u2014 the goal is the right match, not a rubber stamp.",
   },
   {
-    question: "How are cohorts grouped?",
+    question: "How do you decide who\u2019s in which group?",
     answer:
-      "We group by learning profile and primary intervention need \u2014 not just grade level. A 3rd and 4th grader with similar reading goals will have a better experience together than two 3rd graders with very different needs.",
+      "By learning profile, not birth year. A third grader and a fourth grader working on the same reading goals will learn better together than two third graders with completely different needs. Grouping is intentional.",
   },
   {
-    question: "What is the deposit and refund policy?",
+    question: "What\u2019s the deposit and refund policy?",
     answer:
-      "A 25% non-refundable deposit holds your spot. The remaining balance is due 2 weeks before program start. If we cancel a session due to an emergency, we credit or reschedule.",
+      "A 25% non-refundable deposit holds your child\u2019s seat. The remaining balance is due two weeks before the program starts. If we ever need to cancel a session, you receive a credit or a reschedule \u2014 no questions asked.",
   },
   {
-    question: "Where is the program located?",
+    question: "Where exactly is the program?",
     answer:
-      "We operate out of a dedicated community space on Long Island (Nassau/Suffolk). Exact location provided upon enrollment. We are not a home-based program.",
+      "We operate out of a dedicated instructional space on Long Island (Nassau/Suffolk). This is not a home-based program. The exact address is shared once enrollment is confirmed.",
   },
   {
-    question: "Will the progress reports help at my child\u2019s IEP meeting?",
+    question: "Can I actually use the progress reports at a CSE meeting?",
     answer:
-      "Yes \u2014 that\u2019s by design. Weekly reports track goal attainment using the same language and format districts use. The final report gives you documented summer progress data that schools must consider.",
+      "That\u2019s the entire point. Weekly reports use the same language and goal-tracking format your district uses. The final report documents measurable summer progress \u2014 data the school is required to consider.",
   },
   {
-    question: "Can I use FSA or HSA funds?",
+    question: "Does this qualify for FSA or HSA?",
     answer:
-      "Educational therapy for a diagnosed learning disability may qualify as a medical expense. We recommend confirming with your benefits administrator. We provide itemized receipts for all payments.",
+      "Educational therapy for a diagnosed learning disability may qualify as a medical expense under your plan. Check with your benefits administrator. We provide itemized receipts for every payment.",
   },
   {
-    question: "What if my child needs 1:1 support?",
+    question: "What if my child needs one-on-one support?",
     answer:
-      "Our group program is designed for students who can work in small groups (2\u20136 peers). If your child requires 1:1 instruction, we offer a limited number of individual sessions \u2014 ask about availability on your discovery call.",
+      "This program is designed for children who can work in a small group of up to six peers. If your child needs 1:1 instruction, we offer a limited number of individual sessions \u2014 ask on your discovery call.",
   },
   {
-    question: "When does Summer 2026 enrollment close?",
+    question: "When does enrollment close?",
     answer:
-      "Early enrollment closes April 30, 2026. Cohorts typically fill by May. We recommend reserving early \u2014 once a cohort reaches 6 students, it is closed and families go to a waitlist.",
+      "Early enrollment closes April 30, 2026. Historically, cohorts fill by mid-May. There is no waitlist \u2014 once six seats are taken, enrollment is closed. If you\u2019re considering it, don\u2019t wait.",
   },
 ];
 
@@ -127,7 +127,7 @@ export default function FAQ() {
     <section id="faq" className="bg-cream-deep px-8 py-12 md:px-[5rem] md:py-[5rem]">
       <SectionHeader
         eyebrow="Common Questions"
-        title="Everything parents ask before enrolling."
+        title="The questions every parent asks — and the honest answers."
       />
 
       {/* 2-column grid on desktop, 1-column on mobile */}

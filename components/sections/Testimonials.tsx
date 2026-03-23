@@ -6,21 +6,21 @@ const testimonials = [
     name: "Michelle L.",
     detail: "Parent of 3rd grader with dyslexia \u00B7 Merrick, NY",
     quote:
-      "After two summers of generic tutoring going nowhere, this program finally gave us a path. My son came back to school in September reading two levels higher. His teacher couldn\u2019t believe the difference.",
+      "Two summers of generic tutoring taught us what doesn\u2019t work. This program taught our son to read. He came back in September two levels higher, and his teacher asked us what changed. Everything.",
   },
   {
     initials: "JR",
     name: "Jennifer R.",
     detail: "Parent of 2nd grader with ADHD & reading IEP \u00B7 Wantagh, NY",
     quote:
-      "The weekly progress reports were a game-changer. I walked into our September IEP meeting with six weeks of data showing exactly what my daughter had accomplished. The school team was impressed.",
+      "For the first time, I walked into a CSE meeting with six weeks of documented progress. Not my opinion \u2014 data. The team listened differently. That alone was worth every dollar.",
   },
   {
     initials: "TK",
     name: "Tamara K.",
     detail: "Parent of 4th grader with autism & math IEP \u00B7 Bellmore, NY",
     quote:
-      "What makes this different is that she actually read my son\u2019s IEP before day one. She knew his goals, his triggers, and his strengths. He came home every day saying he had fun \u2014 and he learned.",
+      "She knew his IEP goals before he walked in the door. She knew his triggers. She knew what worked. My son came home every day and said he had fun \u2014 and I could see he was actually learning. That combination doesn\u2019t exist anywhere else.",
   },
 ];
 
@@ -41,8 +41,8 @@ export default function Testimonials() {
     <section id="testimonials" className="bg-forest px-8 py-12 md:px-[5rem] md:py-[5rem]">
       <SectionHeader
         eyebrow="Parent Stories"
-        title="What families are saying."
-        subtitle="Real results from real families — students who came in behind and left ready for September."
+        title="The parents who said yes — and what happened next."
+        subtitle="These families took a chance on a different kind of summer. Here\u2019s what they walked away with."
         align="center"
         eyebrowClassName="text-sage"
         titleClassName="text-white"

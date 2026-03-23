@@ -2,18 +2,18 @@ export default function ProblemStrip() {
   const stats = [
     {
       number: "2\u20133\u00D7",
-      title: "Faster regression for IEP students",
-      desc: "Students with learning differences lose skills over summer at 2\u20133\u00D7 the rate of general education peers. Without structured intervention, September is harder than June.",
+      title: "The regression no one warns you about",
+      desc: "Children with IEPs lose skills over summer at two to three times the rate of their peers. By September, months of hard-won progress have quietly disappeared.",
     },
     {
       number: "$0",
-      title: "Extended school year for most families",
-      desc: "Most districts deny ESY services. Parents are left searching for credentialed providers who understand IEPs \u2014 not generic tutors who read from a workbook.",
+      title: "What most districts offer for ESY",
+      desc: "The district said your child doesn\u2019t qualify. Now you\u2019re searching for someone who actually understands IEPs \u2014 not a tutor reading from a workbook they found online.",
     },
     {
       number: "1 in 5",
-      title: "Students have a learning difference",
-      desc: "Yet credentialed SPED interventionists offering private summer programming on Long Island are critically undersupplied. We\u2019re here to close that gap.",
+      title: "Kids have a learning difference",
+      desc: "On Long Island alone, tens of thousands of students need structured summer intervention. The number of credentialed providers offering it? You can count them on one hand.",
     },
   ];
 

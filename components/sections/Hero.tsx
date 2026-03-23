@@ -16,10 +16,10 @@ export default function Hero() {
   ];
 
   const features = [
-    "Structured literacy & Orton-Gillingham framework",
-    "Weekly progress reports aligned to IEP goals",
-    "Parent debrief at every Friday pickup",
-    "Final report you can bring to September CSE meeting",
+    "Orton-Gillingham structured literacy — the gold standard, not a worksheet",
+    "Weekly progress reports written in the language your CSE team uses",
+    "Friday parent debriefs — you\u2019ll never wonder what happened this week",
+    "A final report that gives you real leverage at September\u2019s CSE table",
   ];
 
   return (
@@ -37,16 +37,16 @@ export default function Hero() {
 
           {/* H1 */}
           <h1 className="mt-6 font-display font-bold animate-fade-up animation-delay-200">
-            Your child deserves a summer that{" "}
-            <em className="text-forest-mid italic">builds</em> — not breaks.
+            The summer program your child&apos;s IEP team{" "}
+            <em className="text-forest-mid italic">should</em> have built.
           </h1>
 
           {/* Subhead */}
           <p className="mt-5 text-[16px] leading-[1.7] text-warm-gray max-w-[460px] animate-fade-up animation-delay-300">
-            An evidence-based small-group intensive for students with IEPs and
-            learning differences. Led by a credentialed NYC SPED interventionist
-            who has spent years inside the system — and knows exactly what your
-            child needs.
+            Most summer programs babysit. This one intervenes. Six students,
+            one credentialed NYC SPED interventionist, and a curriculum mapped
+            directly to your child&apos;s IEP goals — so September starts with
+            momentum, not damage control.
           </p>
 
           {/* CTA Buttons */}
@@ -55,13 +55,13 @@ export default function Hero() {
               href="#enroll"
               className="inline-flex items-center rounded-full bg-forest px-6 py-3 text-white text-[15px] font-semibold transition-colors duration-200 hover:bg-forest-mid"
             >
-              Reserve a Spot for Summer 2026
+              Hold My Child&apos;s Seat
             </a>
             <a
               href="#program"
               className="inline-flex items-center rounded-full border-2 border-forest px-6 py-3 text-forest text-[15px] font-semibold transition-colors duration-200 hover:bg-forest hover:text-white"
             >
-              Learn About the Program
+              See How It Works
             </a>
           </div>
 
@@ -79,7 +79,7 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-[13px] text-warm-gray">
-                Cohorts limited to 6 students. Early enrollment closes April 30.
+                6 seats total. Early enrollment closes April 30. No waitlist — once it&apos;s full, it&apos;s full.
               </p>
             </div>
           </div>
@@ -109,8 +109,8 @@ export default function Hero() {
 
             {/* H3 */}
             <h3 className="mt-4 font-display font-semibold text-white text-[1.5rem] leading-[1.25]">
-              Everything your child&apos;s IEP calls for. Finally, a summer
-              program that delivers it.
+              What your child&apos;s IEP promises on paper, this program
+              delivers in person.
             </h3>
 
             {/* 2x2 Stat Grid */}
