@@ -27,6 +27,15 @@ yarn-error.log*
 .env
 functions/.env
 
+# firebase
+.firebase/
+
+# claude code
+.claude/
+
+# functions build
+functions/.next/
+
 # vercel
 .vercel
 

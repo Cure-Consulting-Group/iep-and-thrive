@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function SummerGuideCTA() {
@@ -32,8 +33,15 @@ export default function SummerGuideCTA() {
           </div>
 
           {/* Right — Visual card preview */}
-          <div className="hidden md:block md:col-span-2 bg-forest p-8 h-full">
-            <div className="bg-white/10 border border-white/15 rounded-xl p-5">
+          <div className="hidden md:block md:col-span-2 bg-forest p-8 h-full relative overflow-hidden">
+            <Image
+              src="/images/child-reading.jpg"
+              alt="Child reading a book at sunset"
+              fill
+              className="object-cover opacity-20"
+              sizes="40vw"
+            />
+            <div className="relative z-10 bg-white/10 border border-white/15 rounded-xl p-5">
               <p className="text-sage text-[10px] font-semibold uppercase tracking-widest mb-3">
                 Inside the guide
               </p>

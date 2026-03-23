@@ -1,3 +1,4 @@
+import Image from "next/image";
 import SectionHeader from "../ui/SectionHeader";
 
 const credentials = [
@@ -17,14 +18,17 @@ export default function AboutFounder() {
       />
 
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 md:grid-cols-2">
-        {/* Left — Image Placeholder */}
+        {/* Left — Founder Image */}
         <div className="relative">
-          <div
-            className="w-full rounded-[20px] bg-sage-pale"
-            style={{ aspectRatio: "4 / 5" }}
-            role="img"
-            aria-label="Founder portrait placeholder"
-          />
+          <div className="relative w-full rounded-[20px] overflow-hidden bg-sage-pale" style={{ aspectRatio: "4 / 5" }}>
+            <Image
+              src="/images/founder-teaching.jpg"
+              alt="Program founder — SPED interventionist and educator"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
           {/* Floating Badge */}
           <div className="absolute bottom-4 right-4 flex flex-col items-center rounded-[16px] bg-forest px-5 py-4 text-white shadow-lg">
             <span className="font-display text-[1.4rem] font-bold text-sage">

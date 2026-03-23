@@ -8,7 +8,7 @@
 ## ENROLLMENT AGREEMENT
 
 **Program:** IEP & Thrive Summer Intensive
-**Program Dates:** July 7 – August 14, 2026 (6 weeks, Mon–Thu, 9AM–1PM)
+**Program Dates:** July 7 – August 15, 2026 (6 weeks, Mon–Fri, 9AM–1PM)
 **Operator:** [Legal Entity Name, e.g., Cure Consulting Group LLC]
 
 ---

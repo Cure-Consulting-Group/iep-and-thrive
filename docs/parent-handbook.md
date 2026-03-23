@@ -23,7 +23,7 @@ Thank you for trusting me with your child's summer.
 
 | Detail | Information |
 |--------|-------------|
-| **Dates** | July 7 – August 14, 2026 |
+| **Dates** | July 7 – August 15, 2026 |
 | **Days** | Monday – Thursday |
 | **Hours** | 9:00 AM – 1:00 PM |
 | **Location** | [To be announced] |
@@ -105,7 +105,7 @@ Thank you for trusting me with your child's summer.
 | Urgent / emergency | Call: [contact phone] |
 | Schedule changes | Email with 48 hours' notice when possible |
 
-**Response time:** We aim to respond to all emails within 24 hours during the program (Mon–Thu). Weekend inquiries will be addressed on Monday.
+**Response time:** We aim to respond to all emails within 24 hours during the program (Mon–Fri). Weekend inquiries will be addressed on Monday.
 
 ---
 

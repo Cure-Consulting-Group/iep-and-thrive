@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 export default function Hero() {
   const avatars = [
     { initials: "ML" },
@@ -84,9 +86,17 @@ export default function Hero() {
         </div>
 
         {/* Right Column — Forest Panel */}
-        <div className="bg-forest flex items-center justify-center px-8 py-12 md:px-10 md:py-16" aria-label="Program overview and statistics">
+        <div className="relative bg-forest flex items-center justify-center px-8 py-12 md:px-10 md:py-16" aria-label="Program overview and statistics">
+          {/* Background image */}
+          <Image
+            src="/images/hero-kids-learning.jpg"
+            alt="Diverse students learning in a classroom"
+            fill
+            className="object-cover opacity-15"
+            priority
+          />
           <div
-            className="w-full max-w-md rounded-[20px] p-8"
+            className="relative z-10 w-full max-w-md rounded-[20px] p-8"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.08)",
               border: "1px solid rgba(255, 255, 255, 0.15)",

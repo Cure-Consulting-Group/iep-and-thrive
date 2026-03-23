@@ -300,7 +300,7 @@ export default function FinalReportTemplatePage() {
         </p>
         <p className="font-display text-3xl font-bold mb-2">{studentName || 'Student Name'}</p>
         <p className="font-body text-base text-white/70 mb-8">{TRACK_LABELS[track]}</p>
-        <p className="font-body text-sm text-white/50">July 7 – August 14, 2026</p>
+        <p className="font-body text-sm text-white/50">July 7 – August 15, 2026</p>
         {instructorName && (
           <p className="font-body text-sm text-white/50 mt-1">Prepared by {instructorName}</p>
         )}

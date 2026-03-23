@@ -9,13 +9,8 @@ import { useState } from 'react'
 import { trackEnrollmentSubmit } from '@/lib/analytics'
 
 const gradeOptions = [
-  { value: 'K', label: 'Kindergarten' },
-  { value: '1st', label: '1st Grade' },
-  { value: '2nd', label: '2nd Grade' },
-  { value: '3rd', label: '3rd Grade' },
-  { value: '4th', label: '4th Grade' },
-  { value: '5th', label: '5th Grade' },
-  { value: '6th', label: '6th Grade' },
+  { value: 'Rising 3rd', label: 'Rising 3rd Grade' },
+  { value: 'Rising 4th', label: 'Rising 4th Grade' },
 ]
 
 const programOptions = [
@@ -35,7 +30,7 @@ const challengeOptions = [
 ]
 
 const features = [
-  { icon: '\u{1F4C5}', text: 'Program dates: July 7 \u2013 August 14, 2026 \u00B7 Mon\u2013Thu, 9am\u20131pm' },
+  { icon: '\u{1F4C5}', text: 'Program dates: July 7 \u2013 August 15, 2026 \u00B7 Mon\u2013Fri, 9am\u20131pm' },
   { icon: '\u{1F4CD}', text: 'Long Island, NY \u00B7 Nassau/Suffolk \u00B7 Exact location shared upon enrollment' },
   { icon: '\u{1F4B3}', text: 'Secure Stripe payment \u00B7 25% deposit to hold spot \u00B7 Balance due June 23' },
   { icon: '\u{1F4DE}', text: 'Not ready to commit? Book a free discovery call instead \u2014 no pressure' },

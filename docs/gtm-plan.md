@@ -1,7 +1,7 @@
 # Go-to-Market Plan — IEP & Thrive
 
 **Program:** SPED Summer Intensive
-**Launch Date:** Early enrollment opens now — program runs July 7 – August 14, 2026
+**Launch Date:** Early enrollment opens now — program runs July 7 – August 15, 2026
 **Stage:** Pre-launch
 **Operator:** Sole founder + 1 hired SPED teacher (Year 1)
 
@@ -127,7 +127,7 @@
 
 **Success Criteria:** 12+ enrolled, cohort assignments finalized
 
-### Phase 3: Program Execution & Growth (July 7 → August 14)
+### Phase 3: Program Execution & Growth (July 7 → August 15)
 **Goal:** Deliver exceptional outcomes; build referral engine for Year 2
 
 - [ ] Weekly progress reports delivered every Friday

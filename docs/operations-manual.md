@@ -2,7 +2,7 @@
 
 **Program:** SPED Summer Intensive
 **Season:** Summer 2026
-**Dates:** July 7 – August 14, 2026 (6 weeks, Mon–Thu)
+**Dates:** July 7 – August 15, 2026 (6 weeks, Mon–Fri)
 **Hours:** 9:00 AM – 1:00 PM daily
 
 ---

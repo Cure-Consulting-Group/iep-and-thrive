@@ -62,8 +62,8 @@ export function depositConfirmationTemplate(data: {
       <div style="background: #D8F3DC; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Program:</strong> ${safe.program}</p>
         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Deposit Paid:</strong> ${safe.amount}</p>
-        <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Program Dates:</strong> July 7 &ndash; August 14, 2026</p>
-        <p style="margin: 0; font-size: 14px;"><strong>Schedule:</strong> Mon&ndash;Thu, 9am&ndash;1pm ET</p>
+        <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Program Dates:</strong> July 7 &ndash; August 15, 2026</p>
+        <p style="margin: 0; font-size: 14px;"><strong>Schedule:</strong> Mon&ndash;Fri, 9am&ndash;1pm ET</p>
       </div>
       <h2 style="font-family: Georgia, serif; color: #1B4332; font-size: 18px; margin-bottom: 12px;">
         What Happens Next
@@ -112,8 +112,8 @@ export function balanceConfirmationTemplate(data: {
         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Program:</strong> ${safe.program}</p>
         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Balance Paid:</strong> ${safe.amount}</p>
         <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Status:</strong> Paid in Full</p>
-        <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Program Dates:</strong> July 7 &ndash; August 14, 2026</p>
-        <p style="margin: 0; font-size: 14px;"><strong>Schedule:</strong> Mon&ndash;Thu, 9am&ndash;1pm ET</p>
+        <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Program Dates:</strong> July 7 &ndash; August 15, 2026</p>
+        <p style="margin: 0; font-size: 14px;"><strong>Schedule:</strong> Mon&ndash;Fri, 9am&ndash;1pm ET</p>
       </div>
       <h2 style="font-family: Georgia, serif; color: #1B4332; font-size: 18px; margin-bottom: 12px;">
         Getting Ready for Summer

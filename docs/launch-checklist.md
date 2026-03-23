@@ -1,6 +1,6 @@
 # Launch Checklist — IEP & Thrive
 
-**Target Launch:** Summer 2026 (July 7 – August 14)
+**Target Launch:** Summer 2026 (July 7 – August 15)
 **Status Key:** ✅ Done · ⬜ Not Started · 🔄 In Progress
 
 ---

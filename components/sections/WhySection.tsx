@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 export default function WhySection() {
   const features = [
     {
@@ -76,6 +78,17 @@ export default function WhySection() {
                 — Program Founder, SPED Interventionist, NYC DOE &middot; 8+
                 years
               </p>
+            </div>
+
+            {/* Image — Kids collaborating */}
+            <div className="relative h-44 rounded-[16px] overflow-hidden">
+              <Image
+                src="/images/kids-collaborating.jpg"
+                alt="Students working together on schoolwork"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
             </div>
 
             {/* Card 2 — Credentials */}

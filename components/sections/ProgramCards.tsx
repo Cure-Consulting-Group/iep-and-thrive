@@ -127,7 +127,7 @@ const programs: ProgramCardProps[] = [
     ctaLabel: 'Enroll — $875 Deposit',
     program: 'reading',
     includes: [
-      '4 hrs/day, Mon–Thu',
+      '4 hrs/day, Mon–Fri',
       'Orton-Gillingham framework',
       'Weekly progress reports',
       'Final IEP-aligned report',
@@ -143,11 +143,12 @@ const programs: ProgramCardProps[] = [
     ctaLabel: 'Enroll — $1,000 Deposit',
     program: 'full',
     includes: [
-      '4 hrs/day, Mon–Thu',
+      '4 hrs/day, Mon–Fri',
       'Literacy + math + SEL blocks',
+      'Daily themed enrichment activities',
       'Executive function coaching',
       'Weekly parent debrief + reports',
-      'September CSE-ready final report',
+      'Student portfolio + CSE-ready final report',
       'Max 6 students',
     ],
     featured: true,
@@ -161,7 +162,7 @@ const programs: ProgramCardProps[] = [
     ctaLabel: 'Enroll — $875 Deposit',
     program: 'math',
     includes: [
-      '4 hrs/day, Mon–Thu',
+      '4 hrs/day, Mon–Fri',
       'Concrete-representational-abstract method',
       'Weekly progress reports',
       'Final IEP-aligned report',

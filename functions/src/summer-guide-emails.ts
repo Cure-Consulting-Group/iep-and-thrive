@@ -193,7 +193,7 @@ export function summerGuideDripEmail3Template(data: {
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
             <td style="padding: 4px 0; color: #1C1917;"><strong>Program dates:</strong></td>
-            <td style="padding: 4px 0; color: #1C1917;">July 7 &ndash; August 14, 2026</td>
+            <td style="padding: 4px 0; color: #1C1917;">July 7 &ndash; August 15, 2026</td>
           </tr>
           <tr>
             <td style="padding: 4px 0; color: #1C1917;"><strong>Pricing:</strong></td>

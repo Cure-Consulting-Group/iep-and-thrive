@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { trackDiscoveryCallClick } from '@/lib/analytics'
 
@@ -41,18 +42,20 @@ const steps = [
     number: '04',
     title: 'Summer — and a stronger September',
     description:
-      '6 weeks of structured intervention. Weekly progress updates. A final report that documents growth against IEP goals — and gives you ammunition heading into fall CSE season.',
-    tag: 'Program runs July 7 – August 14, 2026',
+      '6 weeks of structured intervention. Weekly progress updates. A student portfolio and final report that documents growth against IEP goals — presented at our Family Showcase and ready for fall CSE season.',
+    tag: 'Program runs July 7 – August 15, 2026',
   },
 ]
 
 const includedItems = [
   'Pre-program IEP review & goal mapping',
-  '96 hours of direct instruction (4 hrs × 4 days × 6 wks)',
+  '120 hours of direct instruction (4 hrs × 5 days × 6 wks)',
+  'Daily themed enrichment blocks (nature, STEM, creative arts)',
   'All curriculum materials & supplies',
   '6 weekly progress reports (PDF, emailed Fridays)',
-  'Daily parent debrief at pickup',
+  'Student portfolio documenting growth across the program',
   'End-of-program comprehensive report (CSE-ready)',
+  'Family Showcase celebration (August 15)',
   'Home practice guide (15 min/night)',
 ]
 
@@ -98,6 +101,17 @@ export default function HowItWorks() {
 
           {/* RIGHT — Stacked Cards */}
           <div className="space-y-6">
+            {/* Image — Student focused on work */}
+            <div className="relative h-48 rounded-[20px] overflow-hidden">
+              <Image
+                src="/images/child-writing-desk.jpg"
+                alt="Student focused on writing at desk"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+
             {/* Card 1 — What's included */}
             <div className="bg-cream-deep rounded-[20px] p-8">
               <h3 className="font-display text-[1.25rem] font-bold text-text mb-5">
