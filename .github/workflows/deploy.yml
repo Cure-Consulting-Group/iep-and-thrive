@@ -26,6 +26,14 @@ jobs:
 
       - name: Build Next.js
         run: npm run build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyBI4iQ3G265Yawhbg_lUXQTggJBpYPueww
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: iep-and-thrive.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: iep-and-thrive
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: iep-and-thrive.firebasestorage.app
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '564060847585'
+          NEXT_PUBLIC_FIREBASE_APP_ID: '1:564060847585:web:1b8a235db532454f9166a0'
+          NEXT_PUBLIC_SITE_URL: https://iepandthrive.com
 
       - name: Install Cloud Functions dependencies
         run: cd functions && npm ci
