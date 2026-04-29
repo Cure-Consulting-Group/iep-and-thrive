@@ -24,73 +24,22 @@ import path from 'path'
 import {
   DayKey,
   Lesson,
+  LessonMeta,
   LessonSection,
-  PROGRAM_END,
-  PROGRAM_START,
-  SHOWCASE_DAY,
+  PROGRAM_SCHEDULE,
 } from './curriculum-lessons-types'
 
-export type { DayKey, Lesson, LessonSection } from './curriculum-lessons-types'
+export type { DayKey, Lesson, LessonMeta, LessonSection } from './curriculum-lessons-types'
 export {
+  PROGRAM_DATES,
   PROGRAM_END,
+  PROGRAM_SCHEDULE,
   PROGRAM_START,
   SHOWCASE_DAY,
   classifySection,
   programWindowState,
 } from './curriculum-lessons-types'
 export type { SectionRole } from './curriculum-lessons-types'
-
-const DAY_KEYS: DayKey[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
-
-function buildSchoolDays(): { date: string; weekdayLabel: string }[] {
-  const days: { date: string; weekdayLabel: string }[] = []
-  const start = new Date(PROGRAM_START + 'T00:00:00')
-  const end = new Date(PROGRAM_END + 'T00:00:00')
-  const labels = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const dow = d.getDay()
-    const iso = d.toISOString().slice(0, 10)
-    if (dow >= 1 && dow <= 5) {
-      days.push({ date: iso, weekdayLabel: labels[dow] })
-    } else if (iso === SHOWCASE_DAY) {
-      days.push({ date: iso, weekdayLabel: labels[dow] })
-    }
-  }
-  return days
-}
-
-interface DateMapping {
-  weekNumber: number
-  dayKey: DayKey
-  dayLabel: string
-  realWeekdayLabel: string
-  date: string
-  programDayNumber: number
-}
-
-function buildSchedule(): DateMapping[] {
-  const schoolDays = buildSchoolDays()
-  const mappings: DateMapping[] = []
-  let i = 0
-  for (let w = 1; w <= 6; w++) {
-    for (const dayKey of DAY_KEYS) {
-      const slot = schoolDays[i]
-      if (!slot) break
-      mappings.push({
-        weekNumber: w,
-        dayKey,
-        dayLabel: dayKey.charAt(0).toUpperCase() + dayKey.slice(1),
-        realWeekdayLabel: slot.weekdayLabel,
-        date: slot.date,
-        programDayNumber: i + 1,
-      })
-      i++
-    }
-  }
-  return mappings
-}
-
-export const PROGRAM_SCHEDULE: DateMapping[] = buildSchedule()
 
 const CURRICULUM_DIR = path.join(process.cwd(), 'curriculum')
 
@@ -147,10 +96,37 @@ export function loadLesson(weekNumber: number, dayKey: DayKey): Lesson | null {
     realWeekdayLabel: mapping.realWeekdayLabel,
     date: mapping.date,
     programDayNumber: mapping.programDayNumber,
-    rawMarkdown: raw,
     sections,
     ...meta,
   }
+}
+
+export function loadLessonByDate(dateISO: string): Lesson | null {
+  const m = PROGRAM_SCHEDULE.find((x) => x.date === dateISO)
+  if (!m) return null
+  return loadLesson(m.weekNumber, m.dayKey)
+}
+
+export function loadLessonsMeta(): LessonMeta[] {
+  const metas: LessonMeta[] = []
+  for (const mapping of PROGRAM_SCHEDULE) {
+    const filePath = path.join(CURRICULUM_DIR, `week-${mapping.weekNumber}`, `${mapping.dayKey}.md`)
+    if (!fs.existsSync(filePath)) continue
+    const raw = fs.readFileSync(filePath, 'utf8')
+    const { title, subtitle, miniTheme } = extractMeta(raw)
+    metas.push({
+      weekNumber: mapping.weekNumber,
+      dayKey: mapping.dayKey,
+      dayLabel: mapping.dayLabel,
+      realWeekdayLabel: mapping.realWeekdayLabel,
+      date: mapping.date,
+      programDayNumber: mapping.programDayNumber,
+      title,
+      subtitle,
+      miniTheme,
+    })
+  }
+  return metas
 }
 
 export function loadAllLessons(): Lesson[] {
