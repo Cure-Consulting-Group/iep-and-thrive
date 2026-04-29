@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   getDocs,
@@ -76,17 +77,15 @@ export async function uploadReport(
       async () => {
         try {
           const reportUrl = await getDownloadURL(uploadTask.snapshot.ref)
-          await import('firebase/firestore').then(({ setDoc }) =>
-            setDoc(docRef, {
-              ...meta,
-              reportUrl,
-              fileName: file.name,
-              storagePath,
-              publishedAt: serverTimestamp(),
-              viewedAt: null,
-              createdAt: serverTimestamp(),
-            })
-          )
+          await setDoc(docRef, {
+            ...meta,
+            reportUrl,
+            fileName: file.name,
+            storagePath,
+            publishedAt: serverTimestamp(),
+            viewedAt: null,
+            createdAt: serverTimestamp(),
+          })
           resolve(docRef.id)
         } catch (err) {
           reject(err)

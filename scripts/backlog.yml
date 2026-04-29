@@ -986,6 +986,69 @@ tickets:
       - Restore process documented.
       - Parent data NOT auto-deleted (only tiered).
 
+  - id: E11
+    epic: "epic-e"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Flatten users/{uid}/students subcollection to top-level students collection (N+1 fix)"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Today `getAllStudents()` in lib/student-service.ts iterates
+      every user doc and fires a separate getDocs against each user's
+      `students` subcollection. The admin dashboard does the same to
+      compute student counts. This is an N+1 read pattern: 1 query for
+      users + N queries (one per parent). Same root cause hits the
+      attendance roster, today's plan roster, and any admin view that
+      lists "all students."
+
+      Why: With 6 enrolled students and ~20 inquiry-stage parents, this
+      is currently ~21 reads per page load — slow but not crashing. As
+      parent base grows past 50, page loads will exceed 5s and may
+      freeze the tab on slow devices. Fix before Year 2.
+
+      Acceptance:
+      - New top-level `students` collection with `parentId` field,
+        composite index on `(parentId, createdAt desc)` and
+        `(enrollmentStatus, createdAt desc)`.
+      - `getAllStudents()` becomes a single getDocs against the flat
+        collection.
+      - `getStudentsByParent(parentId)` becomes a single where-query.
+      - One-shot migration script in scripts/ to copy existing
+        subcollection docs to the flat collection (preserve ids).
+      - Firestore rules updated: parents read/write only where
+        `resource.data.parentId == request.auth.uid`; admins read/write
+        all.
+      - Old subcollection left in place initially; deprecate after a
+        Year 2 audit confirms no callers remain.
+
+  - id: E12
+    epic: "epic-e"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Harden client-side markdown renderer against malformed input"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: components/admin/MarkdownView.tsx had an infinite-loop bug in
+      tokenize() that crashed the browser on lines starting with #/>/digit
+      patterns the parser couldn't classify. Hot-fixed by handling h1-h5,
+      tightening list-continuation regex, and adding a defensive
+      `if (i === startI) i++` guard so the parser can never get stuck.
+      File this ticket for follow-up: write a markdown corpus test that
+      runs every curriculum/*.md file through tokenize+render and asserts
+      it terminates within N ms.
+
+      Why: We can't rely on curriculum authors to use only the markdown
+      subset our parser handles. A malformed line should degrade
+      gracefully (skip line) not crash the tab. Testing prevents
+      regression.
+
+      Acceptance:
+      - New unit test in __tests__/markdown.test.ts (Jest or Vitest) that
+        loops every .md file under curriculum/ and renders via the
+        tokenizer with a 1000ms timeout per file.
+      - Test fails if any file causes timeout, throw, or empty output.
+      - Run as part of `npm run test` in CI.
+
   - id: E10
     epic: "epic-e"
     milestone: "Horizon 0 — Cohort 1 Launch"

@@ -7,7 +7,7 @@ import { ReactNode } from 'react'
 // No external dependency. Sufficient for the curriculum file shape.
 
 interface Token {
-  type: 'h4' | 'h5' | 'p' | 'ul' | 'ol' | 'table' | 'hr' | 'blockquote' | 'pre'
+  type: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'p' | 'ul' | 'ol' | 'table' | 'hr' | 'blockquote' | 'pre'
   content: string[]
 }
 
@@ -17,15 +17,31 @@ function tokenize(md: string): Token[] {
   let i = 0
 
   while (i < lines.length) {
+    const startI = i
     const line = lines[i]
 
+    if (/^#{5}\s+/.test(line)) {
+      tokens.push({ type: 'h5', content: [line.replace(/^#####\s+/, '').trim()] })
+      i++
+      continue
+    }
     if (/^#{4}\s+/.test(line)) {
       tokens.push({ type: 'h4', content: [line.replace(/^####\s+/, '').trim()] })
       i++
       continue
     }
-    if (/^#{5}\s+/.test(line)) {
-      tokens.push({ type: 'h5', content: [line.replace(/^#####\s+/, '').trim()] })
+    if (/^#{3}\s+/.test(line)) {
+      tokens.push({ type: 'h3', content: [line.replace(/^###\s+/, '').trim()] })
+      i++
+      continue
+    }
+    if (/^#{2}\s+/.test(line)) {
+      tokens.push({ type: 'h2', content: [line.replace(/^##\s+/, '').trim()] })
+      i++
+      continue
+    }
+    if (/^#\s+/.test(line)) {
+      tokens.push({ type: 'h1', content: [line.replace(/^#\s+/, '').trim()] })
       i++
       continue
     }
@@ -45,7 +61,7 @@ function tokenize(md: string): Token[] {
     }
     if (/^\s*[-*]\s+/.test(line)) {
       const items: string[] = []
-      while (i < lines.length && (/^\s*[-*]\s+/.test(lines[i]) || /^\s{2,}/.test(lines[i]))) {
+      while (i < lines.length && (/^\s*[-*]\s+/.test(lines[i]) || /^\s{2,}\S/.test(lines[i]))) {
         items.push(lines[i])
         i++
       }
@@ -54,17 +70,17 @@ function tokenize(md: string): Token[] {
     }
     if (/^\s*\d+\.\s+/.test(line)) {
       const items: string[] = []
-      while (i < lines.length && (/^\s*\d+\.\s+/.test(lines[i]) || /^\s{2,}/.test(lines[i]))) {
+      while (i < lines.length && (/^\s*\d+\.\s+/.test(lines[i]) || /^\s{2,}\S/.test(lines[i]))) {
         items.push(lines[i])
         i++
       }
       tokens.push({ type: 'ol', content: items })
       continue
     }
-    if (/^>\s+/.test(line)) {
+    if (/^>\s*/.test(line)) {
       const quote: string[] = []
-      while (i < lines.length && /^>\s+/.test(lines[i])) {
-        quote.push(lines[i].replace(/^>\s+/, ''))
+      while (i < lines.length && /^>\s*/.test(lines[i])) {
+        quote.push(lines[i].replace(/^>\s*/, ''))
         i++
       }
       tokens.push({ type: 'blockquote', content: quote })
@@ -74,13 +90,14 @@ function tokenize(md: string): Token[] {
       i++
       continue
     }
-    // Paragraph — accumulate until blank line
     const para: string[] = []
-    while (i < lines.length && lines[i].trim() !== '' && !/^[#>|]/.test(lines[i]) && !/^\s*[-*\d]/.test(lines[i])) {
+    while (i < lines.length && lines[i].trim() !== '' && !/^#{1,5}\s/.test(lines[i]) && !/^[>|]/.test(lines[i]) && !/^\s*[-*]\s/.test(lines[i]) && !/^\s*\d+\.\s/.test(lines[i])) {
       para.push(lines[i])
       i++
     }
     if (para.length) tokens.push({ type: 'p', content: para })
+
+    if (i === startI) i++
   }
 
   return tokens
@@ -190,6 +207,24 @@ export default function MarkdownView({ markdown, className = '' }: MarkdownViewP
       {tokens.map((tok, i) => {
         const k = `tok-${i}`
         switch (tok.type) {
+          case 'h1':
+            return (
+              <h2 key={k} className="font-display font-bold text-forest text-2xl mt-6 mb-2">
+                {renderInline(tok.content[0], k)}
+              </h2>
+            )
+          case 'h2':
+            return (
+              <h3 key={k} className="font-display font-bold text-forest text-xl mt-5 mb-2">
+                {renderInline(tok.content[0], k)}
+              </h3>
+            )
+          case 'h3':
+            return (
+              <h4 key={k} className="font-display font-bold text-forest text-lg mt-5 mb-1">
+                {renderInline(tok.content[0], k)}
+              </h4>
+            )
           case 'h4':
             return (
               <h4 key={k} className="font-display font-bold text-forest text-base mt-5 mb-1">

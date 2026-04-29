@@ -227,7 +227,8 @@ export default function PortalDashboard() {
     return () => { cancelled = true }
   }, [user, students])
 
-  const today = new Date().toISOString().split('T')[0]
+  const [today, setToday] = useState('')
+  useEffect(() => { setToday(new Date().toISOString().split('T')[0]) }, [])
   const upcomingBookings = bookings.filter((b) => b.date >= today && b.status === 'confirmed')
   const nextBooking = upcomingBookings[0]
   const unreadReports = reports.filter((r) => !r.viewedAt).length
