@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   Lesson,
-  LessonMeta,
   LessonSection,
+  PROGRAM_DATES,
   classifySection,
 } from '@/lib/curriculum-lessons-types'
 import { getAllStudents, Student } from '@/lib/student-service'
@@ -18,7 +18,6 @@ import MarkdownView from '@/components/admin/MarkdownView'
 
 interface LessonDayViewProps {
   lesson: Lesson
-  meta: LessonMeta[]
 }
 
 const SECTION_GROUPS: { id: 'morning' | 'math' | 'reading' | 'enrichment' | 'pickup' | 'materials' | 'notes' | 'schedule' | 'other'; label: string; emoji: string; color: string }[] = [
@@ -57,7 +56,7 @@ function lessonHref(date: string): string {
   return `/admin/curriculum/lesson/${date}`
 }
 
-export default function LessonDayView({ lesson, meta }: LessonDayViewProps) {
+export default function LessonDayView({ lesson }: LessonDayViewProps) {
   const router = useRouter()
   const [today, setToday] = useState<string>('')
   const [students, setStudents] = useState<Student[]>([])
@@ -95,24 +94,26 @@ export default function LessonDayView({ lesson, meta }: LessonDayViewProps) {
     return map
   }, [lesson])
 
-  const currentIndex = meta.findIndex((m) => m.date === lesson.date)
-  const prev = currentIndex > 0 ? meta[currentIndex - 1] : null
-  const next = currentIndex >= 0 && currentIndex < meta.length - 1 ? meta[currentIndex + 1] : null
-  const todayInProgram = today && meta.some((m) => m.date === today)
+  const currentIndex = PROGRAM_DATES.indexOf(lesson.date)
+  const prevDate = currentIndex > 0 ? PROGRAM_DATES[currentIndex - 1] : null
+  const nextDate = currentIndex >= 0 && currentIndex < PROGRAM_DATES.length - 1 ? PROGRAM_DATES[currentIndex + 1] : null
+  const todayInProgram = today && PROGRAM_DATES.includes(today)
   const isViewingToday = today === lesson.date
 
   const onDateInputChange = (v: string) => {
     if (!v) return
-    const exact = meta.find((m) => m.date === v)
-    if (exact) {
-      router.push(lessonHref(exact.date))
+    if (PROGRAM_DATES.includes(v)) {
+      router.push(lessonHref(v))
       return
     }
-    const target = [...meta].sort((a, b) =>
-      Math.abs(new Date(a.date).getTime() - new Date(v).getTime()) -
-      Math.abs(new Date(b.date).getTime() - new Date(v).getTime())
-    )[0]
-    if (target) router.push(lessonHref(target.date))
+    const targetTime = new Date(v).getTime()
+    let nearest = PROGRAM_DATES[0]
+    let nearestDelta = Math.abs(new Date(nearest).getTime() - targetTime)
+    for (const d of PROGRAM_DATES) {
+      const delta = Math.abs(new Date(d).getTime() - targetTime)
+      if (delta < nearestDelta) { nearest = d; nearestDelta = delta }
+    }
+    router.push(lessonHref(nearest))
   }
 
   return (
@@ -125,9 +126,9 @@ export default function LessonDayView({ lesson, meta }: LessonDayViewProps) {
 
       <div className="bg-white rounded-2xl border border-border p-4 mb-6 sticky top-16 z-30">
         <div className="flex items-center justify-between gap-2">
-          {prev ? (
+          {prevDate ? (
             <Link
-              href={lessonHref(prev.date)}
+              href={lessonHref(prevDate)}
               className="h-12 px-3 rounded-xl border border-border text-text-muted hover:bg-sage-pale font-body text-sm flex items-center"
               aria-label="Previous day"
             >
@@ -149,9 +150,9 @@ export default function LessonDayView({ lesson, meta }: LessonDayViewProps) {
               Day {lesson.programDayNumber} of program · Week {lesson.weekNumber} {lesson.dayLabel}
             </p>
           </div>
-          {next ? (
+          {nextDate ? (
             <Link
-              href={lessonHref(next.date)}
+              href={lessonHref(nextDate)}
               className="h-12 px-3 rounded-xl border border-border text-text-muted hover:bg-sage-pale font-body text-sm flex items-center"
               aria-label="Next day"
             >
@@ -166,8 +167,8 @@ export default function LessonDayView({ lesson, meta }: LessonDayViewProps) {
         <div className="flex items-center gap-2 mt-3">
           <input
             type="date"
-            min={meta[0]?.date}
-            max={meta[meta.length - 1]?.date}
+            min={PROGRAM_DATES[0]}
+            max={PROGRAM_DATES[PROGRAM_DATES.length - 1]}
             defaultValue={lesson.date}
             onChange={(e) => onDateInputChange(e.target.value)}
             className="form-input flex-1 h-11 text-sm"

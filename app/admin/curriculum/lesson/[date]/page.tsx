@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { loadLessonByDate, loadLessonsMeta, PROGRAM_SCHEDULE } from '@/lib/curriculum-lessons'
+import { loadLessonByDate, PROGRAM_SCHEDULE } from '@/lib/curriculum-lessons'
 import LessonDayView from './LessonDayView'
 
 export function generateStaticParams() {
@@ -9,6 +9,5 @@ export function generateStaticParams() {
 export default function LessonPage({ params }: { params: { date: string } }) {
   const lesson = loadLessonByDate(params.date)
   if (!lesson) notFound()
-  const meta = loadLessonsMeta()
-  return <LessonDayView lesson={lesson} meta={meta} />
+  return <LessonDayView lesson={lesson} />
 }

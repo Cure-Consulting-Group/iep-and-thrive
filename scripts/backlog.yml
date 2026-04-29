@@ -605,7 +605,31 @@ tickets:
       - Coverage report aggregated weekly.
       - Surfaced in C1 inline.
 
-  # ---- Epic D — Notification & Attention System ----
+  - id: C11
+    epic: "epic-c"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Slim per-lesson page navigator payload (drop full meta prop)"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: The per-lesson static page (/admin/curriculum/lesson/[date])
+      currently passes the full LessonMeta[] (date, week, day, label,
+      title, subtitle, miniTheme for all 30 lessons) as a prop just to
+      power prev/next/date-picker navigation. The navigator only ever
+      reads `date`. Drop the prop and have LessonDayView import
+      PROGRAM_DATES directly from the client-safe types module — that
+      array already lives in the shared JS bundle.
+
+      Why: Each per-lesson HTML embeds the meta JSON twice (server-render
+      + hydration boot). For 30 pages on a phone in a classroom, this is
+      ~10–15 KB of duplicate per page. Slim payload = faster TTI on
+      cellular and lower hosting egress.
+
+      Acceptance:
+      - Per-lesson HTML drops by ≥10 KB.
+      - Navigator UX unchanged (date picker, prev/next, jump-to-today,
+        snap-to-nearest behaviors all preserved).
+      - No new client-side fetches introduced.
   - id: D1
     epic: "epic-d"
     milestone: "Horizon 0 — Cohort 1 Launch"
