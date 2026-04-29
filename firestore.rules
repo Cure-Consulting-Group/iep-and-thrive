@@ -84,5 +84,28 @@ service cloud.firestore {
       allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
+
+    // Notifications — parent-facing notification ledger written by Cloud Functions
+    // (e.g. attendance-flag triggers). Parents read their own only; admins read
+    // all. Parents may UPDATE their own notification doc but ONLY to mark it
+    // read (toggle `read` + set `readAt`); they cannot mutate any other field
+    // and cannot create or delete entries. Cloud Functions use the Admin SDK
+    // and bypass these rules for writes.
+    match /notifications/{notificationId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow update: if isAdmin() ||
+        (
+          isAuthenticated() &&
+          resource.data.parentId == request.auth.uid &&
+          request.resource.data.parentId == resource.data.parentId &&
+          request.resource.data.studentId == resource.data.studentId &&
+          request.resource.data.kind == resource.data.kind &&
+          request.resource.data.flag == resource.data.flag &&
+          request.resource.data.attendanceDocId == resource.data.attendanceDocId &&
+          request.resource.data.createdAt == resource.data.createdAt
+        );
+      allow create, delete: if false; // server-only via Admin SDK
+    }
   }
 }

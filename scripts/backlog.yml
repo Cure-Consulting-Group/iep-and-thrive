@@ -962,7 +962,35 @@ tickets:
       - Restore process documented.
       - Parent data NOT auto-deleted (only tiered).
 
-  # ---- Epic F — Year 2 / Productization ----
+  - id: E10
+    epic: "epic-e"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Fix GitHub Actions hosting deploy (FIREBASE_SERVICE_ACCOUNT secret missing)"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: The `Deploy to Firebase` workflow has been failing on every
+      push for ~6 weeks because `secrets.FIREBASE_SERVICE_ACCOUNT` is not
+      set in repo settings. Site is currently shipped via local
+      `firebase deploy`. Add the service account JSON to the repo as a
+      GitHub Actions secret named exactly `FIREBASE_SERVICE_ACCOUNT`.
+
+      Why: Local-only deploys are a single-point-of-failure (founder
+      laptop). CI deploy gives reproducibility, audit trail, and unblocks
+      future contributors. P1 not P0 because local deploy works today —
+      but every push that fails CI generates noise and obscures real
+      regressions.
+
+      Acceptance:
+      - Service account created in Firebase project `iep-and-thrive`
+        with `Firebase Hosting Admin` + `Cloud Functions Developer` roles
+        (least privilege; do NOT grant project Owner).
+      - JSON key downloaded, pasted into GitHub repo Settings → Secrets
+        → Actions as `FIREBASE_SERVICE_ACCOUNT`.
+      - Trigger a fresh push (or re-run the latest failed run); workflow
+        completes green.
+      - Service account key file deleted from local disk after upload.
+      - Optional: rotate key on a 90-day cadence (note in runbook E8).
   - id: F1
     epic: "epic-f"
     milestone: "Horizon 2 — Year 2 Productization"

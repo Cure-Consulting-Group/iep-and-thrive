@@ -17,6 +17,7 @@ const adminLinks = [
   { label: 'Curriculum', href: '/admin/curriculum', icon: '📖' },
   { label: 'Resources', href: '/admin/resources', icon: '📁' },
   { label: 'Reports', href: '/admin/reports', icon: '📈' },
+  { label: 'Email Log', href: '/admin/email-log', icon: '✉️' },
 ]
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

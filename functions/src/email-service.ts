@@ -30,7 +30,15 @@ export type EmailTemplateType =
   | "deposit_confirmation"
   | "balance_confirmation"
   | "operator_payment_notification"
+  | "attendance_flag_notification"
+  | "weekly_digest"
   | "general";
+
+export interface SendEmailResult {
+  ok: boolean;
+  messageId: string | null;
+  error?: string;
+}
 
 // ─── Gmail API Setup ───
 
@@ -56,6 +64,18 @@ function getGmailClient() {
  * Falls back gracefully when credentials are not configured.
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
+  const result = await sendEmailWithResult(options);
+  return result.ok;
+}
+
+/**
+ * Send an email and return detailed result including the Gmail message id
+ * (for callers that need to record the upstream send for audit/dedup).
+ * Falls back gracefully when credentials are not configured.
+ */
+export async function sendEmailWithResult(
+  options: EmailOptions
+): Promise<SendEmailResult> {
   const gmail = getGmailClient();
   const senderEmail =
     process.env.GMAIL_SENDER_EMAIL || "hello@iepandthrive.com";
@@ -66,7 +86,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     );
     console.log(`[Gmail] Would send to: ${options.to}`);
     console.log(`[Gmail] Subject: ${options.subject}`);
-    return false;
+    return { ok: false, messageId: null, error: "credentials_not_configured" };
   }
 
   const raw = Buffer.from(
@@ -79,41 +99,80 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   ).toString("base64url");
 
   try {
-    await gmail.users.messages.send({
+    const sendRes = await gmail.users.messages.send({
       userId: "me",
       requestBody: { raw },
     });
-    console.log(`[Gmail] Email sent to ${options.to}: ${options.subject}`);
-    return true;
+    const messageId = sendRes.data?.id ?? null;
+    console.log(
+      `[Gmail] Email sent to ${options.to}: ${options.subject} (id=${messageId})`
+    );
+    return { ok: true, messageId };
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error("[Gmail] Send failed:", error);
-    return false;
+    return { ok: false, messageId: null, error: message };
   }
 }
 
 // ─── Email Logger ───
 
+export interface EmailLogExtras {
+  bodyHtmlPreview?: string;
+  messageId?: string | null;
+  error?: string;
+  meta?: Record<string, unknown>;
+}
+
 /**
  * Log email to Firestore for audit trail.
+ *
+ * Canonical emailLog/{id} shape (this writer + admin viewer at /admin/email-log):
+ *   to:                  string  (recipient address)
+ *   subject:             string
+ *   templateType:        EmailTemplateType (kind)
+ *   status:              'sent' | 'skipped' | 'failed'
+ *   sentAt:              Firestore Timestamp (server)
+ *   credentialsConfigured: boolean (was Gmail OAuth wired at send-time)
+ *   bodyHtmlPreview?:    first 500 chars of HTML (audit only — not full body)
+ *   messageId?:          Gmail message id (when send succeeded)
+ *   error?:              error message string (when status === 'failed')
+ *   meta?:               kind-specific extras (e.g. studentId, flag, etc.)
+ *
+ * Older entries written before this expansion will not have the optional
+ * fields; the admin viewer normalizes at read time.
  */
 export async function logEmail(
   to: string,
   subject: string,
   templateType: EmailTemplateType,
-  success: boolean
+  success: boolean,
+  extras: EmailLogExtras = {}
 ): Promise<void> {
   try {
-    await admin
-      .firestore()
-      .collection("emailLog")
-      .add({
-        to,
-        subject,
-        templateType,
-        status: success ? "sent" : "skipped",
-        sentAt: admin.firestore.FieldValue.serverTimestamp(),
-        credentialsConfigured: !!process.env.GMAIL_OAUTH_CLIENT_ID,
-      });
+    const status: "sent" | "skipped" | "failed" = success
+      ? "sent"
+      : extras.error
+        ? "failed"
+        : "skipped";
+
+    const entry: Record<string, unknown> = {
+      to,
+      subject,
+      templateType,
+      status,
+      sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      credentialsConfigured: !!process.env.GMAIL_OAUTH_CLIENT_ID,
+    };
+
+    if (extras.bodyHtmlPreview !== undefined) {
+      entry.bodyHtmlPreview = extras.bodyHtmlPreview.slice(0, 500);
+    }
+    if (extras.messageId) entry.messageId = extras.messageId;
+    if (extras.error) entry.error = extras.error;
+    if (extras.meta) entry.meta = extras.meta;
+
+    await admin.firestore().collection("emailLog").add(entry);
   } catch (error) {
     console.error("[EmailLog] Failed to log email:", error);
   }

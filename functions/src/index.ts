@@ -24,3 +24,9 @@ export {
 // ─── Summer Guide Lead Capture + Drip ───
 export { summerGuideCapture } from "./summer-guide-capture";
 export { summerGuideDrip } from "./summer-guide-drip";
+
+// ─── D2: Attendance Flag → Parent Notification ───
+export { onAttendanceFlagged } from "./attendance-notifications";
+
+// ─── D5: Friday Weekly Digest ───
+export { sendWeeklyDigest } from "./weekly-digest";
