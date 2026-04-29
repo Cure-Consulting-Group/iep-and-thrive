@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/lib/auth-context'
 
 const navLinks = [
   { label: 'About', href: '#about' },
@@ -13,6 +14,10 @@ const navLinks = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, loading } = useAuth()
+  const portalLink = user
+    ? { label: 'My Portal', href: '/portal', arrow: true }
+    : { label: 'Parent Login', href: '/login', arrow: false }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,6 +67,15 @@ export default function Nav() {
               {link.label}
             </a>
           ))}
+          {!loading && (
+            <Link
+              href={portalLink.href}
+              className="text-text-muted hover:text-forest font-body text-sm transition-colors duration-200"
+            >
+              {portalLink.label}
+              {portalLink.arrow && <span className="ml-1" aria-hidden="true">&rarr;</span>}
+            </Link>
+          )}
           <a
             href="#enroll"
             className="inline-flex items-center rounded-full bg-forest px-5 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-forest-mid"
@@ -110,6 +124,16 @@ export default function Nav() {
                 {link.label}
               </a>
             ))}
+            {!loading && (
+              <Link
+                href={portalLink.href}
+                onClick={() => setMobileOpen(false)}
+                className="text-forest font-display text-2xl font-semibold"
+              >
+                {portalLink.label}
+                {portalLink.arrow && <span className="ml-1" aria-hidden="true">&rarr;</span>}
+              </Link>
+            )}
             <a
               href="#enroll"
               onClick={() => setMobileOpen(false)}

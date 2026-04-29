@@ -60,7 +60,13 @@ export default function WeekDetail() {
           </div>
 
           {/* Week nav */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
+            <Link
+              href={`/admin/curriculum/week/${week.week}/materials`}
+              className="text-white/90 hover:text-white text-sm font-semibold bg-white/10 rounded-full px-3 py-1.5 transition-colors"
+            >
+              📦 Materials
+            </Link>
             {week.week > 1 && (
               <Link
                 href={`/admin/curriculum/week/${week.week - 1}`}

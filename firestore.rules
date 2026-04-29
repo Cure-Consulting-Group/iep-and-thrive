@@ -73,5 +73,16 @@ service cloud.firestore {
     match /guideLeads/{leadId} {
       allow read, write: if false;
     }
+
+    // Attendance — instructor (admin) writes; parents read only their own student's
+    // records. Note: Firestore rules cannot redact specific fields, so the parent UI
+    // must filter `notes` (instructor-private) out at the app layer when surfacing
+    // records to parents. The `parentVisibleNote` field is the safe-to-show channel.
+    match /attendance/{attendanceId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
   }
 }

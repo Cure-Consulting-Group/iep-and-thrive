@@ -28,6 +28,21 @@ export default function CurriculumPage() {
         </p>
       </div>
 
+      {/* Today's plan CTA */}
+      <Link
+        href="/admin/curriculum/today"
+        className="block mb-6 bg-forest text-white rounded-2xl p-5 hover:bg-forest-mid transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🌞</span>
+          <div className="flex-1">
+            <p className="font-display font-bold text-base">Open today's plan</p>
+            <p className="text-xs text-white/70">Mobile-friendly daily lesson view + cohort attendance.</p>
+          </div>
+          <span className="text-white/70">→</span>
+        </div>
+      </Link>
+
       {/* Stats bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
         {[

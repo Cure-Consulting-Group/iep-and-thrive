@@ -1,4 +1,8 @@
+'use client'
+
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import { daysUntilDeadline } from '@/lib/dates'
 
 export default function Hero() {
   const avatars = [
@@ -9,11 +13,16 @@ export default function Hero() {
   ];
 
   const stats = [
-    { value: "4\u20136", label: "Students per cohort" },
+    { value: "6", label: "Students per cohort" },
     { value: "4hrs", label: "Daily structured instruction" },
     { value: "6wk", label: "Program duration" },
     { value: "100%", label: "IEP-goal aligned" },
   ];
+
+  const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  useEffect(() => {
+    setDaysLeft(daysUntilDeadline());
+  }, []);
 
   const features = [
     "Orton-Gillingham structured literacy — the gold standard, not a worksheet",
@@ -79,7 +88,14 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-[13px] text-warm-gray">
-                6 seats total. Early enrollment closes April 30. No waitlist — once it&apos;s full, it&apos;s full.
+                Cohorts limited to 6 students. Early enrollment closes May 30
+                {daysLeft !== null && daysLeft > 0 && (
+                  <> &mdash; <strong className="text-forest">{daysLeft} {daysLeft === 1 ? 'day' : 'days'} left</strong></>
+                )}
+                {daysLeft !== null && daysLeft <= 0 && (
+                  <> &mdash; <strong className="text-forest">enrollment closing soon</strong></>
+                )}
+                .
               </p>
             </div>
           </div>

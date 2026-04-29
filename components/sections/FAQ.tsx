@@ -43,7 +43,7 @@ const faqs = [
   {
     question: "When does enrollment close?",
     answer:
-      "Early enrollment closes April 30, 2026. Historically, cohorts fill by mid-May. There is no waitlist \u2014 once six seats are taken, enrollment is closed. If you\u2019re considering it, don\u2019t wait.",
+      "Early enrollment closes May 30, 2026. Historically, cohorts fill quickly once the deadline approaches. There is no waitlist \u2014 once six seats are taken, enrollment is closed. If you\u2019re considering it, don\u2019t wait.",
   },
 ];
 

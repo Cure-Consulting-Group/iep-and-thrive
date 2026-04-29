@@ -85,7 +85,7 @@ const statsChecklist = [
 
 const redFlags = [
   "No mention of your child's actual IEP before starting",
-  'Groups larger than 8–10 students',
+  'Groups larger than 6 students',
   'No written progress reports during the program',
   'Generic curriculum not tied to learning profile',
   'Tutor without special education certification',

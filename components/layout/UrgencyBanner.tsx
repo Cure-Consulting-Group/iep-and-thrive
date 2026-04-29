@@ -31,7 +31,7 @@ export default function UrgencyBanner() {
       <div className="mx-auto flex items-center justify-between max-w-7xl">
         <p className="text-center flex-1">
           <span aria-hidden="true">🌿 </span>
-          <strong>Summer 2026 enrollment is now open.</strong> Only 6 seats
+          <strong>Summer 2026 enrollment closes May 30.</strong> Only 6 seats
           available — once they&apos;re filled, enrollment closes.{' '}
           <strong>Don&apos;t wait for September to wish you hadn&apos;t.</strong>
         </p>

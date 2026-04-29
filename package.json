@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Cure-Consulting-Group/iep-and-thrive#readme",
   "dependencies": {
+    "@cure-consulting-group/product-engineering-skills": "^6.0.1",
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.5.0",

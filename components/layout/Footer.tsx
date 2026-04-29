@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useAuth } from '@/lib/auth-context'
 
 const programLinks = [
   { label: 'Full Academic Intensive', href: '/program#full-academic' },
@@ -7,7 +10,7 @@ const programLinks = [
   { label: 'IEP Advocacy Services', href: '/contact' },
 ]
 
-const enrollLinks = [
+const baseEnrollLinks = [
   { label: 'Reserve a Spot', href: '/enroll' },
   { label: 'Book Discovery Call', href: '/contact' },
   { label: 'Tuition & Deposits', href: '/program#pricing' },
@@ -22,6 +25,14 @@ const contactLinks = [
 ]
 
 export default function Footer() {
+  const { user, loading } = useAuth()
+  const portalLink = user
+    ? { label: 'My Portal →', href: '/portal' }
+    : { label: 'Parent Login', href: '/login' }
+  const enrollLinks = loading
+    ? baseEnrollLinks
+    : [...baseEnrollLinks, portalLink]
+
   return (
     <footer className="bg-[#111810] text-white/60" role="contentinfo">
       <div className="mx-auto max-w-7xl px-8 py-10 md:py-[3rem] md:px-12 lg:px-[5rem]">

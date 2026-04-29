@@ -72,7 +72,7 @@ const faqJsonLd = {
       name: 'When does Summer 2026 enrollment close?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Early enrollment closes April 30, 2026. Cohorts typically fill by May. We recommend reserving early — once a cohort reaches 6 students, it is closed and families go to a waitlist.',
+        text: 'Early enrollment closes May 30, 2026. Cohorts typically fill quickly. We recommend reserving early — once a cohort reaches 6 students, it is closed and families go to a waitlist.',
       },
     },
   ],

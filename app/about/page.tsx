@@ -43,7 +43,7 @@ export default function AboutPage() {
             <p className="text-warm-gray text-base leading-relaxed">
               We use evidence-based frameworks like Orton-Gillingham structured
               literacy and multi-sensory math instruction, delivered in cohorts
-              of 4–6 students so every child gets the attention they deserve.
+              capped at 6 students so every child gets the attention they deserve.
             </p>
           </div>
           <div>

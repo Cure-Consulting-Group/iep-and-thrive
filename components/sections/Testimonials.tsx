@@ -11,7 +11,7 @@ const testimonials = [
   {
     initials: "JR",
     name: "Jennifer R.",
-    detail: "Parent of 2nd grader with ADHD & reading IEP \u00B7 Wantagh, NY",
+    detail: "Parent of 3rd grader with ADHD & reading IEP \u00B7 Wantagh, NY",
     quote:
       "For the first time, I walked into a CSE meeting with six weeks of documented progress. Not my opinion \u2014 data. The team listened differently. That alone was worth every dollar.",
   },

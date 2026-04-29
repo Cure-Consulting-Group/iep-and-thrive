@@ -1,0 +1,1078 @@
+project_name: "IEP & Thrive — Cohort 1 to Year 2"
+description: >
+  Backlog for the IEP & Thrive Summer 2026 cohort and the path to Year 2
+  productization. Founder-confirmed parameters override earlier roadmap
+  assumptions: cohort cap is 6 students, single solo-founder instructor,
+  no incremental marketing spend, enrollment deadline May 30, 2026,
+  insurance required and not yet purchased.
+
+milestones:
+  - name: "Horizon 0 — Cohort 1 Launch"
+    due: "2026-06-23"
+    description: >
+      Everything that must be true before the first student walks in on
+      July 7. Conversion site, parent onboarding, instructor delivery
+      surface, and minimum-viable compliance.
+  - name: "Horizon 1 — Cohort 1 Operate"
+    due: "2026-08-14"
+    description: >
+      Live-cohort operations: notifications, weekly digests, parent ↔
+      instructor channel, attention flags, and reliability work that lands
+      while the cohort is running.
+  - name: "Horizon 2 — Year 2 Productization"
+    due: "2026-12-31"
+    description: >
+      Multi-cohort, multi-tenancy, recurring school-year products, B2B,
+      and outcomes-driven case studies for Year 2 marketing.
+
+labels:
+  priority:
+    - name: "P0"
+      color: "B60205"
+      description: "Must ship before its horizon — blocks the cohort or compliance."
+    - name: "P1"
+      color: "D93F0B"
+      description: "Should ship in its horizon — meaningful quality or risk reduction."
+    - name: "P2"
+      color: "FBCA04"
+      description: "Nice to have — defer if pressed."
+  effort:
+    - name: "effort:S"
+      color: "C2E0C6"
+      description: "Small — under a day."
+    - name: "effort:M"
+      color: "BFD4F2"
+      description: "Medium — 1–3 days."
+    - name: "effort:L"
+      color: "FEF2C0"
+      description: "Large — most of a week."
+    - name: "effort:XL"
+      color: "F9D0C4"
+      description: "Extra large — multi-week, likely needs decomposition."
+  epic:
+    - name: "epic-a"
+      color: "1B4332"
+      description: "Marketing Site Conversion Hardening"
+    - name: "epic-b"
+      color: "2D6A4F"
+      description: "Parent Account Onboarding Polish"
+    - name: "epic-c"
+      color: "40916C"
+      description: "Curriculum Delivery Infrastructure"
+    - name: "epic-d"
+      color: "B7E4C7"
+      description: "Notification & Attention System"
+    - name: "epic-e"
+      color: "D4860B"
+      description: "Data, Compliance, Reliability"
+    - name: "epic-f"
+      color: "6B6560"
+      description: "Year 2 / Productization"
+
+tickets:
+  # ---- Epic A — Marketing Site Conversion Hardening ----
+  - id: A1
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Sweep all marketing copy for stale program details (grades, schedule, group size, deadline)"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Audit every marketing surface (homepage, /program, /enroll, /faq,
+      /about, footer, OG tags, drip emails) for outdated program details and
+      align to current truth: grades 3–4, Mon–Fri schedule, cohort cap of 6,
+      enrollment deadline May 30 2026.
+
+      Why: Founder parameters changed after the initial copy pass. Stale
+      numbers in even one place undermine trust with parents who are
+      cross-checking sources before depositing.
+
+      Acceptance:
+      - grep produces zero hits for "8 students", "10 students", "Mon–Thu",
+        "Mon-Thu", "April 30", "K–6th" outside of intentional historical
+        references.
+      - /faq, /program, /enroll, hero, urgency banner all show 6/Mon–Fri/3–4/May 30.
+      - Drip email templates updated and re-sent through preview.
+
+  - id: A2
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Add Parent Login link to nav + footer"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Surface a "Parent Login" entry in both the primary nav (right
+      side, before the Reserve CTA) and the footer "Enroll" column. Links
+      to /portal (or current parent app entry path).
+
+      Why: Enrolled families currently have no obvious way back into the
+      portal from the marketing site. Reduces support pings and signals
+      that this is a real product, not a brochure.
+
+      Acceptance:
+      - Visible at all breakpoints; appears in mobile drawer.
+      - Uses outline-pill style so it doesn't compete with the Reserve CTA.
+      - Footer link present in Enroll column.
+
+  - id: A3
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Add May 30 countdown to hero + enrollment form"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Render a live "X days until enrollment closes" countdown
+      adjacent to the hero CTA cluster and inside the enrollment form
+      header. Stops at 0 and swaps to "Waitlist only" copy.
+
+      Why: Scarcity + deadline is the strongest conversion lever we have
+      with no marketing spend. Static "April 30" copy currently reads
+      stale and the deadline moved to May 30.
+
+      Acceptance:
+      - Computed client-side from a single source-of-truth date constant.
+      - Copy: "Enrollment closes in N days · May 30, 2026".
+      - Falls back gracefully when N <= 0.
+
+  - id: A4
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Add FAQPage JSON-LD to /faq"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Emit schema.org FAQPage JSON-LD on the /faq route covering all
+      8 Q&A entries.
+
+      Why: Free SERP real estate for high-intent queries like "summer SPED
+      program Long Island" — the only SEO lever available with no ad spend.
+
+      Acceptance:
+      - Validates in Google Rich Results Test.
+      - Question and answer text matches rendered DOM exactly.
+      - Lives in the page's <head> as an inline script tag with type
+        application/ld+json.
+
+  - id: A5
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "\"Sample week\" teaser on /program drawn from week-1 markdown"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Extract a sanitized "what a week looks like" block from the
+      week-1 curriculum markdown and render it as a section on /program —
+      block schedule + sample literacy/math/SEL activity descriptions, no
+      proprietary scope/sequence detail.
+
+      Why: Parents repeatedly ask "what will my kid actually do?" on
+      discovery calls. A concrete daily picture closes the imagination gap
+      and reduces low-information objections.
+
+      Acceptance:
+      - Pulled from a single source markdown file (no copy duplication).
+      - Renders block schedule (literacy / movement / math / SEL / portfolio).
+      - Includes 2–3 sample activities with kid-facing language.
+
+  - id: A6
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Capture 1-2 video testimonials (founder reach-out task)"
+    priority: "P1"
+    effort: "L"
+    body: |
+      What: Founder-led task to reach out to 3–5 prior tutoring/intervention
+      families, secure consent, capture short (60–90s) video testimonials,
+      and embed on /about and the homepage testimonial strip.
+
+      Why: Text testimonials are table stakes; video moves trust meaningfully
+      for first-cohort prospects who can't yet rely on alumni word of mouth.
+
+      Acceptance:
+      - Signed video release for each subject.
+      - Hosted on a CDN (Mux, Bunny, or Vimeo unlisted) — not raw mp4 from Firebase.
+      - Lazy-loaded with poster image; meets Lighthouse perf budget.
+
+  - id: A7
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Verify Summer Guide drip end-to-end with test email"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Submit the Summer Guide opt-in form with a fresh test inbox,
+      confirm every email in the sequence fires at the expected interval,
+      links resolve, unsubscribe works, and tracking pixels (if any) load.
+
+      Why: This is our only top-of-funnel nurture and we have not validated
+      it since copy and parameters changed. A broken drip silently kills
+      conversion.
+
+      Acceptance:
+      - Documented test run with timestamps of each delivery.
+      - All links 200 and land on correct routes with current copy.
+      - Unsubscribe flow verified.
+
+  - id: A8
+    epic: "epic-a"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Lighthouse pass on /, /program, /enroll; fix LCP/CLS regressions"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Run Lighthouse (mobile) on the three highest-intent routes,
+      capture baseline, and fix regressions until LCP < 2.5s and CLS < 0.1
+      on a throttled mobile profile.
+
+      Why: Conversion-critical pages. Mobile parents on weak signal will
+      bounce before the hero paints. Also feeds SEO.
+
+      Acceptance:
+      - Before/after Lighthouse JSON committed to /docs/perf/.
+      - LCP < 2.5s, CLS < 0.1, TBT under 200ms.
+      - No render-blocking 3rd-party scripts in the critical path.
+
+  - id: A9
+    epic: "epic-a"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Intermediate /enroll/[program] confirmation step before Stripe"
+    priority: "P2"
+    effort: "M"
+    body: |
+      What: Insert a one-screen review step between the enrollment form
+      and Stripe Checkout that summarizes program, deposit amount, balance
+      due date, refund policy, and child name — with a single "Continue
+      to secure payment" CTA.
+
+      Why: Friction-as-feature: reduces refund disputes ("I didn't realize
+      it was non-refundable") and chargebacks. Also a natural place to
+      inject the e-sign agreement.
+
+      Acceptance:
+      - Route /enroll/[program]/confirm renders summary state.
+      - Stripe session created server-side only after confirm.
+      - Cancel returns to /#program with form values preserved.
+
+  - id: A10
+    epic: "epic-a"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Sticky mobile CTA: \"Book a free call\" alt to deposit"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: On mobile only, add a sticky bottom bar with two actions:
+      "Reserve a Spot" (primary) and "Book a free call" (secondary). Hide
+      on /enroll and once the form is in viewport.
+
+      Why: Many mobile visitors aren't ready to deposit but will book a
+      call. Today the secondary CTA is buried; making it always-reachable
+      lifts call volume without taxing depositors.
+
+      Acceptance:
+      - Visible only at < 768px.
+      - Hides when the enrollment form intersects viewport.
+      - Does not overlap iOS home indicator (safe-area-inset-bottom).
+
+  # ---- Epic B — Parent Account Onboarding Polish ----
+  - id: B1
+    epic: "epic-b"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Welcome email sequence post-signup (3 emails over 7 days)"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Three transactional emails fired after parent account creation:
+      Day 0 (welcome + portal tour link), Day 2 (intake form nudge if
+      incomplete), Day 7 (what to expect in Week 1 of cohort).
+
+      Why: Closes the dead-air gap between deposit and program start.
+      Without this, parents go quiet for weeks and intake-form completion
+      stalls.
+
+      Acceptance:
+      - Sends only to enrolled-and-deposited parents.
+      - Honors a sequence-stop flag if intake is already complete.
+      - Templates live in the same notification system as cohort comms (one source).
+
+  - id: B2
+    epic: "epic-b"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Intake form completion rate dashboard (admin)"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Single admin tile in /admin showing total enrolled vs intake
+      complete, with a drill-down list of incomplete families and last
+      reminder date.
+
+      Why: Intake is the gate to cohort grouping and curriculum
+      personalization. Founder needs a five-second view of who to chase.
+
+      Acceptance:
+      - Tile shows N complete / M enrolled.
+      - Click-through to filterable list.
+      - Last-reminder timestamp shown per family.
+
+  - id: B3
+    epic: "epic-b"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Multi-student support: parent with siblings"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Parent account model supports N students, with per-student
+      intake, deposits, and progress views. UI: student switcher in portal
+      header.
+
+      Why: ~10–15% of inquiries mention siblings. Today they'd have to
+      create duplicate parent accounts, which fragments billing and
+      progress views.
+
+      Acceptance:
+      - Data model: parents → students (1:N).
+      - Portal navigation includes a student switcher.
+      - Stripe customer is shared across siblings; one card on file.
+
+  - id: B4
+    epic: "epic-b"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Magic-link login option"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Add passwordless email magic-link as an alternative to
+      email+password sign-in.
+
+      Why: Parents lose passwords. Magic links convert "I can't log in"
+      tickets into a self-service flow and reduce abandoned-portal rates.
+
+      Acceptance:
+      - Toggle on the sign-in screen.
+      - Link expires in 15 minutes, single-use.
+      - Falls back cleanly if email delivery fails.
+
+  - id: B5
+    epic: "epic-b"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Parent profile completeness nudge"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Soft progress bar in the portal home showing profile and
+      intake completeness with a single CTA to the next missing field.
+
+      Why: Gentle in-app nudge complements the email sequence (B1) and
+      lifts intake completion without spam.
+
+      Acceptance:
+      - Bar disappears at 100%.
+      - CTA deep-links to the specific incomplete section.
+      - Dismissed state respected for the session.
+
+  - id: B6
+    epic: "epic-b"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Photo/video release e-signature capture"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Dedicated e-sign step in onboarding for photo/video release,
+      separate from the enrollment agreement (E3). Stores signed PDF and
+      timestamp in the parent record.
+
+      Why: Required before any portfolio photos (C7) or showcase videos
+      can be captured. Without per-student consent, we can't legally use
+      images even internally.
+
+      Acceptance:
+      - Per-student consent (not per-parent).
+      - Signed PDF stored in Firebase Storage with restricted access.
+      - Admin view shows consent status per student.
+
+  - id: B7
+    epic: "epic-b"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Onboarding video (3 min Loom) embedded in portal home"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Founder records a 3-minute Loom walking through the portal —
+      where to find the daily plan, weekly reports, and message thread.
+      Embed at the top of the parent portal home with dismiss control.
+
+      Why: Cuts "how do I…" support requests and humanizes the product
+      with the founder's voice.
+
+      Acceptance:
+      - Loom embed with poster image, lazy-loaded.
+      - Dismiss persists per-parent.
+      - Captions on.
+
+  # ---- Epic C — Curriculum Delivery Infrastructure ----
+  - id: C1
+    epic: "epic-c"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Instructor \"Today's Plan\" view in /admin"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Single-pane admin view that shows today's schedule, materials,
+      per-block activities, and per-student notes for the current cohort
+      day. Auto-advances by date.
+
+      Why: With one instructor and six students across multiple blocks,
+      the founder can't be flipping between markdown files. This is the
+      primary in-the-room surface during program hours.
+
+      Acceptance:
+      - Loads in < 1s on a laptop on classroom Wi-Fi.
+      - Reads from canonical curriculum source (markdown until C9).
+      - Includes attendance and behavioral flag entry inline (links to C3).
+
+  - id: C2
+    epic: "epic-c"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Materials prep checklist generator per week"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Generate a printable/exportable checklist of all materials
+      required for the upcoming week, aggregated from per-day lesson
+      plans.
+
+      Why: Solo instructor; no prep time on Monday morning. The checklist
+      is the difference between a smooth week and a chaotic one.
+
+      Acceptance:
+      - Generates from week-N markdown.
+      - Quantities aggregated and de-duped across days.
+      - Exportable as PDF or printable HTML.
+
+  - id: C3
+    epic: "epic-c"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Per-student daily attendance + behavioral flag capture"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Quick daily entry per student: present/absent/late, energy
+      level, regulation flag, brief free-text note. Designed for thumb-
+      tap on phone during transitions.
+
+      Why: Feeds both attention flags (D2) and weekly progress reports
+      (C6). Without daily capture, Friday reports become guesswork.
+
+      Acceptance:
+      - Single screen, < 30s to complete the cohort.
+      - Optimistic UI; works offline and syncs.
+      - Data structured for downstream report generation.
+
+  - id: C4
+    epic: "epic-c"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Weekly OG probe data capture (phonics accuracy %, ORF wpm)"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Structured capture of weekly Orton-Gillingham probe data —
+      phonics accuracy %, oral reading fluency words-per-minute, error
+      types — per student, with trend visualization.
+
+      Why: This is the literal evidence the final CSE-ready report rests
+      on. It needs to be structured data, not prose, from day one.
+
+      Acceptance:
+      - Schema covers phonics %, ORF wpm, error type tallies.
+      - Trend chart per student over weeks.
+      - Exportable to the final report (C6).
+
+  - id: C5
+    epic: "epic-c"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Pre-/post-assessment battery digital capture"
+    priority: "P0"
+    effort: "L"
+    body: |
+      What: Digitize the pre-program and post-program assessment battery
+      (informal phonics inventory, fluency probe, math screener, SEL
+      self-report). Captures item-level responses, not just totals.
+
+      Why: Pre/post deltas are the spine of the marketing case studies
+      (F6) and the family-facing growth narrative. Paper-only capture
+      will not survive into Year 2.
+
+      Acceptance:
+      - Item-level capture with rubric scoring.
+      - Pre and post linked per student.
+      - Admin export to CSV.
+
+  - id: C6
+    epic: "epic-c"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Auto-populate weekly progress report from C3+C4 data"
+    priority: "P1"
+    effort: "L"
+    body: |
+      What: Friday weekly report PDF auto-generated per student, pulling
+      attendance (C3), OG probe data (C4), and a templated narrative slot
+      for instructor commentary. Email delivery via the digest channel
+      (D5).
+
+      Why: Hand-writing six reports every Friday is unsustainable. A
+      templated generator keeps the report consistent in voice and
+      district-grade in format.
+
+      Acceptance:
+      - PDF render matches the marketing claim ("2-page progress summary").
+      - Instructor narrative slot is the only manual input.
+      - One-click "send to parent" with audit log.
+
+  - id: C7
+    epic: "epic-c"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Portfolio artifact upload (photos of student work) per student per week"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Instructor uploads 1–3 photos of student work per student per
+      week, tagged with week and (optionally) skill area. Surfaces in the
+      parent portal under that student's portfolio.
+
+      Why: Portfolio artifacts are the most emotionally resonant piece of
+      the parent experience and the showcase (C8) is built from them.
+      Requires consent gate (B6).
+
+      Acceptance:
+      - Upload from mobile in < 10s per artifact.
+      - Auto-resized; original retained.
+      - Gated by per-student photo release (B6).
+
+  - id: C8
+    epic: "epic-c"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "End-of-program showcase prep checklist + invite emails"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Run-of-show checklist for the final-day family showcase
+      (logistics, student prep, materials), plus templated invite emails
+      to families with RSVP capture.
+
+      Why: The showcase is a primary referral and testimonial moment;
+      executed sloppily it costs us Year 2 word of mouth.
+
+      Acceptance:
+      - Checklist covers T-2wk through T-day.
+      - RSVP captured in admin tile.
+      - Reminder email at T-3 days.
+
+  - id: C9
+    epic: "epic-c"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Migrate curriculum copy from .md to Firestore-backed CMS"
+    priority: "P2"
+    effort: "XL"
+    body: |
+      What: Replace the markdown-file-based curriculum source with a
+      Firestore data model + admin CMS. Preserve markdown export for
+      portability.
+
+      Why: Year 2 with multiple cohorts/instructors requires versioned,
+      multi-author curriculum editing. Markdown-as-source breaks once
+      more than one human edits.
+
+      Acceptance:
+      - One-time migration from markdown to Firestore.
+      - Admin editor with preview.
+      - Markdown export round-trips losslessly.
+
+  - id: C10
+    epic: "epic-c"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Lesson-level \"I taught this\" check-off journal"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Per-lesson checkbox the instructor taps to mark a lesson as
+      delivered (or partially / skipped with reason). Aggregates into a
+      coverage report.
+
+      Why: Cheap audit trail for what was actually taught vs planned —
+      useful for Year 2 curriculum tightening and CSE-meeting honesty.
+
+      Acceptance:
+      - One tap per lesson; optional skip-reason.
+      - Coverage report aggregated weekly.
+      - Surfaced in C1 inline.
+
+  # ---- Epic D — Notification & Attention System ----
+  - id: D1
+    epic: "epic-d"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Parent dashboard: \"This week's progress\" tile"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Always-visible tile on the parent portal home summarizing the
+      current week — attendance, latest probe data, latest portfolio
+      artifact, latest instructor note.
+
+      Why: Parents shouldn't have to dig. The tile is the answer to "how
+      is my kid doing?" without scheduling a call.
+
+      Acceptance:
+      - Renders empty-state cleanly pre-cohort.
+      - All four data points pulled from canonical sources.
+      - Click-through to deeper views.
+
+  - id: D2
+    epic: "epic-d"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Real-time attention flag → parent notification"
+    priority: "P0"
+    effort: "L"
+    body: |
+      What: When an instructor raises a behavioral/regulation flag (C3),
+      a same-day notification fires to the parent (in-app + email) with
+      a brief context note. Severity-tiered.
+
+      Why: Trust is built on no-surprises. A bad day at 11am should not
+      be the first thing the parent learns at pickup.
+
+      Acceptance:
+      - Severity tiers: heads-up / concern / urgent.
+      - Urgent fires SMS too (D9 dependency).
+      - Logged in audit trail.
+
+  - id: D3
+    epic: "epic-d"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "In-app notification bell + unread state"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Bell icon in the portal header with unread badge, opening a
+      panel of recent notifications. Mark-read on click.
+
+      Why: Email-only notifications get lost. An in-app inbox makes the
+      portal the canonical source for "what's new with my kid."
+
+      Acceptance:
+      - Real-time unread count via Firestore listener.
+      - Mark-read syncs across devices.
+      - Empty-state copy is parent-warm, not generic.
+
+  - id: D4
+    epic: "epic-d"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Web Push notifications (PWA install prompt)"
+    priority: "P2"
+    effort: "L"
+    body: |
+      What: Convert the parent portal to a PWA, prompt for install, and
+      enable Web Push for high-priority notifications.
+
+      Why: Push beats email for time-sensitive alerts. Defer to Year 2 —
+      Cohort 1 can ride email + SMS.
+
+      Acceptance:
+      - Manifest + service worker.
+      - Install prompt timed thoughtfully (not on first visit).
+      - Push permission requested only after first meaningful action.
+
+  - id: D5
+    epic: "epic-d"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Weekly digest email (Friday evening) consolidating progress"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Friday 6pm digest email per parent: attendance summary, OG
+      probe deltas, portfolio artifact thumbnails, instructor narrative,
+      next-week preview, and "what to practice this weekend."
+
+      Why: This is the marketing promise — "weekly progress reports you
+      can use in September." It cannot be vaporware.
+
+      Acceptance:
+      - Sends Fridays 6pm cohort-local time.
+      - Generated from C6 output.
+      - Resilient to missing data (degrades gracefully).
+
+  - id: D6
+    epic: "epic-d"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "\"Missed pickup\" / late notification (mobile-fast)"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: One-tap instructor action that fires a "running 10/15/30 min
+      late" notification to a parent (push + SMS).
+
+      Why: Pickup logistics are a real-world failure mode. A solo
+      instructor with six kids cannot also be making individual phone
+      calls when a parent is late.
+
+      Acceptance:
+      - Two taps from C1 to send.
+      - Pre-set delay options (10/15/30/custom).
+      - Logged in C3 audit.
+
+  - id: D7
+    epic: "epic-d"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Goal-attainment threshold alerts"
+    priority: "P2"
+    effort: "M"
+    body: |
+      What: When a student crosses an IEP-goal threshold (e.g., ORF wpm
+      target hit), trigger a celebration notification to the parent and
+      flag for the final report.
+
+      Why: Pure delight feature. Strong material for testimonials and
+      case studies (F6).
+
+      Acceptance:
+      - Configurable thresholds per student.
+      - Celebration template, not generic notification.
+      - Surfaces in F6 dataset.
+
+  - id: D8
+    epic: "epic-d"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Parent → instructor message thread (in-portal, async)"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Per-student async message thread between parent and
+      instructor inside the portal. Email mirror; instructor-side
+      muting hours.
+
+      Why: Replaces ad-hoc text/email. Keeps everything auditable and
+      protects the founder's evening hours.
+
+      Acceptance:
+      - Thread per student (not per parent).
+      - Email mirror with reply-by-email.
+      - Quiet hours configurable on instructor side.
+
+  - id: D9
+    epic: "epic-d"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "SMS notifications for time-critical events (Twilio)"
+    priority: "P2"
+    effort: "M"
+    body: |
+      What: Twilio integration for the time-critical subset of
+      notifications: urgent attention flags (D2), late pickup (D6),
+      cohort cancellations.
+
+      Why: Email lag is unacceptable for these events. SMS is the only
+      reliable channel for "right now" parent attention.
+
+      Acceptance:
+      - Per-parent SMS opt-in captured at onboarding.
+      - Limited to the urgent subset (cost control).
+      - Delivery receipts logged.
+
+  - id: D10
+    epic: "epic-d"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Email log admin viewer"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Admin page listing all emails sent by the system with
+      timestamp, recipient, template, and delivery status.
+
+      Why: When a parent says "I never got the report," we need a 5-second
+      answer. Today we'd be guessing.
+
+      Acceptance:
+      - Filter by parent, template, date range.
+      - Bounce/complaint status from provider.
+      - Resend action.
+
+  # ---- Epic E — Data, Compliance, Reliability ----
+  - id: E1
+    epic: "epic-e"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Firestore daily backup automation"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Scheduled Cloud Function (or gcloud scheduler job) that runs
+      a Firestore export to a dedicated GCS bucket nightly with 30-day
+      retention.
+
+      Why: Storing parent and student data without backups is malpractice.
+      Cheap, fast, must exist before first deposit data lands.
+
+      Acceptance:
+      - Nightly export verified by restore test.
+      - Bucket lifecycle: 30-day retention.
+      - Alert on backup failure.
+
+  - id: E2
+    epic: "epic-e"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Cyber/E&O + general liability + abuse rider insurance"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Procure required policies before first student arrives:
+      cyber/E&O (data breach), general liability (premises), and abuse/
+      molestation rider (mandatory for any kid-facing program).
+
+      Why: Founder confirmed insurance is required and not yet purchased.
+      No insurance, no program — full stop.
+
+      Acceptance:
+      - Policies bound and certificates on file.
+      - Premises landlord listed as additional insured if required.
+      - Renewal calendar entry created.
+
+  - id: E3
+    epic: "epic-e"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Signed enrollment agreement (PDF, e-sign) replacing checkbox"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Replace the current "I agree" checkbox with a real e-sign flow
+      (Documenso, Dropbox Sign, or similar) producing a signed PDF stored
+      against the parent record.
+
+      Why: A checkbox is not a signed contract. For deposit, refund, and
+      liability disputes we need a proper artifact.
+
+      Acceptance:
+      - Signed PDF with timestamp and IP captured per parent.
+      - Stored in Firebase Storage with restricted access.
+      - Inserted into the /enroll/[program]/confirm flow (A9).
+
+  - id: E4
+    epic: "epic-e"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "PII access audit logs"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Log all admin reads and writes to PII fields (parent contact
+      info, child IEP, intake notes) with actor, timestamp, and field-
+      level diff.
+
+      Why: Required for any future B2B / district relationship and good
+      hygiene regardless. Cheap insurance against an internal incident.
+
+      Acceptance:
+      - Logged via Firestore trigger or wrapper.
+      - Queryable in an admin view.
+      - Retention policy documented.
+
+  - id: E5
+    epic: "epic-e"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Add Sentry (or equivalent) error tracking"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Wire Sentry into the Next.js app and Firebase Functions with
+      release tagging and source maps.
+
+      Why: With one operator, silent errors during cohort hours are
+      catastrophic. Sentry gives the founder a same-day signal.
+
+      Acceptance:
+      - Browser + server + functions all reporting.
+      - Source maps uploaded on deploy.
+      - Slack/email alert on first occurrence of new errors.
+
+  - id: E6
+    epic: "epic-e"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Smoke-test suite for critical flows (Playwright)"
+    priority: "P1"
+    effort: "L"
+    body: |
+      What: Playwright suite covering: enrollment form submit → Stripe
+      checkout (test mode), parent sign-in, intake form completion, admin
+      Today's Plan loads.
+
+      Why: With a solo founder and infrequent deploys, manual QA is the
+      bottleneck. A 5-flow smoke suite catches the 80% of regressions.
+
+      Acceptance:
+      - Runs in CI on PR.
+      - < 5 minutes total.
+      - Stripe in test mode; no live keys in suite.
+
+  - id: E7
+    epic: "epic-e"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Remove unused `resend` dependency"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Confirm no live code paths use `resend`, then remove from
+      package.json and uninstall.
+
+      Why: Hygiene; reduces supply-chain surface and clarifies which
+      provider actually delivers email today.
+
+      Acceptance:
+      - grep finds zero imports.
+      - Build green after removal.
+      - Env var docs updated.
+
+  - id: E8
+    epic: "epic-e"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Document incident-response runbook"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Short runbook in /docs covering: site down, payment failures,
+      data exposure suspected, missing-child scenario, instructor
+      illness. Each with first-30-minutes action list.
+
+      Why: A solo operator under stress will not invent the right
+      response. Pre-decisions made calmly are the runbook.
+
+      Acceptance:
+      - Five scenarios documented.
+      - Contact list (insurer, attorney, hosting) embedded.
+      - Reviewed before cohort kickoff.
+
+  - id: E9
+    epic: "epic-e"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Storage lifecycle: auto-archive cohort 1 data after 1yr"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: GCS lifecycle rules to move cohort-1 portfolio media and
+      reports to coldline after 12 months.
+
+      Why: Cost control as cohorts accumulate. Defer until we actually
+      have a year of data to archive.
+
+      Acceptance:
+      - Lifecycle rules in Terraform/console.
+      - Restore process documented.
+      - Parent data NOT auto-deleted (only tiered).
+
+  # ---- Epic F — Year 2 / Productization ----
+  - id: F1
+    epic: "epic-f"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Multi-cohort data model (cohorts collection, cohort-scoped students)"
+    priority: "P1"
+    effort: "XL"
+    body: |
+      What: Refactor the data model so students, reports, attendance,
+      and curriculum are scoped to a cohort. Today everything is implicitly
+      "cohort 1."
+
+      Why: Without this, Year 2 is a fork. With it, Year 2 is
+      configuration. Highest-leverage Horizon 2 work.
+
+      Acceptance:
+      - cohorts collection with start/end dates and roster.
+      - All student-scoped data references cohortId.
+      - Migration path for cohort-1 data documented.
+
+  - id: F2
+    epic: "epic-f"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Instructor multi-tenancy"
+    priority: "P2"
+    effort: "XL"
+    body: |
+      What: Multiple instructor identities, each scoped to their cohort(s).
+      Admin role separate from instructor role.
+
+      Why: Founder is the only instructor in Year 1. Year 2+ may bring
+      a co-teacher or contractor — without this, that's a database
+      rewrite.
+
+      Acceptance:
+      - Roles: owner, instructor, parent.
+      - Instructor sees only their cohorts.
+      - Audit logs (E4) include actor role.
+
+  - id: F3
+    epic: "epic-f"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "School-year Saturday tutoring product (recurring billing)"
+    priority: "P2"
+    effort: "XL"
+    body: |
+      What: Productize a school-year Saturday small-group offering as a
+      monthly subscription via Stripe Billing. New marketing surface,
+      different cohort cadence.
+
+      Why: Smooths revenue across the year and gives summer parents an
+      obvious continuation path.
+
+      Acceptance:
+      - Stripe Subscriptions integration.
+      - Separate landing page.
+      - Reuses cohort + curriculum infrastructure (F1).
+
+  - id: F4
+    epic: "epic-f"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "\"IEP Audit + 90-day plan\" standalone product"
+    priority: "P2"
+    effort: "L"
+    body: |
+      What: One-time consulting product: founder reviews a child's IEP
+      and delivers a written 90-day plan. Stripe one-time payment,
+      structured intake, deliverable template.
+
+      Why: Lower-friction first purchase; converts skeptics. Also a
+      revenue line that doesn't require a cohort.
+
+      Acceptance:
+      - Dedicated landing page.
+      - Stripe one-time checkout.
+      - Templated deliverable + intake.
+
+  - id: F5
+    epic: "epic-f"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "District / B2B billing (PO + invoice flow)"
+    priority: "P2"
+    effort: "XL"
+    body: |
+      What: Support purchase orders and net-30 invoicing for district or
+      agency-funded students. Stripe Invoicing or accounting-side flow.
+
+      Why: Districts that want to fund students cannot pay by parent
+      credit card. Without this we leave revenue and case studies on
+      the table.
+
+      Acceptance:
+      - PO capture in enrollment.
+      - Net-30 invoicing.
+      - W-9 / vendor onboarding handled.
+
+  - id: F6
+    epic: "epic-f"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "De-identified outcomes dataset + Year 2 marketing case studies"
+    priority: "P2"
+    effort: "L"
+    body: |
+      What: Aggregate cohort-1 pre/post (C5), OG probe trends (C4), and
+      goal-attainment data (D7) into a de-identified dataset; produce 2–3
+      narrative case studies for Year 2 marketing.
+
+      Why: This is the conversion lever for Year 2 — real outcomes from
+      real students. Without it, Year 2 marketing is still "trust me."
+
+      Acceptance:
+      - De-identification reviewed against FERPA-style guidelines.
+      - 2–3 case studies with parent consent.
+      - Dataset reusable for grants / B2B pitches.

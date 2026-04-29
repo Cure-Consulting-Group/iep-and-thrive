@@ -8,6 +8,8 @@ import { useAuth } from '@/lib/auth-context'
 
 const adminLinks = [
   { label: 'Dashboard', href: '/admin', icon: '📊' },
+  { label: "Today's Plan", href: '/admin/curriculum/today', icon: '🌞' },
+  { label: 'Attendance', href: '/admin/attendance', icon: '🗒️' },
   { label: 'Students', href: '/admin/students', icon: '🎓' },
   { label: 'Pipeline', href: '/admin/pipeline', icon: '🔀' },
   { label: 'Bookings', href: '/admin/bookings', icon: '📅' },
