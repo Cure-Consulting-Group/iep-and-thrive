@@ -19,6 +19,7 @@
  */
 
 import { escapeHtml } from "./email-service";
+import { generateUnsubscribeToken } from "./unsubscribe-token";
 
 // ─── Shared variable schema (Epic G) ───
 
@@ -29,6 +30,8 @@ export interface EmailVariables {
   programTrack?: "reading" | "math" | "full" | string;
   cohortStartISO?: string;
   cohortEndISO?: string;
+  programLocation?: string;
+  programDailyHours?: string;
   portalUrl?: string;
   deadlineISO?: string;
 }
@@ -40,6 +43,7 @@ export interface EmailLayoutOpts {
   preheader?: string;
   footerNotes?: string;
   kind?: EmailKind;
+  unsubscribeToken?: string;
 }
 
 export interface RenderedEmail {
@@ -135,8 +139,12 @@ function emailLayout(contentOrOpts: string | EmailLayoutOpts): string {
     ? `<p style="text-align:center;color:#78716C;font-size:13px;margin-top:24px;">${opts.footerNotes}</p>`
     : "";
 
+  const unsubLink = opts.unsubscribeToken
+    ? `${SITE_URL}/unsubscribe?token=${encodeURIComponent(opts.unsubscribeToken)}`
+    : `${SITE_URL}/unsubscribe`;
+
   const complianceHtml = showUnsubscribe
-    ? `<p style="margin:0;font-size:11px;line-height:1.5;">You're receiving this as a parent or prospect of IEP &amp; Thrive. <a href="${SITE_URL}/unsubscribe" style="color:#78716C;text-decoration:underline;">Unsubscribe</a> · A program of Cure Consulting Group.</p>`
+    ? `<p style="margin:0;font-size:11px;line-height:1.5;">You're receiving this as a parent or prospect of IEP &amp; Thrive. <a href="${unsubLink}" style="color:#78716C;text-decoration:underline;">Unsubscribe</a> · A program of Cure Consulting Group.</p>`
     : `<p style="margin:0;font-size:11px;line-height:1.5;">This is a transactional email related to your IEP &amp; Thrive account · A program of Cure Consulting Group.</p>`;
 
   return `<!doctype html>
@@ -181,9 +189,197 @@ function emailLayout(contentOrOpts: string | EmailLayoutOpts): string {
 export function renderEmail(opts: {
   subject: string;
   layout: EmailLayoutOpts;
+  recipientUid?: string;
 }): RenderedEmail {
-  const html = emailLayout(opts.layout);
+  const layout: EmailLayoutOpts = opts.recipientUid
+    ? { ...opts.layout, unsubscribeToken: generateUnsubscribeToken(opts.recipientUid) }
+    : opts.layout;
+  const html = emailLayout(layout);
   return { subject: opts.subject, html, text: htmlToPlainText(html) };
+}
+
+// ─── G3: Pre-Program Ramp Templates ───
+//
+// Four lifecycle emails sent T-30 / T-14 / T-7 / T-1 days before program
+// start (Tue Jul 7, 2026). Voice: warm authority, parent-first, concrete.
+// Each template takes EmailVariables; renderEmail() wraps with the G1 shell
+// and (when recipientUid is provided) signs the unsubscribe link.
+
+export type RampPhase = "T-30" | "T-14" | "T-7" | "T-1";
+
+function fmtLong(iso: string | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+}
+
+function fmtMonthDay(iso: string | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+}
+
+function trackLabel(track: string | undefined): string {
+  if (track === "reading") return "Reading & Language Intensive";
+  if (track === "math") return "Math & Numeracy Intensive";
+  if (track === "full") return "Full Academic Intensive";
+  return "Summer Intensive";
+}
+
+export function preProgramRampTemplate(
+  phase: RampPhase,
+  vars: EmailVariables
+): { subject: string; layout: EmailLayoutOpts } {
+  const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
+  const student = vars.studentName ? escapeHtml(vars.studentName) : "your child";
+  const track = trackLabel(vars.programTrack);
+  const startLong = fmtLong(vars.cohortStartISO);
+  const startShort = fmtMonthDay(vars.cohortStartISO);
+  const location = escapeHtml(vars.programLocation || "Long Island, NY (exact location shared on enrollment)");
+  const hours = escapeHtml(vars.programDailyHours || "9:00am – 1:00pm, Monday–Friday");
+  const portalLink = `<a href="${SITE_URL}/portal" style="color:#1B4332;font-weight:600;">your parent portal</a>`;
+
+  const heading = (text: string) =>
+    `<h1 style="font-family:Georgia,serif;color:#1B4332;font-size:22px;margin:0 0 16px 0;line-height:1.3;">${text}</h1>`;
+
+  if (phase === "T-30") {
+    return {
+      subject: `${student}'s summer is taking shape — 30 days to kickoff`,
+      layout: {
+        kind: "lifecycle",
+        preheader: `One month out: here's what we're preparing for ${student}, and what we'll need from you in the next two weeks.`,
+        content: `
+          ${heading(`30 days until ${startShort}`)}
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+            One month from now, ${student} starts the ${track}. I'm already pulling
+            their IEP, mapping goals to our six-week scope, and finalizing the small-group
+            placements so the first morning isn't a guess — it's a plan.
+          </p>
+          <h2 style="font-family:Georgia,serif;color:#1B4332;font-size:17px;margin:20px 0 8px 0;">What I'm doing this month</h2>
+          <ul style="font-size:14px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;padding-left:20px;">
+            <li>Reviewing every current IEP &amp; mapping annual goals to weekly objectives</li>
+            <li>Grouping students by learning profile (not just grade)</li>
+            <li>Pre-printing weekly progress report templates for your CSE meeting</li>
+          </ul>
+          <h2 style="font-family:Georgia,serif;color:#1B4332;font-size:17px;margin:20px 0 8px 0;">What I'll need from you in the next 2 weeks</h2>
+          <ul style="font-size:14px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;padding-left:20px;">
+            <li>Intake form complete (medical, emergency contacts, learning notes)</li>
+            <li>Photo/video release signed (for portfolio &amp; family showcase)</li>
+            <li>Balance payment when you're ready (due ${fmtMonthDay(vars.cohortStartISO ? new Date(new Date(vars.cohortStartISO + "T00:00:00").getTime() - 14 * 86400000).toISOString().slice(0,10) : "")})</li>
+          </ul>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:20px 0 0 0;">
+            Everything lives in ${portalLink}. I'll send a logistics email two weeks out.
+          </p>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">
+            — IEP &amp; Thrive
+          </p>
+        `,
+      },
+    };
+  }
+
+  if (phase === "T-14") {
+    return {
+      subject: `Two weeks out: ${student}'s Day-1 logistics`,
+      layout: {
+        kind: "lifecycle",
+        preheader: `Pickup, dropoff, schedule, what to bring — everything you need to know before ${startShort}.`,
+        content: `
+          ${heading(`Two weeks until kickoff`)}
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+            ${student} starts ${startLong}. Here's the practical stuff — print this or save it.
+          </p>
+          <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+            <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;width:40%;">Schedule</td><td style="padding:8px 12px;">${hours}</td></tr>
+            <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Dates</td><td style="padding:8px 12px;">${startShort} – ${fmtMonthDay(vars.cohortEndISO)}</td></tr>
+            <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Location</td><td style="padding:8px 12px;">${location}</td></tr>
+            <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Cohort size</td><td style="padding:8px 12px;">6 students max</td></tr>
+          </table>
+          <h2 style="font-family:Georgia,serif;color:#1B4332;font-size:17px;margin:20px 0 8px 0;">What to bring (every day)</h2>
+          <ul style="font-size:14px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;padding-left:20px;">
+            <li>Refillable water bottle (labeled)</li>
+            <li>Snack — nut-free if any classmate has a nut allergy (I'll confirm)</li>
+            <li>One favorite book (we'll add to the portfolio)</li>
+            <li>Comfortable clothes — we move around</li>
+          </ul>
+          <h2 style="font-family:Georgia,serif;color:#1B4332;font-size:17px;margin:20px 0 8px 0;">If anything's changed</h2>
+          <p style="font-size:14px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+            Work schedule shifted? Summer travel? Custody changes? Reply to this email so I know.
+          </p>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:20px 0 0 0;">
+            Open ${portalLink} to confirm your intake and release are submitted.
+          </p>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">— IEP &amp; Thrive</p>
+        `,
+      },
+    };
+  }
+
+  if (phase === "T-7") {
+    return {
+      subject: `Final week — checklist for ${startShort}`,
+      layout: {
+        kind: "lifecycle",
+        preheader: `One week to go. Five-item checklist below — reply if anything is incomplete and I'll handle it.`,
+        content: `
+          ${heading(`One week until ${student} starts`)}
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+            One week from ${startLong}. Quick checklist — reply to this email if any item
+            below is a "no" and I'll handle it before Day 1.
+          </p>
+          <ul style="font-size:15px;line-height:1.8;color:#1C1917;margin:0 0 16px 0;padding-left:20px;">
+            <li>✅ Intake form submitted</li>
+            <li>✅ Photo / video release signed</li>
+            <li>✅ Balance payment processed</li>
+            <li>✅ Emergency contacts on file (at least one non-parent)</li>
+            <li>✅ Latest IEP shared (if not already in our portal)</li>
+          </ul>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">
+            Check status anytime in ${portalLink}.
+          </p>
+          <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
+            P.S. — If ${student} is nervous about Day 1, that's normal. I'll meet them at the
+            door, learn their name first, and we'll do an easy introduction activity before
+            any work. They'll be okay.
+          </p>
+          <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">— IEP &amp; Thrive</p>
+        `,
+      },
+    };
+  }
+
+  // T-1
+  return {
+    subject: `See ${student} tomorrow at 9am`,
+    layout: {
+      kind: "lifecycle",
+      preheader: `Tomorrow is Day 1. Quick logistics + my phone for anything urgent.`,
+      content: `
+        ${heading(`Tomorrow's the day`)}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          We're ready for ${student}. Quick recap so you're not searching email tomorrow morning:
+        </p>
+        <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+          <tr><td style="padding:8px 12px;background:#D8F3DC;font-weight:600;width:40%;">Time</td><td style="padding:8px 12px;background:#D8F3DC;">${hours}</td></tr>
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Where</td><td style="padding:8px 12px;">${location}</td></tr>
+          <tr><td style="padding:8px 12px;background:#D8F3DC;font-weight:600;">Bring</td><td style="padding:8px 12px;background:#D8F3DC;">Water, snack, favorite book</td></tr>
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Pickup</td><td style="padding:8px 12px;">1:00pm sharp — Friday parent debrief at pickup</td></tr>
+        </table>
+        <p style="font-size:14px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          If anything urgent comes up tomorrow morning — sick child, traffic, anything — text or
+          call. The number's in ${portalLink} under My Profile.
+        </p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">
+          See you at 9.
+        </p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">— IEP &amp; Thrive</p>
+      `,
+    },
+  };
 }
 
 // ─── Contact Notification ───

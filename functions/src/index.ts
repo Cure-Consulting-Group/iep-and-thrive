@@ -33,3 +33,6 @@ export { sendWeeklyDigest } from "./weekly-digest";
 
 // ─── G2: CAN-SPAM Unsubscribe Handler ───
 export { unsubscribe } from "./unsubscribe";
+
+// ─── G3: Pre-Program Ramp Series ───
+export { sendPreProgramRamp, previewRampEmail } from "./pre-program-ramp";

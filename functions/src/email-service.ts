@@ -15,6 +15,13 @@ export interface EmailOptions {
   subject: string;
   htmlBody: string;
   textBody?: string;
+  /**
+   * G2: when set to 'lifecycle' or 'marketing', sendEmailWithResult checks
+   * users.unsubscribed for `recipientUid` and skips the send if true.
+   * Defaults to 'transactional' (always sends).
+   */
+  kind?: "transactional" | "lifecycle" | "marketing";
+  recipientUid?: string;
 }
 
 export type EmailTemplateType =
@@ -76,6 +83,37 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 export async function sendEmailWithResult(
   options: EmailOptions
 ): Promise<SendEmailResult> {
+  // G2: opt-out enforcement for non-transactional kinds.
+  const kind = options.kind ?? "transactional";
+  if (kind !== "transactional" && options.recipientUid) {
+    try {
+      const userSnap = await admin
+        .firestore()
+        .collection("users")
+        .doc(options.recipientUid)
+        .get();
+      if (userSnap.exists) {
+        const data = userSnap.data() ?? {};
+        if (data.unsubscribed === true) {
+          console.log(
+            `[Email] Skipped ${kind} send to ${options.to} (uid=${options.recipientUid}) — unsubscribed.`
+          );
+          return { ok: false, messageId: null, error: "recipient_unsubscribed" };
+        }
+        if (data.isTest === true) {
+          // E13: test accounts never receive production lifecycle/marketing
+          // sends. Manual previewRampEmail bypasses by passing kind='transactional'.
+          console.log(
+            `[Email] Skipped ${kind} send to ${options.to} (uid=${options.recipientUid}) — isTest.`
+          );
+          return { ok: false, messageId: null, error: "recipient_is_test" };
+        }
+      }
+    } catch (err) {
+      console.error("[Email] Failed to check unsubscribe flag — proceeding with send:", err);
+    }
+  }
+
   const gmail = getGmailClient();
   const senderEmail =
     process.env.GMAIL_SENDER_EMAIL || "hello@iepandthrive.com";
@@ -89,13 +127,30 @@ export async function sendEmailWithResult(
     return { ok: false, messageId: null, error: "credentials_not_configured" };
   }
 
+  // Build the message body. If textBody is provided, send multipart/alternative
+  // so clients that prefer plain-text (or strip HTML) get a readable fallback.
+  let bodyBlock: string;
+  if (options.textBody) {
+    const boundary = `iet-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    bodyBlock =
+      `MIME-Version: 1.0\r\n` +
+      `Content-Type: multipart/alternative; boundary="${boundary}"\r\n\r\n` +
+      `--${boundary}\r\n` +
+      `Content-Type: text/plain; charset=utf-8\r\n\r\n` +
+      options.textBody +
+      `\r\n--${boundary}\r\n` +
+      `Content-Type: text/html; charset=utf-8\r\n\r\n` +
+      options.htmlBody +
+      `\r\n--${boundary}--\r\n`;
+  } else {
+    bodyBlock = `MIME-Version: 1.0\r\nContent-Type: text/html; charset=utf-8\r\n\r\n` + options.htmlBody;
+  }
+
   const raw = Buffer.from(
     `From: IEP & Thrive <${senderEmail}>\r\n` +
       `To: ${options.to}\r\n` +
       `Subject: ${options.subject}\r\n` +
-      `MIME-Version: 1.0\r\n` +
-      `Content-Type: text/html; charset=utf-8\r\n\r\n` +
-      options.htmlBody
+      bodyBlock
   ).toString("base64url");
 
   try {
