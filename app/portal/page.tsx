@@ -172,20 +172,20 @@ export default function PortalDashboard() {
   const load = useCallback(async () => {
     if (!user) return
     setLoading(true)
-    try {
-      const [studs, books, reps, unread] = await Promise.all([
-        getStudentsByParent(user.uid),
-        getBookingsByParent(user.uid),
-        getReportsByParent(user.uid),
-        getUnreadCount(user.uid).catch(() => 0),
-      ])
-      setStudents(studs)
-      setBookings(books)
-      setReports(reps)
-      setUnreadNotifications(unread)
-    } catch (err) {
-      console.error('Failed to load dashboard:', err)
-    }
+    const results = await Promise.allSettled([
+      getStudentsByParent(user.uid),
+      getBookingsByParent(user.uid),
+      getReportsByParent(user.uid),
+      getUnreadCount(user.uid),
+    ])
+    if (results[0].status === 'fulfilled') setStudents(results[0].value)
+    else console.error('Failed to load students:', results[0].reason)
+    if (results[1].status === 'fulfilled') setBookings(results[1].value)
+    else console.error('Failed to load bookings:', results[1].reason)
+    if (results[2].status === 'fulfilled') setReports(results[2].value)
+    else console.error('Failed to load reports:', results[2].reason)
+    if (results[3].status === 'fulfilled') setUnreadNotifications(results[3].value)
+    else console.error('Failed to load notifications:', results[3].reason)
     setLoading(false)
   }, [user])
 
