@@ -139,6 +139,7 @@ async function loadEnrolledStudents(): Promise<EnrolledStudent[]> {
 
   for (const userDoc of usersSnap.docs) {
     const userData = userDoc.data() || {};
+    if (userData.isTest === true) continue;
     const parentEmail = (userData.email as string) || "";
     const parentName = (userData.displayName as string) || "";
     if (!parentEmail) continue;

@@ -33,6 +33,7 @@ export interface Student {
   emergencyContacts: { name: string; phone: string; relationship: string }[]
   createdAt: Timestamp
   updatedAt: Timestamp
+  isTest?: boolean
 }
 
 // ─── Operations ───

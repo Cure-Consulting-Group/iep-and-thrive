@@ -21,6 +21,7 @@ export interface UserProfile {
   role: 'parent' | 'admin'
   phone: string
   createdAt: unknown
+  isTest?: boolean
 }
 
 interface AuthContextType {

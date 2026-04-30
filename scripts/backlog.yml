@@ -1021,6 +1021,96 @@ tickets:
       - Old subcollection left in place initially; deprecate after a
         Year 2 audit confirms no callers remain.
 
+  - id: E13
+    epic: "epic-e"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Test cohort accounts (3 parents at different lifecycle stages)"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Create 3 real Firebase Auth parent accounts, each seeded
+      with a realistic student record at a different cohort lifecycle
+      stage (inquiry, deposited, enrolled). All test accounts marked so
+      they don't pollute analytics, weekly digests, or roster counts.
+      Credentials stored in 1Password (no Secret Manager — that's E14).
+
+      Why: Founder is the only QA resource. Without test accounts, every
+      portal-side check requires logging out of admin, logging into a
+      real parent (or building impersonation, which is more work and has
+      privacy implications). Test accounts in a separate browser
+      profile = QA in 30 seconds.
+
+      Acceptance:
+      - 3 accounts created: parent-test-1/2/3@iepandthrive.com
+      - Each has a [TEST]-prefixed student name, grade 3 or 4, realistic
+        intake fields, distinct enrollmentStatus ('inquiry', 'deposited',
+        'enrolled')
+      - User profile flag `isTest: true` on all 3 accounts
+      - sendWeeklyDigest, summer guide drip, and any future
+        notification fan-outs filter out `isTest: true` users
+      - Credentials documented in 1Password with the path noted in
+        team docs (founder owns)
+      - Admin views (roster, pipeline) visually distinguish test
+        accounts (e.g. greyed-out badge or [TEST] prefix)
+
+  - id: E14
+    epic: "epic-e"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Test credentials in GCP Secret Manager + Playwright smoke tests"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Pair with E6 (Playwright smoke test suite). Move E13's test
+      account credentials from 1Password (interactive use) to GCP Secret
+      Manager so headless CI can fetch them at runtime. Wire Playwright
+      tests covering critical flows: enrollment form submit, login,
+      portal load, intake form complete, attendance read.
+
+      Why: Manual QA via test accounts catches UX bugs but doesn't
+      auto-detect regressions. CI smoke tests run on every push,
+      catching breakage before it lands in production. Secret Manager
+      earns its keep when CI needs runtime credential access — a
+      password manager can't serve a headless runner.
+
+      Acceptance:
+      - Secret Manager secret created: iep-and-thrive-test-credentials
+        (JSON: {accounts: [{email, password, label}]})
+      - IAM: only Cloud Build / GitHub Actions service account can read
+      - Playwright suite added under tests/e2e/, runs against
+        iep-and-thrive.web.app or a preview URL
+      - 5 critical-path tests minimum; each completes in <60s
+      - GH Actions workflow runs Playwright on every push to main
+      - Failing test blocks deploy (paired with E10 CI fix)
+
+  - id: E15
+    epic: "epic-e"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Admin parent impersonation (read-only, support/debug)"
+    priority: "P2"
+    effort: "M"
+    body: |
+      What: Admin can select a real parent and view their portal as a
+      read-only impersonation, for customer support ("I can't see my
+      reports — let me see what you see"). Persistent banner, write-
+      block on all parent mutations, audit log of every impersonation
+      session.
+
+      Why: Different use case than E13 (test accounts). Test accounts
+      catch regressions in test-data shapes; impersonation is the only
+      way to debug a specific real parent's issue without rebuilding
+      their state. Defer until cohort 2 — at solo-founder + 6-student
+      scale, founder can call the parent and walk through together.
+
+      Acceptance:
+      - useEffectiveUser() hook returns impersonated uid when admin
+        sets it; own uid otherwise
+      - Sticky orange banner: "Viewing as [Parent Name] · Exit"
+      - All write services guard via isImpersonating flag and throw
+      - impersonationLog/{id} collection records adminUid,
+        targetParentUid, started/endedAt
+      - ToS/privacy line discloses admin may view account data for
+        support purposes (founder + counsel)
+
   - id: E12
     epic: "epic-e"
     milestone: "Horizon 0 — Cohort 1 Launch"

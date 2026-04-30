@@ -89,6 +89,7 @@ async function getParentEmail(
       .get();
     if (!userDoc.exists) return null;
     const data = userDoc.data() ?? {};
+    if (data.isTest === true) return null;
     const email = (data.email as string | undefined) ?? "";
     const displayName = (data.displayName as string | undefined) ?? "";
     if (!email) return null;
