@@ -22,6 +22,8 @@ export interface UserProfile {
   phone: string
   createdAt: unknown
   isTest?: boolean
+  unsubscribed?: boolean
+  unsubscribedAt?: unknown
 }
 
 interface AuthContextType {

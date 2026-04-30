@@ -30,3 +30,6 @@ export { onAttendanceFlagged } from "./attendance-notifications";
 
 // ─── D5: Friday Weekly Digest ───
 export { sendWeeklyDigest } from "./weekly-digest";
+
+// ─── G2: CAN-SPAM Unsubscribe Handler ───
+export { unsubscribe } from "./unsubscribe";
