@@ -53,6 +53,36 @@ gcloud auth application-default login
 gcloud config set project iep-and-thrive
 ```
 
+## CI / GitHub Actions
+
+The `.github/workflows/e2e.yml` workflow runs the Playwright suite against production on every push to `main`, every PR, every 6 hours, and on manual dispatch.
+
+Test passwords are stored as GitHub Actions secrets (so they don't appear in CI logs):
+
+| Secret | Value |
+|---|---|
+| `E2E_INQUIRY_PASSWORD` | `TestPass123!inquiry` |
+| `E2E_DEPOSITED_PASSWORD` | `TestPass123!deposited` |
+| `E2E_ENROLLED_PASSWORD` | `TestPass123!enrolled` |
+
+These are intentionally low-stakes (test accounts gated by `isTest` so they never receive production emails). If the password formula changes, update both the seed script and the GitHub secrets:
+
+```bash
+gh secret set E2E_INQUIRY_PASSWORD --body '<new-password>' -R Cure-Consulting-Group/iep-and-thrive
+# repeat for deposited / enrolled
+```
+
+## E10 — separate manual step (CI hosting deploy)
+
+This is a different ticket. The `deploy.yml` workflow is broken because it requires a `FIREBASE_SERVICE_ACCOUNT` repo secret that doesn't exist. To unblock CI deploys (currently founder uses local `firebase deploy` only):
+
+1. Firebase Console → IAM & admin → Service accounts → Create service account named `github-actions-deploy`
+2. Grant roles: **Firebase Hosting Admin**, **Cloud Functions Developer** (least privilege)
+3. Keys tab → Add key → JSON → download
+4. `gh secret set FIREBASE_SERVICE_ACCOUNT --body "$(cat path/to/key.json)" -R Cure-Consulting-Group/iep-and-thrive`
+5. Delete the local key file
+6. Re-run the failing `Deploy to Firebase` workflow; should pass
+
 ## When to rotate
 
 These credentials are low-stakes (test accounts gated by `isTest`) but rotate the password formula if any test account password ever appears outside 1Password (slacked, screenshot, committed to a branch). Update both this doc and the `scripts/seed-test-accounts.mjs` PERSONAS block, then run reset + seed.

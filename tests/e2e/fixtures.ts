@@ -1,9 +1,24 @@
 import { Page, expect } from '@playwright/test'
 
+// Passwords default to the documented formula (TestPass123!{persona}).
+// CI overrides via E2E_*_PASSWORD env vars sourced from GitHub Actions
+// secrets so credentials don't appear in CI logs even if the formula changes.
 export const ACCOUNTS = {
-  inquiry:   { email: 'parent-test-inquiry@iepandthrive.com',   password: 'TestPass123!inquiry',   stage: 'Inquiry' },
-  deposited: { email: 'parent-test-deposited@iepandthrive.com', password: 'TestPass123!deposited', stage: 'Deposited' },
-  enrolled:  { email: 'parent-test-enrolled@iepandthrive.com',  password: 'TestPass123!enrolled',  stage: 'Enrolled' },
+  inquiry: {
+    email: 'parent-test-inquiry@iepandthrive.com',
+    password: process.env.E2E_INQUIRY_PASSWORD || 'TestPass123!inquiry',
+    stage: 'Inquiry',
+  },
+  deposited: {
+    email: 'parent-test-deposited@iepandthrive.com',
+    password: process.env.E2E_DEPOSITED_PASSWORD || 'TestPass123!deposited',
+    stage: 'Deposited',
+  },
+  enrolled: {
+    email: 'parent-test-enrolled@iepandthrive.com',
+    password: process.env.E2E_ENROLLED_PASSWORD || 'TestPass123!enrolled',
+    stage: 'Enrolled',
+  },
 } as const
 
 export type PersonaKey = keyof typeof ACCOUNTS
