@@ -6,14 +6,102 @@
  * - Gold: #D4860B
  * - Cream: #FDFAF4
  * - Sage: #D8F3DC
+ *
+ * G1 Foundation (Epic G):
+ * - emailLayout() accepts a string (legacy) or an EmailLayoutOpts object
+ *   with preheader, footerNotes, and `kind` (transactional | lifecycle |
+ *   marketing). Lifecycle/marketing emails get an unsubscribe link in the
+ *   footer per CAN-SPAM (G2).
+ * - renderEmail() returns { subject, html, text } with auto-generated
+ *   plain-text fallback for new templates.
+ * - Physical address sourced from OPERATOR_PHYSICAL_ADDRESS env var with
+ *   a clearly-marked placeholder fallback until founder confirms (G2).
  */
 
 import { escapeHtml } from "./email-service";
 
-// ─── Shared Layout ───
+// ─── Shared variable schema (Epic G) ───
 
-function emailLayout(content: string): string {
-  return `
+export interface EmailVariables {
+  parentName?: string;
+  parentEmail?: string;
+  studentName?: string;
+  programTrack?: "reading" | "math" | "full" | string;
+  cohortStartISO?: string;
+  cohortEndISO?: string;
+  portalUrl?: string;
+  deadlineISO?: string;
+}
+
+export type EmailKind = "transactional" | "lifecycle" | "marketing";
+
+export interface EmailLayoutOpts {
+  content: string;
+  preheader?: string;
+  footerNotes?: string;
+  kind?: EmailKind;
+}
+
+export interface RenderedEmail {
+  subject: string;
+  html: string;
+  text: string;
+}
+
+// ─── Foundation helpers ───
+
+function getPhysicalAddress(): string {
+  return (
+    process.env.OPERATOR_PHYSICAL_ADDRESS ||
+    "Long Island, NY · [Mailing address pending — set OPERATOR_PHYSICAL_ADDRESS env var]"
+  );
+}
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://iep-and-thrive.web.app";
+
+/**
+ * Strip HTML to plain-text. Conservative — handles the tags our templates
+ * actually use (p, br, h1-h6, li, a, strong, em). For richer needs we'd
+ * pull in `html-to-text`; this stays dep-free.
+ */
+export function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p\s*>/gi, "\n\n")
+    .replace(/<\/h[1-6]\s*>/gi, "\n\n")
+    .replace(/<\/li\s*>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "  • ")
+    .replace(/<\/tr\s*>/gi, "\n")
+    .replace(/<\/td\s*>/gi, "  ")
+    .replace(/<a [^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/gi, "$2 ($1)")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+// ─── Shared Layout ───
+//
+// Accepts either a string (legacy callers — auto-wrapped as transactional)
+// or an EmailLayoutOpts object. Returns full HTML document with header,
+// content card, and CAN-SPAM-compliant footer (address always; unsubscribe
+// link for lifecycle/marketing).
+
+function emailLayout(contentOrOpts: string | EmailLayoutOpts): string {
+  // Legacy callers (string content) get the original simple shell — preserves
+  // production behavior for the 9 existing templates until each is migrated
+  // to the EmailLayoutOpts object form.
+  if (typeof contentOrOpts === "string") {
+    return `
     <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FDFAF4; padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
         <span style="font-family: Georgia, serif; font-size: 22px; font-weight: bold;">
@@ -23,7 +111,7 @@ function emailLayout(content: string): string {
         </span>
       </div>
       <div style="background: white; border-radius: 16px; padding: 32px; border: 1px solid rgba(27,67,50,0.12);">
-        ${content}
+        ${contentOrOpts}
       </div>
       <p style="text-align: center; color: #78716C; font-size: 12px; margin-top: 24px;">
         IEP & Thrive · Special Education Summer Intensive<br/>
@@ -31,6 +119,71 @@ function emailLayout(content: string): string {
       </p>
     </div>
   `;
+  }
+
+  // New form: full G1 shell with preheader, footer notes, and CAN-SPAM
+  // compliance footer (address + unsubscribe for lifecycle/marketing).
+  const opts = contentOrOpts;
+  const kind = opts.kind ?? "transactional";
+  const showUnsubscribe = kind !== "transactional";
+
+  const preheaderHtml = opts.preheader
+    ? `<div style="display:none;font-size:1px;color:#FDFAF4;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">${escapeHtml(opts.preheader)}</div>`
+    : "";
+
+  const footerNotesHtml = opts.footerNotes
+    ? `<p style="text-align:center;color:#78716C;font-size:13px;margin-top:24px;">${opts.footerNotes}</p>`
+    : "";
+
+  const complianceHtml = showUnsubscribe
+    ? `<p style="margin:0;font-size:11px;line-height:1.5;">You're receiving this as a parent or prospect of IEP &amp; Thrive. <a href="${SITE_URL}/unsubscribe" style="color:#78716C;text-decoration:underline;">Unsubscribe</a> · A program of Cure Consulting Group.</p>`
+    : `<p style="margin:0;font-size:11px;line-height:1.5;">This is a transactional email related to your IEP &amp; Thrive account · A program of Cure Consulting Group.</p>`;
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body style="margin:0;padding:0;background:#FDFAF4;">
+  ${preheaderHtml}
+  <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FDFAF4; padding: 32px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="font-family: Georgia, serif; font-size: 22px; font-weight: bold;">
+        <span style="color: #1B4332;">IEP</span>
+        <span style="color: #D4860B;"> &amp; </span>
+        <span style="color: #1B4332;">Thrive</span>
+      </span>
+    </div>
+    <div style="background: white; border-radius: 16px; padding: 32px; border: 1px solid rgba(27,67,50,0.12);">
+      ${opts.content}
+    </div>
+    ${footerNotesHtml}
+    <div style="text-align:center;color:#78716C;font-size:12px;margin-top:24px;line-height:1.6;">
+      <p style="margin:0 0 6px 0;">
+        <strong>IEP &amp; Thrive</strong> · Special Education Summer Intensive<br/>
+        ${getPhysicalAddress()}<br/>
+        <a href="${SITE_URL}" style="color:#1B4332;">iep-and-thrive.web.app</a>
+      </p>
+      ${complianceHtml}
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Render a complete email (subject + html + auto-generated plain-text).
+ * Preferred entry point for new templates (Epic G+). Existing templates
+ * continue to call emailLayout() directly — they automatically get the
+ * new shell + compliance footer through the same path.
+ */
+export function renderEmail(opts: {
+  subject: string;
+  layout: EmailLayoutOpts;
+}): RenderedEmail {
+  const html = emailLayout(opts.layout);
+  return { subject: opts.subject, html, text: htmlToPlainText(html) };
 }
 
 // ─── Contact Notification ───

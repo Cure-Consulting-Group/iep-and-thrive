@@ -68,6 +68,9 @@ labels:
     - name: "epic-f"
       color: "6B6560"
       description: "Year 2 / Productization"
+    - name: "epic-g"
+      color: "FDFAF4"
+      description: "Email Lifecycle System"
 
 tickets:
   # ---- Epic A — Marketing Site Conversion Hardening ----
@@ -1281,3 +1284,398 @@ tickets:
       - De-identification reviewed against FERPA-style guidelines.
       - 2–3 case studies with parent consent.
       - Dataset reusable for grants / B2B pitches.
+
+  # ---- Epic G — Email Lifecycle System ----
+  - id: G1
+    epic: "epic-g"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Email foundation: shared layout + variable schema + test-send mode"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Single shared `<EmailLayout>` shell (header + body slot +
+      footer with address, sender ID, unsubscribe), typed variable
+      schema for personalization (parentName, studentName, programTrack,
+      cohortStartISO, portalUrl, deadlineISO, etc.), plain-text fallback
+      generator, and an admin test-send tool that previews any template
+      with a chosen persona's data.
+
+      Why: 8 templates ship today, ~22 more coming. Without a shared
+      shell every new template re-styles headers/footers — drift is
+      guaranteed. Variable schema prevents merge-tag bugs in production.
+      Test-send tool prevents shipping broken templates to real parents.
+
+      Acceptance:
+      - functions/src/email-templates.ts exports renderEmail(
+          layout opts incl. preheader, content, footer notes
+        ) used by all current and future templates.
+      - All 8 existing templates retrofitted to the new shell.
+      - Plain-text fallback auto-generated and attached to every send.
+      - Mobile-responsive (verify at 320px width).
+      - Admin can preview any template via /admin/email-log "Preview"
+        button or a Cloud Function callable.
+
+  - id: G2
+    epic: "epic-g"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "CAN-SPAM compliance: unsubscribe + physical address + opt-out enforcement"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Every commercial email must include a physical postal
+      address, sender identification, a one-click unsubscribe link, and
+      respect opt-outs within 10 days. Implement a global `unsubscribed`
+      flag on `users/{uid}` profile + a one-click /unsubscribe?token=
+      route that flips it. Marketing/lifecycle emails check the flag
+      before sending; transactional emails (bookings, attendance flags,
+      reports) ignore it.
+
+      Why: Current 8 templates have zero unsubscribe affordance and no
+      physical address. Legal exposure today, even at low volume.
+      P0 because the moment we send any new lifecycle email, a parent
+      could complain.
+
+      Acceptance:
+      - users.unsubscribed: boolean field, default false
+      - One-click /unsubscribe?token=<HMAC of uid> route
+      - Token-signed link prevents enumeration attacks
+      - Footer of every email renders address + unsubscribe link
+        (or "transactional — required for your enrollment" for txn)
+      - sendEmail() service checks flag for marketing/lifecycle category
+      - Address sourced from env (OPERATOR_PHYSICAL_ADDRESS); founder
+        confirms before merge
+
+  - id: G3
+    epic: "epic-g"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Pre-program ramp series: T-30 / T-14 / T-7 / Day-before"
+    priority: "P0"
+    effort: "L"
+    body: |
+      What: Four scheduled emails to every deposited family in the
+      run-up to Day 1 (Tue Jul 7, 2026):
+      - T-30: "What's coming — IEP review week starts"
+      - T-14: "Two weeks out — pickup/dropoff logistics"
+      - T-7:  "Final week — what to bring, what to expect"
+      - Day-before: "See you tomorrow at 9am"
+
+      Why: Drives Day-1 readiness. Parents who receive logistics 7 days
+      out arrive prepared; parents who don't show up confused, miss
+      forms, or skip Day 1 entirely. Direct primary metric for Epic G.
+
+      Acceptance:
+      - 4 templates registered in email-templates.ts
+      - Scheduled Cloud Function (sendPreProgramRamp) running daily at
+        9:00 ET, gates by date math (T-30/T-14/T-7/T-1)
+      - Skips if user.unsubscribed (G2) or isTest (E13)
+      - Personalized: parentName, studentName, cohortStartISO, location
+      - emailLog/ entry per send
+
+  - id: G4
+    epic: "epic-g"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Balance due reminder series: T-30 / T-14 / T-7"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Three scheduled reminders for deposited families whose
+      balance hasn't been paid yet, ending T-2 weeks before program
+      start (June 23, 2026). Each links directly to Stripe Checkout
+      for the balance.
+
+      Why: Balance is 75% of tuition revenue per family. A single
+      missed balance is $2,625-$3,000. Reminders are the lowest-cost
+      revenue-protection lever we have.
+
+      Acceptance:
+      - 3 templates with progressive urgency (informational →
+        reminder → final-call)
+      - Scheduled function checks Stripe for balance paid status
+      - Skips families who paid balance early
+      - Links use stripeCheckout endpoint with type=balance
+      - emailLog tagged template=balance_due_T<n>
+
+  - id: G5
+    epic: "epic-g"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Final report delivery + program wrap email"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Email triggered when admin publishes the CSE-ready final
+      report for a student (sets progressReports.weekNumber=7 with
+      reportUrl). Renders the report link inside the IEP & Thrive
+      shell with a wrap message about CSE meeting prep, next-steps,
+      and post-program survey.
+
+      Why: This is THE handoff moment. Final report is the deliverable
+      that justifies $4K tuition and lets parents walk into September
+      CSE meetings with documented evidence. The email is the bow on
+      the package — every alum family judges program quality on the
+      polish of this moment.
+
+      Acceptance:
+      - Firestore trigger on progressReports/{id} write where
+        weekNumber=7 and viewedAt=null
+      - Includes link to authenticated portal report viewer (NOT
+        inline PDF — auth-gated for FERPA-adjacent privacy)
+      - Voice: appreciative, forward-looking, CSE-prep-oriented
+      - Founder's name + signature in body
+      - Footer note: "post-program survey coming next week"
+        (sets up G9)
+
+  - id: G6
+    epic: "epic-g"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Photo/video release reminder (pre-Day 1)"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Reminder email if a deposited family has not yet returned
+      a signed photo/video release by T-14 days. Includes the release
+      form link (e-sign per B6) and a clear opt-out path.
+
+      Why: Without signed release, we cannot use student photos in the
+      portfolio (C7), the showcase (C8), or any Year 2 case study (F6).
+      Catching missing releases before Day 1 (vs scrambling Day 1) is
+      worth a one-line scheduled function.
+
+      Acceptance:
+      - Daily check; if user has deposited student without signed
+        release and date >= T-14, send template (max once)
+      - Template links to release sign route
+      - Tracked in emailLog
+      - Skips on unsubscribe (G2) or isTest (E13)
+
+  - id: G7
+    epic: "epic-g"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Discovery call series: confirmation + 24h reminder + 48h follow-up"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Three templates around the discovery call lifecycle:
+      - Confirmation when call is booked (immediate)
+      - 24h reminder before call (scheduled)
+      - 48h follow-up after call ("ready to enroll? questions?")
+
+      Why: Discovery → deposit conversion is the top funnel leak. Cold
+      traffic books a call, then half ghost. The follow-up email
+      surfaces hesitations and recovers ~20-30% of "talked but didn't
+      move" bookings (industry rule of thumb).
+
+      Acceptance:
+      - confirmation: triggered by booking onCreate (replaces existing
+        booking confirmation for type=discovery)
+      - reminder: existing sendBookingReminders function extended for
+        discovery type
+      - follow-up: new scheduled function fires 48h post-call
+        completion if status != 'enrolled'
+
+  - id: G8
+    epic: "epic-g"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Mid-program parent check-in survey (Week 3)"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Week 3 (around Jul 28, 2026) email to every enrolled
+      family asking: "How is it going? What's working? What's not?"
+      with a 3-question survey form (Tally / Google Form / Typeform).
+
+      Why: Catches concerns before they're complaints. Small program;
+      every family's continued satisfaction matters disproportionately.
+      Mid-program surveys also surface positive testimonials we can use
+      for end-of-program harvest.
+
+      Acceptance:
+      - Scheduled function fires Mon Jul 27, 2026 9:00 ET
+      - Sends to enrolled (not deposited-only) families
+      - Survey link tracked in emailLog
+      - Negative responses (rating <= 3) trigger operator alert (G10)
+
+  - id: G9
+    epic: "epic-g"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Post-program survey + testimonial harvest"
+    priority: "P1"
+    effort: "M"
+    body: |
+      What: Two templates fired after Aug 15 program end:
+      - Post-program survey (T+3 days): structured outcomes survey
+      - Testimonial request (T+14 days): asks for written or video
+        testimonial with consent form
+
+      Why: Year 2 marketing is built on Year 1 testimonials. Asking
+      every alum family at peak goodwill (just received final report)
+      is the highest-yield moment we'll ever have for this. F6
+      (de-identified case studies) depends on this data.
+
+      Acceptance:
+      - Both scheduled functions
+      - Survey covers: Day-1 readiness, instructor quality, IEP-goal
+        progress, would-recommend (NPS), testimonial-permission
+      - Consent form for video testimonials (FERPA-aware)
+      - Responses written to surveyResponses/ collection (new)
+
+  - id: G10
+    epic: "epic-g"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Operator alerts: stale inquiry / capacity hit / negative survey"
+    priority: "P2"
+    effort: "M"
+    body: |
+      What: Three operator-side alert templates fired to founder when
+      attention is needed:
+      - Stale inquiry: 7+ days since inquiry submitted, no progress
+      - Capacity hit: cohort reaches 6 students enrolled — start waitlist
+      - Negative survey: any survey response with rating <= 3
+
+      Why: Founder is solo; without alerts, edge cases get lost.
+      Operator-side, low parent impact — defer until cohort 1 patterns
+      reveal which alerts actually save founder time.
+
+      Acceptance:
+      - 3 templates, sent to OPERATOR_EMAIL only
+      - Triggered by Firestore writes (or scheduled for stale-inquiry)
+      - Tagged template=ops_<type> in emailLog
+
+  - id: G11
+    epic: "epic-g"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Intake form started-but-incomplete reminder"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Reminder email if a deposited family has started intake
+      (any field filled) but not submitted within 7 days. Includes
+      direct link to /portal/intake.
+
+      Why: Day-1 readiness depends on completed intake. Founder
+      can't run sessions without IEP info, medical, emergency
+      contacts. The reminder is cheap insurance against scramble.
+
+      Acceptance:
+      - Daily check of users with deposited student where intake
+        progress > 0 and submitted = false and 7+ days elapsed
+      - Max once per parent per cohort
+      - Skips on unsubscribe (G2) or isTest (E13)
+
+  - id: G12
+    epic: "epic-g"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "Weather/cancellation broadcast template + admin send tool"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Template for ad-hoc operator broadcasts (e.g. "Tomorrow's
+      session canceled due to forecast — make-up Friday"). Admin UI
+      composes message + recipient set (all enrolled vs single
+      family) and sends in <2 min.
+
+      Why: Real cohort = real emergencies. Sick founder, forecast
+      issues, facility lockouts. Single template + send tool keeps
+      response time tight when it matters.
+
+      Acceptance:
+      - Template: header "Schedule update" + free-text body slot +
+        standard footer
+      - /admin/broadcast UI with recipient picker
+      - Confirmation step before send
+      - emailLog tagged template=broadcast
+
+  - id: G13
+    epic: "epic-g"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Re-engagement: 90-day inactive parent"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Parent who inquired but hasn't booked or deposited within
+      90 days receives a single re-engagement email with a "still
+      interested?" prompt + cohort 2 early-bird offer (when product
+      exists).
+
+      Why: Year 2 problem — at current scale (20 inquiries) the manual
+      check is faster. Defer.
+
+      Acceptance:
+      - Scheduled monthly
+      - Skips parents who deposited or unsubscribed
+      - Sends at most once per parent per 12 months
+
+  - id: G14
+    epic: "epic-g"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Cross-sell: school-year tutoring announcement (alum)"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Email to cohort-1 alum families announcing school-year
+      Saturday tutoring (when product exists, F3). Links to
+      enrollment with alum discount.
+
+      Why: Highest-converting audience for Year 2 cross-sell — they
+      already know our pedagogy and pricing. Defer until F3 ships.
+
+      Acceptance:
+      - Triggered manually by founder
+      - Scoped to enrollmentStatus=completed
+      - Discount code unique per family
+
+  - id: G15
+    epic: "epic-g"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Refund processed notification"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Triggered by Stripe refund webhook. Confirms refund
+      amount, reason, and timeline.
+
+      Why: Edge case at cohort 1 scale — handle ad-hoc until cohort 2.
+
+      Acceptance:
+      - Stripe webhook handler updated
+      - Template covers full + partial refund cases
+
+  - id: G16
+    epic: "epic-g"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Branded Firebase Auth emails (verification, password reset)"
+    priority: "P2"
+    effort: "S"
+    body: |
+      What: Replace Firebase default verification + password-reset
+      emails with IEP & Thrive branded versions via Firebase Auth
+      custom action handlers.
+
+      Why: Default Firebase emails work and are minimally branded.
+      Polish; not blocking. Defer.
+
+      Acceptance:
+      - Custom email action URL configured in Firebase Console
+      - Handler renders branded shell + token-passing UI
+      - Verification + reset both work end-to-end
+
+  - id: G17
+    epic: "epic-g"
+    milestone: "Horizon 2 — Year 2 Productization"
+    title: "Email preference center (per-category opt-outs)"
+    priority: "P2"
+    effort: "M"
+    body: |
+      What: /portal/preferences page lets parents opt out of
+      categories independently (marketing vs digest vs lifecycle).
+      G2 ships single global unsubscribe; G17 is the granular polish.
+
+      Why: At cohort-1 scale a single global unsubscribe satisfies
+      CAN-SPAM and the few unsubscribers we'll see. Per-category
+      becomes valuable when marketing volume scales.
+
+      Acceptance:
+      - users.emailPreferences: { marketing, digest, lifecycle }
+      - Each email send checks the relevant category
+      - /portal/preferences UI to toggle
+      - Unsubscribe link defaults to single-click global; "manage
+        preferences" link routes to the page
