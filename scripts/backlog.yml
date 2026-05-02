@@ -284,6 +284,7 @@ tickets:
     title: "Welcome email sequence post-signup (3 emails over 7 days)"
     priority: "P0"
     effort: "M"
+    done: true
     body: |
       What: Three transactional emails fired after parent account creation:
       Day 0 (welcome + portal tour link), Day 2 (intake form nudge if
@@ -1381,6 +1382,7 @@ tickets:
     title: "Balance due reminder series: T-30 / T-14 / T-7"
     priority: "P0"
     effort: "M"
+    done: true
     body: |
       What: Three scheduled reminders for deposited families whose
       balance hasn't been paid yet, ending T-2 weeks before program
@@ -1434,6 +1436,7 @@ tickets:
     title: "Photo/video release reminder (pre-Day 1)"
     priority: "P0"
     effort: "S"
+    done: true
     body: |
       What: Reminder email if a deposited family has not yet returned
       a signed photo/video release by T-14 days. Includes the release
@@ -1550,6 +1553,7 @@ tickets:
     title: "Intake form started-but-incomplete reminder"
     priority: "P1"
     effort: "S"
+    done: true
     body: |
       What: Reminder email if a deposited family has started intake
       (any field filled) but not submitted within 7 days. Includes

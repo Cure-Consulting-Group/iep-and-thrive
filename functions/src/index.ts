@@ -36,3 +36,18 @@ export { unsubscribe } from "./unsubscribe";
 
 // ─── G3: Pre-Program Ramp Series ───
 export { sendPreProgramRamp, previewRampEmail } from "./pre-program-ramp";
+
+// ─── B1: Welcome Email Sequence (day-0 / day-2 / day-7) ───
+export { sendWelcomeSequence } from "./welcome-sequence";
+
+// ─── Unified Email Preview (HTTPS, admin-token gated) ───
+export { previewEmail } from "./preview-email";
+
+// ─── G4: Balance Due Reminders (T-30 / T-14 / T-7) ───
+export { sendBalanceDueReminders } from "./balance-due-reminders";
+
+// ─── G6: Photo / Video Release Reminder (T-14) ───
+export { sendPhotoReleaseReminder } from "./photo-release-reminder";
+
+// ─── G11: Intake Started-but-Incomplete Reminder ───
+export { sendIntakeIncompleteReminder } from "./intake-incomplete-reminder";
