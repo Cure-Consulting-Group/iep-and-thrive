@@ -1378,6 +1378,7 @@ tickets:
     title: "Balance due reminder series: T-30 / T-14 / T-7"
     priority: "P0"
     effort: "M"
+    done: true
     body: |
       What: Three scheduled reminders for deposited families whose
       balance hasn't been paid yet, ending T-2 weeks before program

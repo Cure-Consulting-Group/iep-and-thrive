@@ -42,3 +42,6 @@ export { sendWelcomeSequence } from "./welcome-sequence";
 
 // ─── Unified Email Preview (HTTPS, admin-token gated) ───
 export { previewEmail } from "./preview-email";
+
+// ─── G4: Balance Due Reminders (T-30 / T-14 / T-7) ───
+export { sendBalanceDueReminders } from "./balance-due-reminders";
