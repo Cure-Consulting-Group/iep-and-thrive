@@ -10,11 +10,24 @@ import { google } from "googleapis";
 
 // ─── Types ───
 
+export interface EmailAttachment {
+  filename: string;
+  /** Buffer of file body, or base64-encoded string. */
+  content: Buffer | string;
+  contentType: string;
+}
+
 export interface EmailOptions {
   to: string;
   subject: string;
   htmlBody: string;
   textBody?: string;
+  /**
+   * E3: optional attachments. When present, the outgoing message is rendered
+   * as multipart/mixed wrapping the alternative body. Each attachment becomes
+   * a Content-Disposition: attachment part.
+   */
+  attachments?: EmailAttachment[];
   /**
    * G2: when set to 'lifecycle' or 'marketing', sendEmailWithResult checks
    * users.unsubscribed for `recipientUid` and skips the send if true.
@@ -129,19 +142,59 @@ export async function sendEmailWithResult(
 
   // Build the message body. If textBody is provided, send multipart/alternative
   // so clients that prefer plain-text (or strip HTML) get a readable fallback.
+  // E3: when attachments are present we wrap the alternative in a
+  //     multipart/mixed envelope and add Content-Disposition: attachment parts.
+  const hasAttachments = !!(options.attachments && options.attachments.length);
+  const altBoundary = `iet-alt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  const mixBoundary = `iet-mix-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+
+  function altPart(): string {
+    if (options.textBody) {
+      return (
+        `Content-Type: multipart/alternative; boundary="${altBoundary}"\r\n\r\n` +
+        `--${altBoundary}\r\n` +
+        `Content-Type: text/plain; charset=utf-8\r\n\r\n` +
+        options.textBody +
+        `\r\n--${altBoundary}\r\n` +
+        `Content-Type: text/html; charset=utf-8\r\n\r\n` +
+        options.htmlBody +
+        `\r\n--${altBoundary}--\r\n`
+      );
+    }
+    return `Content-Type: text/html; charset=utf-8\r\n\r\n` + options.htmlBody;
+  }
+
+  function attachmentParts(): string {
+    if (!options.attachments) return "";
+    let out = "";
+    for (const att of options.attachments) {
+      const buf = typeof att.content === "string" ? Buffer.from(att.content, "base64") : att.content;
+      const b64 = buf.toString("base64").replace(/(.{76})/g, "$1\r\n");
+      out +=
+        `--${mixBoundary}\r\n` +
+        `Content-Type: ${att.contentType}; name="${att.filename}"\r\n` +
+        `Content-Transfer-Encoding: base64\r\n` +
+        `Content-Disposition: attachment; filename="${att.filename}"\r\n\r\n` +
+        b64 +
+        `\r\n`;
+    }
+    return out;
+  }
+
   let bodyBlock: string;
-  if (options.textBody) {
-    const boundary = `iet-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  if (hasAttachments) {
     bodyBlock =
       `MIME-Version: 1.0\r\n` +
-      `Content-Type: multipart/alternative; boundary="${boundary}"\r\n\r\n` +
-      `--${boundary}\r\n` +
-      `Content-Type: text/plain; charset=utf-8\r\n\r\n` +
-      options.textBody +
-      `\r\n--${boundary}\r\n` +
-      `Content-Type: text/html; charset=utf-8\r\n\r\n` +
-      options.htmlBody +
-      `\r\n--${boundary}--\r\n`;
+      `Content-Type: multipart/mixed; boundary="${mixBoundary}"\r\n\r\n` +
+      `--${mixBoundary}\r\n` +
+      altPart() +
+      `\r\n` +
+      attachmentParts() +
+      `--${mixBoundary}--\r\n`;
+  } else if (options.textBody) {
+    bodyBlock =
+      `MIME-Version: 1.0\r\n` +
+      altPart();
   } else {
     bodyBlock = `MIME-Version: 1.0\r\nContent-Type: text/html; charset=utf-8\r\n\r\n` + options.htmlBody;
   }

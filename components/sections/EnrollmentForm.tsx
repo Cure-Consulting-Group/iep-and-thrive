@@ -61,13 +61,28 @@ export default function EnrollmentForm() {
         body: JSON.stringify(data),
       })
 
-      if (!res.ok) {
-        const result = await res.json()
+      const result = await res.json()
+      if (!res.ok || !result.success) {
         throw new Error(result.error || 'Something went wrong')
       }
 
       trackEnrollmentSubmit(data.programInterest)
-      router.push('/success')
+      // E3: send to e-signature step before Stripe checkout when we know
+      // the chosen program track. Inquiries with 'Not sure yet' fall
+      // through to /success so the team can call before requesting a
+      // signed agreement.
+      const trackMap: Record<string, 'full' | 'reading' | 'math'> = {
+        'Full Academic Intensive': 'full',
+        'Reading & Language Intensive': 'reading',
+        'Math & Numeracy Intensive': 'math',
+      }
+      const track = trackMap[data.programInterest as keyof typeof trackMap]
+      if (result.inquiryId && track) {
+        const next = '/enroll/agreement?inquiryId=' + result.inquiryId + '&program=' + track
+        router.push(next)
+      } else {
+        router.push('/success')
+      }
     } catch (err) {
       setServerError(
         err instanceof Error ? err.message : 'Something went wrong. Please try again.'

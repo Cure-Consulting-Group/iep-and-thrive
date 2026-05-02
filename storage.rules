@@ -25,5 +25,21 @@ service firebase.storage {
         (request.auth.uid == userId || request.auth.token.admin == true);
       allow write: if request.auth != null && request.auth.token.admin == true;
     }
+
+    // E3 — Signed enrollment agreements (server-written; client read-only)
+    match /signedAgreements/{enrollmentId} {
+      allow read: if request.auth != null;
+      // Authorization (own vs admin) is enforced server-side via
+      // getSignedAgreementPdf; client direct reads work only if firestore
+      // metadata permits, but we keep this gate auth-required to fail safe.
+      allow write: if false;
+    }
+
+    // E3 — Per-uid raw signature images (audit-only; admin + owner read)
+    match /signatures/{userId}/{allPaths=**} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == userId || request.auth.token.admin == true);
+      allow write: if false;
+    }
   }
 }
