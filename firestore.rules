@@ -84,6 +84,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Assessment results (C5) - pre/post battery scores per student.
+    // Same parent-read / admin-write contract as probeResults.
+    match /assessmentResults/{id} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Guide leads — server-only (Cloud Functions use Admin SDK, bypassing rules)
     // Deny all client-side access; no public reads or writes
     match /guideLeads/{leadId} {

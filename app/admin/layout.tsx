@@ -17,6 +17,7 @@ const adminLinks = [
   { label: 'Curriculum', href: '/admin/curriculum', icon: '📖' },
   { label: 'Materials', href: '/admin/materials', icon: '🧰' },
   { label: 'Probes', href: '/admin/probes', icon: '📈' },
+  { label: 'Assessments', href: '/admin/assessments', icon: '📝' },
   { label: 'Resources', href: '/admin/resources', icon: '📁' },
   { label: 'Reports', href: '/admin/reports', icon: '📈' },
   { label: 'Email Log', href: '/admin/email-log', icon: '✉️' },
