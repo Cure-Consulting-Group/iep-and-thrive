@@ -74,6 +74,16 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // Probe results (C4) - weekly Orton-Gillingham probe data per student
+    // (phonics accuracy %, ORF wpm, error tallies). Parents may read only
+    // their own student records; admin writes all.
+    match /probeResults/{id} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Guide leads — server-only (Cloud Functions use Admin SDK, bypassing rules)
     // Deny all client-side access; no public reads or writes
     match /guideLeads/{leadId} {
