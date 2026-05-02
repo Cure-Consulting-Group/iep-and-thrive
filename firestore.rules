@@ -68,6 +68,31 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // Admin tasks (C2) - instructor checklist state (e.g. weekly materials prep).
+    // Pure instructor surface; no parent visibility.
+    match /adminTasks/{taskId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Probe results (C4) - weekly Orton-Gillingham probe data per student
+    // (phonics accuracy %, ORF wpm, error tallies). Parents may read only
+    // their own student records; admin writes all.
+    match /probeResults/{id} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Assessment results (C5) - pre/post battery scores per student.
+    // Same parent-read / admin-write contract as probeResults.
+    match /assessmentResults/{id} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Guide leads — server-only (Cloud Functions use Admin SDK, bypassing rules)
     // Deny all client-side access; no public reads or writes
     match /guideLeads/{leadId} {

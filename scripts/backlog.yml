@@ -434,6 +434,7 @@ tickets:
       - Includes attendance and behavioral flag entry inline (links to C3).
 
   - id: C2
+    status: done
     epic: "epic-c"
     milestone: "Horizon 0 — Cohort 1 Launch"
     title: "Materials prep checklist generator per week"
@@ -472,6 +473,7 @@ tickets:
       - Data structured for downstream report generation.
 
   - id: C4
+    status: done
     epic: "epic-c"
     milestone: "Horizon 0 — Cohort 1 Launch"
     title: "Weekly OG probe data capture (phonics accuracy %, ORF wpm)"
@@ -491,6 +493,7 @@ tickets:
       - Exportable to the final report (C6).
 
   - id: C5
+    status: done
     epic: "epic-c"
     milestone: "Horizon 0 — Cohort 1 Launch"
     title: "Pre-/post-assessment battery digital capture"

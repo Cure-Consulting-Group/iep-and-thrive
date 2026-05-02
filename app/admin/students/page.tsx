@@ -7,6 +7,7 @@ import {
   Student,
   EnrollmentStatus,
 } from '@/lib/student-service'
+import ProbeTrendList from '@/components/admin/ProbeTrendList'
 
 const STATUS_LABELS: Record<EnrollmentStatus, string> = {
   inquiry: 'Inquiry',
@@ -251,6 +252,12 @@ export default function AdminStudentsPage() {
                         📄 View IEP Document
                       </a>
                     )}
+                  </div>
+
+                  {/* Probe trend (C4) */}
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <h3 className="font-body text-xs font-semibold text-text-muted uppercase mb-3">Probe Trend</h3>
+                    <ProbeTrendList studentId={student.id} />
                   </div>
                 </div>
               )}

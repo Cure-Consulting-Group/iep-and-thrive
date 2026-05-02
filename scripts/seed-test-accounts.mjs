@@ -107,6 +107,14 @@ const PERSONAS = [
   },
 ]
 
+const ADMIN_PERSONA = {
+  key: 'admin',
+  email: 'admin-test@iepandthrive.com',
+  password: 'TestPass123!admin',
+  displayName: '[TEST] Admin Instructor',
+  phone: '(555) 010-9999',
+}
+
 async function deleteExistingByEmail(auth, email) {
   try {
     const existing = await auth.getUserByEmail(email)
@@ -161,6 +169,32 @@ async function seedOne(auth, db, persona) {
   return { uid: created.uid, studentId: studentRef.id, email: persona.email }
 }
 
+async function seedAdmin(auth, db) {
+  const oldUid = await deleteExistingByEmail(auth, ADMIN_PERSONA.email)
+  if (oldUid) await deleteUserDoc(db, oldUid)
+
+  const created = await auth.createUser({
+    email: ADMIN_PERSONA.email,
+    password: ADMIN_PERSONA.password,
+    displayName: ADMIN_PERSONA.displayName,
+    emailVerified: true,
+  })
+
+  // Custom claim drives Firestore rules and ProtectedRoute requireAdmin guard.
+  await auth.setCustomUserClaims(created.uid, { admin: true })
+
+  await db.collection('users').doc(created.uid).set({
+    email: ADMIN_PERSONA.email,
+    displayName: ADMIN_PERSONA.displayName,
+    role: 'admin',
+    phone: ADMIN_PERSONA.phone,
+    isTest: true,
+    createdAt: FieldValue.serverTimestamp(),
+  })
+
+  return { uid: created.uid, email: ADMIN_PERSONA.email }
+}
+
 async function main() {
   assertEnvironment()
 
@@ -180,12 +214,18 @@ async function main() {
     console.log(`  ✅ ${persona.key.padEnd(10)} → ${persona.email}  uid=${r.uid}`)
   }
 
+  // Admin instructor account (custom claim admin:true).
+  const adminRes = await seedAdmin(auth, db)
+  console.log(`  ✅ admin      → ${adminRes.email}  uid=${adminRes.uid}`)
+
   console.log('═'.repeat(60))
   console.log(`\nDone. Credentials (store in 1Password under "IEP & Thrive — Test Accounts"):\n`)
   for (const persona of PERSONAS) {
     console.log(`  ${persona.email}`)
     console.log(`    password: ${persona.password}`)
   }
+  console.log(`  ${ADMIN_PERSONA.email}`)
+  console.log(`    password: ${ADMIN_PERSONA.password}`)
   console.log(`\nTo reset: node scripts/reset-test-accounts.mjs`)
 }
 

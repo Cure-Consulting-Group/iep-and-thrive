@@ -18,7 +18,7 @@ import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 
 const PROJECT_ID = 'iep-and-thrive'
-const TEST_EMAIL_PREFIX = 'parent-test-'
+const TEST_EMAIL_PREFIXES = ['parent-test-', 'admin-test']
 
 function assertEnvironment() {
   const project = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || ''
@@ -47,7 +47,7 @@ async function main() {
   const auth = getAuth()
   const db = getFirestore()
 
-  console.log(`\nResetting test accounts (prefix "${TEST_EMAIL_PREFIX}") in: ${PROJECT_ID}`)
+  console.log(`\nResetting test accounts (prefixes 'parent-test-' / 'admin-test') in: ${PROJECT_ID}`)
   console.log('═'.repeat(60))
 
   let pageToken
@@ -58,7 +58,7 @@ async function main() {
     const list = await auth.listUsers(1000, pageToken)
     for (const user of list.users) {
       const email = user.email || ''
-      if (!email.startsWith(TEST_EMAIL_PREFIX)) continue
+      if (!TEST_EMAIL_PREFIXES.some((pre) => email.startsWith(pre))) continue
       const studentCount = await deleteUserCascading(db, user.uid)
       await auth.deleteUser(user.uid)
       console.log(`  🗑️  ${email}  (uid=${user.uid}, students=${studentCount})`)
