@@ -26,4 +26,9 @@ export const CLOUD_FUNCTIONS = {
   summerGuideCapture: `${FUNCTIONS_BASE_URL}/summerGuideCapture`,
   submitEnrollmentAgreement: `${FUNCTIONS_BASE_URL}/submitEnrollmentAgreement`,
   getSignedAgreementPdf: `${FUNCTIONS_BASE_URL}/getSignedAgreementPdf`,
+  // Epic H — tutoring subscriptions. Implementations land in functions/src
+  // via tickets H3 (subscriptionCheckout) and H11 (customerPortal). URL
+  // shape matches all other Cloud Functions endpoints.
+  subscriptionCheckout: `${FUNCTIONS_BASE_URL}/subscriptionCheckout`,
+  customerPortal: `${FUNCTIONS_BASE_URL}/customerPortal`,
 } as const;

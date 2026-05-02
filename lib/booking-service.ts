@@ -16,13 +16,19 @@ import { db } from '@/lib/firebase'
 
 // ─── Types ───
 
+export type SlotType =
+  | 'discovery_call'
+  | 'consultation'
+  | 'check_in'
+  | 'tutoring'
+
 export interface AvailableSlot {
   id: string
   date: string          // "2026-07-15"
   startTime: string     // "10:00"
   endTime: string       // "10:20"
   duration: number      // 20
-  type: 'discovery_call' | 'consultation' | 'check_in'
+  type: SlotType
   isAvailable: boolean
   bookedBy: string | null
   createdAt: Timestamp
@@ -34,7 +40,7 @@ export interface Booking {
   parentName: string
   parentEmail: string
   studentName: string
-  type: 'discovery_call' | 'consultation' | 'check_in'
+  type: SlotType
   slotId: string
   date: string
   startTime: string
