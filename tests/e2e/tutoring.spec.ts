@@ -92,15 +92,15 @@ test.describe('Booking gate states (Epic H5/H10)', () => {
   })
 
   test('Enrolled (no subscription) → "No active tutoring subscription"', async ({ page }) => {
-    await login(page, ACCOUNTS.enrolled)
+    await login(page, 'enrolled')
     await page.goto('/book?type=tutoring')
     await expect(page.getByText(/no active tutoring subscription/i).first()).toBeVisible()
   })
 
   test('Subscriber → SessionsCounter chip is visible', async ({ page }) => {
     test.skip(SKIP_SUBSCRIBER, 'Set SKIP_SUBSCRIBER_TESTS=1 if subscriber persona is not seeded.')
-    if (!ACCOUNTS.subscriber) test.skip()
-    await login(page, ACCOUNTS.subscriber!)
+    if (!('subscriber' in ACCOUNTS)) test.skip()
+    await login(page, 'subscriber')
     await page.goto('/book?type=tutoring')
     await expect(page.getByRole('status').first()).toBeVisible()
   })
@@ -113,8 +113,8 @@ test.describe('Booking gate states (Epic H5/H10)', () => {
 test.describe('Portal subscription page (Epic H6/H10)', () => {
   test('Subscriber sees plan summary + sessions tracker', async ({ page }) => {
     test.skip(SKIP_SUBSCRIBER, 'Set SKIP_SUBSCRIBER_TESTS=1 if subscriber persona is not seeded.')
-    if (!ACCOUNTS.subscriber) test.skip()
-    await login(page, ACCOUNTS.subscriber!)
+    if (!('subscriber' in ACCOUNTS)) test.skip()
+    await login(page, 'subscriber')
     await page.goto('/portal/subscription')
     await expect(page.getByText(/active subscription/i).first()).toBeVisible()
     await expect(page.getByText(/sessions remaining/i).first()).toBeVisible()

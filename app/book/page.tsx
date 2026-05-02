@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Suspense, useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import {
@@ -39,6 +39,14 @@ const SEGMENTS: { value: BookingType; label: string; description?: string }[] = 
 const DROP_IN_CHECKOUT_URL = `${CLOUD_FUNCTIONS.stripeCheckout}?product=drop-in`
 
 export default function BookingPage() {
+  return (
+    <Suspense fallback={<div className="text-text-muted text-sm py-8">Loading…</div>}>
+      <BookingPageInner />
+    </Suspense>
+  )
+}
+
+function BookingPageInner() {
   const { user, profile } = useAuth()
   const searchParams = useSearchParams()
   const router = useRouter()
