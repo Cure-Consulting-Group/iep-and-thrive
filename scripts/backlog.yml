@@ -1959,6 +1959,7 @@ tickets:
     title: "Slot seeding tool / runbook for founder weekly availability"
     priority: "P0"
     effort: "S"
+    status: "done"
     body: |
       What: scripts/seed-tutoring-slots.mjs that takes a JSON-ish
       week template (e.g., "Mon/Wed/Fri 4pm, 5pm, 6pm") and writes
