@@ -1801,6 +1801,7 @@ tickets:
     title: "Stripe webhook extension for subscription + invoice events"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: Extend functions/src/stripe-webhook.ts to handle:
       - customer.subscription.created → write users/{uid}.subscription
