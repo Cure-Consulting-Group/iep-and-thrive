@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SignatureCanvas, SignatureCanvasHandle } from '@/components/portal/SignatureCanvas'
 import { useAuth } from '@/lib/auth-context'
@@ -13,6 +13,14 @@ import Link from 'next/link'
 type ProgramTrack = 'full' | 'reading' | 'math'
 
 export default function EnrollmentAgreementPage() {
+  return (
+    <Suspense fallback={<div className="text-text-muted text-sm py-8">Loading…</div>}>
+      <EnrollmentAgreementInner />
+    </Suspense>
+  )
+}
+
+function EnrollmentAgreementInner() {
   const router = useRouter()
   const search = useSearchParams()
   const { user, profile, loading: authLoading } = useAuth()

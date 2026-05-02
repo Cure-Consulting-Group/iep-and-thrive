@@ -5,9 +5,9 @@ import { useAuth } from "@/lib/auth-context"
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
-  MaterialsCategory,
-  MaterialsManifest,
-} from "@/lib/materials-parser"
+  type MaterialsCategory,
+  type MaterialsManifest,
+} from "@/lib/materials-types"
 import {
   MaterialsChecklistDoc,
   getMaterialsChecklist,

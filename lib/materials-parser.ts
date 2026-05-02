@@ -22,33 +22,24 @@
 
 import fs from "fs"
 import path from "path"
+import {
+  PARSER_VERSION,
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  slugify,
+  type MaterialsCategory,
+  type MaterialsItem,
+  type MaterialsManifest,
+} from "@/lib/materials-types"
 
-export const PARSER_VERSION = 1
-
-export type MaterialsCategory = "literacy" | "math" | "general" | "enrichment"
-
-export const CATEGORY_LABELS: Record<MaterialsCategory, string> = {
-  literacy: "Literacy",
-  math: "Math",
-  general: "General",
-  enrichment: "Enrichment",
+// Re-export types and constants for back-compat with existing consumers.
+export {
+  PARSER_VERSION,
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  slugify,
 }
-
-export const CATEGORY_ORDER: MaterialsCategory[] = ["literacy", "math", "general", "enrichment"]
-
-export interface MaterialsItem {
-  id: string                       // stable slug — see slugify()
-  name: string                     // human-facing display name
-  category: MaterialsCategory
-  sources: string[]                // e.g. ["overview", "monday:math"]
-}
-
-export interface MaterialsManifest {
-  weekNumber: number
-  parserVersion: number
-  generatedAt: string              // ISO timestamp
-  items: MaterialsItem[]
-}
+export type { MaterialsCategory, MaterialsItem, MaterialsManifest }
 
 const CURRICULUM_DIR = path.join(process.cwd(), "curriculum")
 
@@ -63,11 +54,6 @@ function normalizeName(raw: string): string {
     .replace(/-/g, " ")
     .replace(/\s+/g, " ")
     .trim()
-}
-
-export function slugify(raw: string): string {
-  const n = normalizeName(raw)
-  return n.replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 80) || "item"
 }
 
 const CATEGORY_KEYWORDS: { category: MaterialsCategory; patterns: RegExp[] }[] = [

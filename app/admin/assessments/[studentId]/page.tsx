@@ -1,23 +1,20 @@
-'use client'
+import AssessmentStudentClient from "./AssessmentStudentClient"
 
-import { useParams } from "next/navigation"
-import Link from "next/link"
-import AssessmentBatteryView from "@/components/admin/AssessmentBatteryView"
+// Static export requires generateStaticParams. Student IDs aren't known at
+// build time, so the canonical client route is
+// /admin/assessments/student?studentId=…  (see ../student/page.tsx).
+// This dynamic route stub is kept to avoid breaking any hardcoded links;
+// it generates no static pages.
+// Returns a placeholder param to satisfy `output: 'export'`; the
+// real entry point is /admin/assessments/student?studentId=…
+export function generateStaticParams() {
+  return [{ studentId: "_" }]
+}
 
-export default function AssessmentStudentPage() {
-  const params = useParams()
-  const studentId = (params?.studentId as string) || ""
-  if (!studentId) {
-    return <div className="text-text-muted text-sm py-8">Missing student id.</div>
-  }
-  return (
-    <div>
-      <div className="mb-4">
-        <Link href="/admin/assessments" className="text-sm font-body text-forest underline">
-          &larr; All assessments
-        </Link>
-      </div>
-      <AssessmentBatteryView studentId={studentId} />
-    </div>
-  )
+export default function AssessmentStudentPage({
+  params,
+}: {
+  params: { studentId: string }
+}) {
+  return <AssessmentStudentClient studentId={params.studentId} />
 }

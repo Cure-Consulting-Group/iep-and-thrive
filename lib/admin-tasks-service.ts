@@ -24,11 +24,11 @@ import {
   FieldValue,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import {
+import type {
   MaterialsCategory,
   MaterialsItem,
   MaterialsManifest,
-} from "@/lib/materials-parser"
+} from "@/lib/materials-types"
 
 const COLLECTION = "adminTasks"
 
