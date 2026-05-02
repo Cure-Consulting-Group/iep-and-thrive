@@ -19,6 +19,13 @@ export const ACCOUNTS = {
     password: process.env.E2E_ENROLLED_PASSWORD || 'TestPass123!enrolled',
     stage: 'Enrolled',
   },
+  // Epic H — used by tests/e2e/tutoring.spec.ts. Requires
+  // scripts/seed-test-accounts.mjs to run with the subscriber persona.
+  subscriber: {
+    email: 'parent-test-subscriber@iepandthrive.com',
+    password: process.env.E2E_SUBSCRIBER_PASSWORD || 'TestPass123!subscriber',
+    stage: 'Subscriber',
+  },
 } as const
 
 // Admin (instructor) account. Seeded via scripts/seed-test-accounts.mjs;
