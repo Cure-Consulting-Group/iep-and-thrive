@@ -71,6 +71,9 @@ labels:
     - name: "epic-g"
       color: "FDFAF4"
       description: "Email Lifecycle System"
+    - name: "epic-h"
+      color: "40916C"
+      description: "Tutoring Subscription & Booking"
 
 tickets:
   # ---- Epic A — Marketing Site Conversion Hardening ----
@@ -1693,3 +1696,339 @@ tickets:
       - /portal/preferences UI to toggle
       - Unsubscribe link defaults to single-click global; "manage
         preferences" link routes to the page
+
+  # ──────────────────────────────────────────────────────────────────
+  # Epic H — Tutoring Subscription & Booking
+  # PRD:    docs/tutoring-prd.md
+  # Design: docs/tutoring-design.md
+  # Contract: lib/subscription.ts (banked to main BEFORE agent dispatch)
+  # ──────────────────────────────────────────────────────────────────
+
+  - id: H1
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "/tutoring marketing one-pager (hero + 3 pricing cards + IEP add-on + FAQ)"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Build the public-facing /tutoring page per docs/tutoring-design.md §1-5.
+      Sections: TutoringHero, Trust Strip, Who This Is For (4 cards), 3
+      PricingCards in a row (Drop-in $125, Weekly $460/mo featured,
+      Twice-Weekly $880/mo), IEPReviewBanner ($250 add-on), How It
+      Works (3 steps), reused AboutFounder, 6-question FAQ, bottom CTA.
+
+      Add /tutoring entry to Nav.tsx and Footer.tsx; add
+      /portal/subscription entry to portal nav.
+
+      Pricing values come from lib/subscription.ts TUTORING_PRICING —
+      do NOT inline duplicate values.
+
+      Why: Productize an existing offering, capture the pipeline that
+      doesn't fit the cohort, and lay groundwork for Year-2 recurring
+      revenue.
+
+      Acceptance:
+      - /tutoring renders all 11 sections at desktop + tablet + mobile
+      - 3 PricingCards each link to the correct Stripe checkout endpoint
+      - IEPReviewBanner CTA links to one-time checkout for $250 product
+      - FAQ uses the existing FAQ atom (no new accordion)
+      - Lighthouse: performance ≥ 90, a11y ≥ 95
+      - All copy, prices, and feature lists pulled from lib/subscription.ts
+
+  - id: H2
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Stripe products + customer portal config (founder runbook)"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: Document the Stripe Dashboard work the founder must do
+      manually — create 4 products (Drop-in, Weekly, Twice-Weekly,
+      IEP Review), enable customer portal with cancel/pause flows,
+      capture the 4 price IDs into env vars.
+
+      This is operations, not engineering. Implementation agent
+      writes docs/runbooks/stripe-tutoring-products.md with the
+      exact dashboard steps + an env var snippet.
+
+      Why: Stripe products can't be code-managed in our setup;
+      runbook removes ambiguity.
+
+      Acceptance:
+      - Runbook covers product creation steps for each tier
+      - Env var names match lib/subscription.ts stripePriceIdEnvVar()
+        contract: STRIPE_TUTORING_WEEKLY_PRICE_ID,
+        STRIPE_TUTORING_TWICE_WEEKLY_PRICE_ID,
+        STRIPE_TUTORING_DROPIN_PRICE_ID,
+        STRIPE_TUTORING_IEP_REVIEW_PRICE_ID
+      - Customer portal config: cancel-at-period-end + pause options
+        enabled; payment method update enabled
+      - Webhook events to subscribe: customer.subscription.created,
+        customer.subscription.updated, customer.subscription.deleted,
+        invoice.paid, invoice.payment_failed
+
+  - id: H3
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "subscriptionCheckout Cloud Function (Stripe subscription mode)"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: New Cloud Function functions/src/subscription-checkout.ts
+      exposing an HTTPS endpoint that creates a Stripe Checkout
+      session in `mode: 'subscription'` for the requested tier.
+
+      Mirrors the existing functions/src/stripe-checkout.ts (one-time
+      payment mode) but uses subscription price IDs.
+
+      Why: Existing checkout function only supports one-time mode for
+      cohort deposits; subscription mode is a separate Stripe flow.
+
+      Acceptance:
+      - Endpoint accepts query/body { plan: 'weekly' | 'twice-weekly' }
+      - Resolves price ID via lib/subscription.ts stripePriceIdEnvVar()
+      - Creates session with success_url=/portal/subscription?welcome=1
+        and cancel_url=/tutoring#pricing
+      - Persists session.client_reference_id = uid (parent must be
+        signed in; reject anonymous with 401)
+      - Exported from functions/src/index.ts
+      - Endpoint URL added to lib/functions-config.ts CLOUD_FUNCTIONS
+
+  - id: H4
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Stripe webhook extension for subscription + invoice events"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: Extend functions/src/stripe-webhook.ts to handle:
+      - customer.subscription.created → write users/{uid}.subscription
+        SubscriptionState per lib/subscription.ts shape, send welcome
+        email
+      - customer.subscription.updated → patch state (status, periodEnd,
+        cancelAtPeriodEnd)
+      - customer.subscription.deleted → status='canceled'; send
+        cancelled email
+      - invoice.paid (subsequent renewal) → reset sessionsUsedThisCycle=0,
+        update currentPeriodStart/End, send monthly receipt email
+      - invoice.payment_failed → status='past_due', send recover email
+
+      Map Stripe customerId → uid via existing
+      stripeCustomerId field on users/{uid} (or look up by
+      session.client_reference_id at first creation).
+
+      Why: Webhook is the only authoritative writer of subscription
+      state; client never writes it.
+
+      Acceptance:
+      - All 5 event types implemented
+      - Idempotent (Stripe redelivers; check event.id in
+        webhookEventLog/ collection)
+      - Each handler logs to emailLog for the email it sends
+      - Existing one-time payment flow (cohort deposits) untouched
+
+  - id: H5
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "BookingGate + SegmentedControl + tutoring slot type on /book"
+    priority: "P0"
+    effort: "L"
+    body: |
+      What: Extend app/book/page.tsx with a SegmentedControl tab
+      (Discovery call / Tutoring session / Drop-in). Render gate
+      states A/B/C/D/E per docs/tutoring-design.md §6 — drive
+      branching from lib/subscription.ts bookingGateState() helper.
+
+      Components to build:
+      - components/ui/SegmentedControl.tsx (radiogroup pattern,
+        keyboard arrow nav)
+      - components/portal/BookingGate.tsx (states A, B, E)
+      - components/portal/SessionsCounter.tsx (states C, D — chip,
+        role=status aria-live=polite, prop-driven { used, allowed,
+        cycleEnd })
+
+      Tutoring slots are availableSlots/ docs with type: 'tutoring'.
+      Booking a tutoring slot from state C decrements
+      users/{uid}.subscription.sessionsUsedThisCycle in a transaction
+      with the booking write.
+
+      24-hour cancel policy enforced server-side: cancellation < 24h
+      before slot DOES NOT decrement sessionsUsedThisCycle (forfeit).
+
+      Why: Without the gate, anyone could book tutoring slots without
+      paying.
+
+      Acceptance:
+      - All 5 states render correctly per design spec
+      - SessionsCounter announces decrement to screen readers
+      - Sessions counter decrement happens in same Firestore tx as
+        booking write (no race)
+      - Same-day cancellation forfeits (no decrement reversal)
+      - Calendar dimmed overlay for state D (exhausted)
+      - Policy block always visible below calendar in C/D
+      - Existing discovery-call booking flow unchanged
+
+  - id: H6
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "/portal/subscription page (status + sessions tracker + portal link)"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: New parent-portal page at /portal/subscription per
+      docs/tutoring-design.md §7. 4 cards: Plan summary,
+      SessionsTracker, Recent sessions (last 5), Policy reminder.
+      Empty state for parents without active sub. past_due banner.
+      Loading skeleton.
+
+      Components:
+      - components/portal/SubscriptionStatusCard.tsx
+      - components/portal/SessionsTrackerCard.tsx (reuses
+        SessionsCounter under the hood)
+
+      "Manage subscription in customer portal" CTA opens Stripe
+      Customer Portal session (call functions/src/customer-portal.ts
+      to mint the URL — small new HTTPS callable).
+
+      Why: Self-service subscription management without engineering
+      tickets per cancellation.
+
+      Acceptance:
+      - Card 1 shows tier, status, renews date, next charge
+      - Card 2 shows X / Y sessions remaining + progress bar
+      - Card 3 lists last 5 bookings with status badges
+      - Card 4 shows the 4 policy bullets
+      - Empty state when no subscription
+      - past_due banner triggers when status='past_due'
+      - Stripe customer-portal link opens in new tab
+      - Page is in the parent-portal nav
+
+  - id: H7
+    epic: "epic-h"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "/admin/subscribers list view"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Admin-only page at /admin/subscribers showing all
+      users/{uid} with active subscriptions: tier, status, sessions
+      this cycle (used/allowed), cycle end, recent no-shows.
+      Filterable by tier and status.
+
+      Why: Founder needs to see capacity utilization at a glance and
+      flag anyone trending toward churn.
+
+      Acceptance:
+      - Admin auth gate (custom claim admin:true)
+      - Table renders all subscribers with the columns above
+      - Filter chips: All / Active / Past-due / Cancelled
+      - Click row → /admin/students for that parent
+      - Empty state when no subscribers yet
+
+  - id: H8
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Email templates: subscription welcome, monthly receipt, forfeit reminder"
+    priority: "P1"
+    effort: "S"
+    body: |
+      What: Add to functions/src/email-templates.ts (or sibling file
+      lifecycle-email-templates.ts) three new templates:
+      - subscriptionWelcomeTemplate (transactional)
+      - subscriptionMonthlyReceiptTemplate (transactional)
+      - sessionForfeitedTemplate (lifecycle)
+      - subscriptionPausedTemplate (transactional)
+      - subscriptionCanceledTemplate (transactional)
+
+      Hooked from H4 webhook handlers.
+
+      Why: Customer-portal-only management leaves a communication gap
+      without these emails.
+
+      Acceptance:
+      - All 5 templates render with the standard email shell
+      - Subject lines + preheader copy match design spec §8
+      - All emails respect users.unsubscribed flag
+      - All sends log to emailLog/
+
+  - id: H9
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Slot seeding tool / runbook for founder weekly availability"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: scripts/seed-tutoring-slots.mjs that takes a JSON-ish
+      week template (e.g., "Mon/Wed/Fri 4pm, 5pm, 6pm") and writes
+      availableSlots/ docs for the next N weeks with type: 'tutoring'.
+      Plus docs/runbooks/tutoring-slot-management.md explaining how
+      to use it, blackout cohort weeks, and rebuild after schedule
+      changes.
+
+      Why: Without seeded slots, the booking calendar is empty. Founder
+      shouldn't need to click each slot in the admin UI.
+
+      Acceptance:
+      - Script accepts --weeks N and --start YYYY-MM-DD args
+      - Skips dates that fall inside cohort weeks (July 7 – Aug 14)
+      - Idempotent (delete-and-rebuild flag)
+      - Runbook covers cohort-weeks blackout, weekend schedule, and
+        how to add/remove slots one-off via /admin/slots
+
+  - id: H10
+    epic: "epic-h"
+    milestone: "Horizon 0 — Cohort 1 Launch"
+    title: "Playwright e2e: drop-in checkout, subscription checkout, subscriber booking"
+    priority: "P0"
+    effort: "M"
+    body: |
+      What: New tests/e2e/tutoring.spec.ts covering:
+      - /tutoring page renders with correct prices from
+        lib/subscription.ts
+      - Drop-in CTA opens Stripe checkout (assert redirect URL)
+      - Subscription CTAs open subscription checkout (assert URL with
+        plan param)
+      - IEP review CTA opens one-time checkout
+      - Logged-in subscriber visits /book?type=tutoring → sees
+        SessionsCounter + slot calendar
+      - Logged-in non-subscriber visits /book?type=tutoring → sees
+        BookingGate state B
+      - Anonymous visits /book?type=tutoring → sees BookingGate state A
+
+      Use the existing test cohort personas + the admin-test persona
+      added in C2/C4/C5. May need a new "subscriber" persona seeded
+      via scripts/seed-test-accounts.mjs.
+
+      Why: Critical paths must not regress; the gate has 5 states
+      and they all matter.
+
+      Acceptance:
+      - All 7 specs pass against deployed site
+      - State A and B tested via fresh-incognito flows
+      - State C tested via seeded subscriber persona
+      - Specs added to tests/e2e/tutoring.spec.ts
+      - Subscriber test persona added if missing
+
+  - id: H11
+    epic: "epic-h"
+    milestone: "Horizon 1 — Cohort 1 Operate"
+    title: "customerPortal Cloud Function (Stripe billing portal session URL)"
+    priority: "P0"
+    effort: "S"
+    body: |
+      What: New HTTPS callable function customerPortal that mints a
+      Stripe billing portal session URL for the authenticated parent
+      (using their stripeCustomerId from users/{uid}). Returns
+      { url: string }. Client (/portal/subscription) calls it on
+      "Manage subscription" click and redirects window.location.
+
+      Why: H6 needs this to surface the customer-portal CTA. Pulled
+      out as its own ticket so it can ship in parallel with H6.
+
+      Acceptance:
+      - Auth-required HTTPS callable
+      - Reads users/{uid}.stripeCustomerId
+      - Sets return_url = absolute /portal/subscription URL
+      - Errors gracefully when no stripeCustomerId (no sub)
+      - Exported from functions/src/index.ts
+      - URL added to CLOUD_FUNCTIONS in lib/functions-config.ts
