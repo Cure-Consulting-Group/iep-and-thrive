@@ -834,6 +834,7 @@ tickets:
     title: "Firestore daily backup automation"
     priority: "P0"
     effort: "S"
+    status: "done"
     body: |
       What: Scheduled Cloud Function (or gcloud scheduler job) that runs
       a Firestore export to a dedicated GCS bucket nightly with 30-day
@@ -872,6 +873,7 @@ tickets:
     title: "Signed enrollment agreement (PDF, e-sign) replacing checkbox"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: Replace the current "I agree" checkbox with a real e-sign flow
       (Documenso, Dropbox Sign, or similar) producing a signed PDF stored
@@ -1674,6 +1676,8 @@ tickets:
     title: "Email preference center (per-category opt-outs)"
     priority: "P2"
     effort: "M"
+    status: "done"
+    status: "done"
     body: |
       What: /portal/preferences page lets parents opt out of
       categories independently (marketing vs digest vs lifecycle).

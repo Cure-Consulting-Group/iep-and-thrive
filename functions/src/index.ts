@@ -54,3 +54,6 @@ export { sendIntakeIncompleteReminder } from "./intake-incomplete-reminder";
 
 // ─── B6: Photo/Video Release E-Signature ───
 export { submitPhotoRelease } from "./photo-release";
+
+// ─── E3: Enrollment Agreement E-Signature ───
+export { submitEnrollmentAgreement, getSignedAgreementPdf } from "./e-signature";

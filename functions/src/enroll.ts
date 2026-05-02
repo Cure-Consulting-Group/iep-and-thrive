@@ -73,15 +73,19 @@ export const enroll = onRequest(
         confirmSent
       );
 
-      // 3. Save enrollment inquiry to Firestore
-      await admin.firestore().collection("enrollmentInquiries").add({
-        ...data,
-        notificationSent: notifSent,
-        confirmationSent: confirmSent,
-        submittedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      // 3. Save enrollment inquiry to Firestore (return id so /enroll/agreement
+      //    can correlate the signed agreement back to this inquiry).
+      const inquiryRef = await admin
+        .firestore()
+        .collection("enrollmentInquiries")
+        .add({
+          ...data,
+          notificationSent: notifSent,
+          confirmationSent: confirmSent,
+          submittedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
-      res.status(200).json({ success: true });
+      res.status(200).json({ success: true, inquiryId: inquiryRef.id });
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({ success: false, error: "Invalid form data" });

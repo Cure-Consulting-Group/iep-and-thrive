@@ -24,4 +24,6 @@ export const CLOUD_FUNCTIONS = {
   enroll: `${FUNCTIONS_BASE_URL}/enroll`,
   stripeCheckout: `${FUNCTIONS_BASE_URL}/stripeCheckout`,
   summerGuideCapture: `${FUNCTIONS_BASE_URL}/summerGuideCapture`,
+  submitEnrollmentAgreement: `${FUNCTIONS_BASE_URL}/submitEnrollmentAgreement`,
+  getSignedAgreementPdf: `${FUNCTIONS_BASE_URL}/getSignedAgreementPdf`,
 } as const;

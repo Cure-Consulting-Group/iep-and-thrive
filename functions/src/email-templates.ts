@@ -853,3 +853,51 @@ export function weeklyDigestTemplate(data: {
     `),
   };
 }
+
+// ─── E3: Signed Agreement Delivery ───
+//
+// Sent at sign-time with the rendered PDF as an attachment. ESIGN
+// "ability to receive a signed copy" requirement.
+
+function trackLabelE3(track: string): string {
+  if (track === "reading") return "Reading & Language Intensive";
+  if (track === "math") return "Math & Numeracy Intensive";
+  if (track === "full") return "Full Academic Intensive";
+  return "Summer Intensive";
+}
+
+export function signedAgreementDeliveryTemplate(data: {
+  parentName: string;
+  studentName: string;
+  programTrack: string;
+}): RenderedEmail {
+  const safeParent = escapeHtml(data.parentName.split(" ")[0] || "there");
+  const safeStudent = escapeHtml(data.studentName || "your child");
+  const track = escapeHtml(trackLabelE3(data.programTrack));
+
+  const layout: EmailLayoutOpts = {
+    kind: "transactional",
+    preheader: "Your signed enrollment agreement is attached. Next step: secure deposit.",
+    content: `
+      <h1 style="font-family:Georgia,serif;color:#1B4332;font-size:22px;margin:0 0 16px 0;line-height:1.3;">Your enrollment agreement is signed</h1>
+      <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${safeParent},</p>
+      <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+        Thanks for signing the enrollment agreement for ${safeStudent}'s spot in the ${track}.
+        Your countersigned PDF is attached for your records — please save a copy.
+      </p>
+      <h2 style="font-family:Georgia,serif;color:#1B4332;font-size:16px;margin:18px 0 8px 0;">What's next</h2>
+      <ol style="font-size:14px;line-height:1.7;color:#1C1917;margin:0 0 16px 0;padding-left:20px;">
+        <li>Complete the deposit (25%) via the Stripe checkout you'll see immediately after this page.</li>
+        <li>Upload the current IEP in the parent portal so we can begin the goal mapping.</li>
+        <li>Watch for the T-30 ramp email about a month before Day 1.</li>
+      </ol>
+      <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;">
+        You can re-download this signed agreement anytime from <strong>Portal &rsaquo; Agreements</strong>.
+        If anything looks wrong, reply to this email and we'll fix it before any payment.
+      </p>
+      <p style="font-size:14px;line-height:1.6;color:#1C1917;margin:18px 0 0 0;">— IEP &amp; Thrive</p>
+    `,
+  };
+
+  return renderEmail({ subject: `Your enrollment agreement (signed) — IEP & Thrive`, layout });
+}

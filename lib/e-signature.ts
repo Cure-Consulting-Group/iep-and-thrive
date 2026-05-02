@@ -2,7 +2,27 @@
  * Shared e-signature primitives for IEP & Thrive (B6 photo release, E3
  * enrollment agreement, and any future e-signed legal docs).
  *
- * Coordination contract for Agent 5 (E3 enrollment agreement):
+ * SHARED ACROSS:
+ *   - B6 Photo/Video Release  (functions/src/photo-release.ts)
+ *   - E3 Enrollment Agreement (functions/src/e-signature/)
+ *
+ * ESIGN/UETA satisfaction summary (full prose lives in
+ * docs/legal/enrollment-agreement.md Section 8 and docs/legal/photo-release.md):
+ *   1. Consent to electronic records — captured as a SEPARATE checkbox
+ *      distinct from the signature itself.
+ *   2. Intent to sign — drawn signature (canvas PNG) + typed printed name
+ *      = two distinct affirmative acts.
+ *   3. Association of signature with record — documentHash (sha256 of
+ *      the rendered text) is embedded in the PDF audit block; the canvas
+ *      signature image is rendered into the same PDF.
+ *   4. Record retention/integrity — PDFs stored in GCS, audit record in
+ *      Firestore; both retained indefinitely (covered by E1 backup
+ *      automation).
+ *   5. Ability to receive a signed copy — emailed at sign-time + always
+ *      downloadable from /portal/agreements.
+ *   6. Withdrawal of consent disclosure — covered in legal docs.
+ *
+ * Coordination contract:
  *   - documentType is an open string; "photoRelease" and "enrollmentAgreement"
  *     are reserved.
  *   - documentVersion is semver-ish (e.g. "1.0.0"). Re-versioning is required
@@ -10,18 +30,11 @@
  *     time MUST equal sha256(documentText) of the rendered template at sign
  *     time, so old versions remain verifiable.
  *   - signedAt / ip / userAgent are SERVER-SET ONLY — never trust the client
- *     for these. The client builds an `UnsignedAuditRecord` with the fields
- *     it CAN provide; the Cloud Function adds server-side fields and
- *     produces a full SignatureAuditRecord.
+ *     for these.
  *   - PDFs are generated server-side via pdf-lib (functions/) and stored at
- *     `legal-signatures/{uid}/{docId}/{slug}.pdf`. The client holds a
+ *     `legal-signatures/{uid}/{docId}/{slug}.pdf` (B6) or
+ *     `signedAgreements/{enrollmentId}.pdf` (E3). The client holds a
  *     download URL only.
- *
- * Why a shared lib (and not duplicated per doc-type): both B6 and E3 (and
- * future docs) need: (1) the same audit shape so the admin viewer can list
- * "all signed docs across types" with one query, (2) the same hash function
- * so tampering checks work uniformly, (3) the same PDF embedding so the
- * artifacts look consistent in litigation/CSE-meeting contexts.
  */
 
 // ─── Types ───
@@ -30,6 +43,9 @@ export type SignatureDocumentType =
   | 'photoRelease'
   | 'enrollmentAgreement'
   | string
+
+/** Back-compat alias — older E3 code imports `SignedDocumentType`. */
+export type SignedDocumentType = SignatureDocumentType
 
 export interface SignatureAuditRecord {
   /** Firebase Auth uid of the signer (parent). */
@@ -41,13 +57,13 @@ export interface SignatureAuditRecord {
   documentHash: string
   /** ISO8601, server-set. */
   signedAt: string
-  /** Server-captured at submit time. */
+  /** Server-captured at submit time (X-Forwarded-For chain). */
   ip: string
   /** Server-captured at submit time (HTTP User-Agent header). */
   userAgent: string
   /** What the signer typed in the "Type your full name" box. */
   typedName: string
-  /** GCS path under the legal-signatures/{uid}/{docId}/ prefix. */
+  /** GCS path of the canvas signature PNG. */
   signatureImageStoragePath: string
   /** GCS path of the rendered PDF. */
   pdfStoragePath: string
@@ -67,25 +83,23 @@ export type UnsignedAuditRecord = Omit<
 
 /**
  * Compute a deterministic sha256 hex digest of a string. Uses Web Crypto when
- * available (browser + modern Node) and falls back gracefully. Used both for
- * the client-side `createSignatureRecord` step (so the doc hash is available
- * to display before submit) and on the server (to verify the client did not
- * tamper with the rendered text).
+ * available (browser + modern Node) and falls back to node:crypto for
+ * SSR/test contexts.
  */
 export async function sha256Hex(input: string): Promise<string> {
-  const enc = new TextEncoder().encode(input)
-  // Browsers + Node 18+ expose globalThis.crypto.subtle
   const subtle: SubtleCrypto | undefined =
     (globalThis as unknown as { crypto?: { subtle?: SubtleCrypto } }).crypto?.subtle
-  if (!subtle) {
-    throw new Error(
-      '[e-signature] Web Crypto subtle not available. Install in a modern browser/Node 18+.'
-    )
+  if (subtle) {
+    const enc = new TextEncoder().encode(input)
+    const buf = await subtle.digest('SHA-256', enc)
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
   }
-  const buf = await subtle.digest('SHA-256', enc)
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
+  // Node fallback (SSR, test runner, or older Node without WebCrypto)
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { createHash } = require('crypto') as typeof import('crypto')
+  return createHash('sha256').update(input, 'utf8').digest('hex')
 }
 
 // ─── Client-side record builder ───
@@ -147,12 +161,11 @@ export interface GeneratePdfInput {
 /**
  * Generate a signed PDF embedding the document text, the signature image,
  * and the full audit block. Implementation note: the actual rendering uses
- * `pdf-lib` and lives in functions/src/photo-release.ts (and equivalent for
- * E3). This module exposes the type signature so client callers can rely on
- * a stable contract; clients should NOT call this directly — the server
- * always produces the canonical PDF as part of the submit flow.
- *
- * Exported as a named function (not a type) so test harnesses can mock it.
+ * `pdf-lib` and lives in functions/src/photo-release.ts (B6) and
+ * functions/src/e-signature/pdf-generator.ts (E3). This module exposes the
+ * type signature so client callers can rely on a stable contract; clients
+ * should NOT call this directly — the server always produces the canonical
+ * PDF as part of the submit flow.
  */
 export async function generateSignedPdf(
   _input: GeneratePdfInput
@@ -163,9 +176,38 @@ export async function generateSignedPdf(
   )
 }
 
-// ─── Server-side helper (functions/) ───
-//
-// `getServerSideAuditMeta(req)` — see functions/src/photo-release.ts. Lives
-// there (not here) because it pulls Express/Functions request types we don't
-// want to import in the client bundle. The shape is documented in the
-// SignatureAuditRecord interface above (signedAt + ip + userAgent).
+// ─── E3 enrollment-agreement submit payload ───
+
+/**
+ * Client-side payload for posting an enrollment agreement signature to
+ * functions/src/e-signature/index.ts:submitEnrollmentAgreement.
+ *
+ * - signatureDataUrl: data:image/png;base64,... from canvas.toDataURL
+ * - typedName: signer-typed printed name
+ * - electronicConsent: true ONLY if the signer ticked the SEPARATE
+ *   ESIGN consent checkbox (NOT the signature itself).
+ * - documentVersion / documentHash: the version + hash of the text the
+ *   signer saw, computed client-side from the rendered agreement.
+ * - inquiryId: links the agreement back to the enrollment inquiry that
+ *   preceded it (so the post-sign Stripe redirect knows the program).
+ */
+export interface SubmitEnrollmentAgreementInput {
+  inquiryId: string
+  documentVersion: string
+  documentHash: string
+  documentText: string
+  signatureDataUrl: string
+  typedName: string
+  electronicConsent: boolean
+  parentName: string
+  studentName?: string
+  programTrack: 'full' | 'reading' | 'math' | string
+}
+
+export interface SubmitEnrollmentAgreementResponse {
+  ok: boolean
+  enrollmentId?: string
+  pdfStoragePath?: string
+  redirectTo?: string
+  error?: string
+}

@@ -168,3 +168,48 @@ By signing below, I confirm that:
 ---
 
 *A copy of this agreement will be provided to the enrolling family. The original will be retained by IEP & Thrive.*
+
+---
+
+### SECTION 8: ELECTRONIC RECORDS & SIGNATURE CONSENT
+
+In compliance with the federal ESIGN Act (15 U.S.C. § 7001) and New York State Technology Law Article 3, IEP & Thrive uses an electronic signature workflow at /enroll/agreement that captures your drawn signature, a typed printed name, and a separate consent to do business electronically. The PDF generated at sign-time embeds an audit block (timestamp, IP address, User-Agent, agreement version, SHA-256 of the agreement text) so the signature is bound to the exact text you reviewed.
+
+#### 8.1 What you are consenting to
+
+When you tick the "I consent to do business electronically" checkbox on the agreement page, you confirm:
+
+- You agree to receive this agreement and related enrollment communications (deposit + balance receipts, weekly progress reports, photo/video release reminders, schedule updates) in electronic form.
+- Your drawn canvas signature and typed printed name together constitute your electronic signature, intended to have the same legal effect as a handwritten signature.
+- The IEP & Thrive server may record your IP address and User-Agent at the moment of signing as part of the audit trail. This data is retained with the signed PDF for the lifetime of the program record.
+
+#### 8.2 Hardware and software requirements
+
+To view, sign, and retain this agreement electronically you need:
+
+- A modern web browser (Chrome, Edge, Firefox, or Safari released within the last 2 years) with JavaScript enabled and HTML5 canvas support.
+- A pointer device (mouse, trackpad, touchscreen, or stylus) to draw the signature.
+- A PDF reader (any modern OS includes one) to view the signed PDF that we email you and that is downloadable from the parent portal.
+- An email address that can receive attachments up to 1 MB.
+
+If your environment cannot meet these requirements, contact us at hello@iepandthrive.com to arrange a paper-based enrollment.
+
+#### 8.3 How to receive a signed copy
+
+Immediately after signing, we email you the rendered PDF as an attachment to the email address on your parent account. The same PDF is always available for re-download from Portal › Agreements at https://iepandthrive.com/portal/agreements. On request to hello@iepandthrive.com, we will mail you a paper copy at no charge.
+
+#### 8.4 How to withdraw your consent to electronic records
+
+You may withdraw your consent to do business electronically at any time by emailing hello@iepandthrive.com with the subject "Withdraw electronic consent" and your name + child name in the body. Effect of withdrawal:
+
+- Future enrollment communications will be delivered on paper to the mailing address on file.
+- Records signed prior to withdrawal (including this agreement) are retained as part of the enrollment file in their original electronic form. Withdrawal is not retroactive.
+- Withdrawal applies only to communications about the enrolled program; legally required notices (e.g., emergency communications during program hours) may still be delivered electronically when speed matters.
+
+#### 8.5 How to update your contact information
+
+Update your email or mailing address in Portal › Profile, or email hello@iepandthrive.com. Out-of-date contact information undermines our ability to deliver electronic records and may delay payment receipts and progress reports.
+
+#### 8.6 How to request a paper copy
+
+Email hello@iepandthrive.com with the subject "Paper copy request" and your name + child name. We mail a paper copy of the requested record (this agreement, a progress report, or a payment receipt) within 10 business days at no charge.

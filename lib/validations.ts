@@ -43,3 +43,22 @@ export const contactSchema = z.object({
 })
 
 export type ContactFormData = z.infer<typeof contactSchema>
+
+// E3 — Enrollment Agreement e-signature submission.
+// Mirrors functions/src/e-signature/index.ts request body validation.
+export const signedAgreementSchema = z.object({
+  inquiryId: z.string().min(1),
+  documentVersion: z.string().min(1),
+  documentHash: z.string().regex(/^[a-f0-9]{64}$/i, "documentHash must be sha256 hex"),
+  documentText: z.string().min(50),
+  signatureDataUrl: z
+    .string()
+    .regex(/^data:image\/png;base64,/i, "signatureDataUrl must be a base64 PNG data URL"),
+  typedName: z.string().min(2, "Please type your full printed name"),
+  electronicConsent: z.literal(true, { message: "You must consent to do business electronically." }),
+  parentName: z.string().min(2),
+  studentName: z.string().optional(),
+  programTrack: z.enum(["full", "reading", "math"]),
+})
+
+export type SignedAgreementFormData = z.infer<typeof signedAgreementSchema>

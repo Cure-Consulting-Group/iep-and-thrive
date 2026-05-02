@@ -164,5 +164,14 @@ service cloud.firestore {
         );
       allow create, delete: if false; // server-only via Admin SDK
     }
+
+    // E3 — Enrollment Agreements (signed)
+    // Server-only writes (Cloud Function uses Admin SDK and bypasses these
+    // rules). Parents read only their own agreements; admins read all.
+    match /enrollmentAgreements/{enrollmentId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if false;
+    }
   }
 }
