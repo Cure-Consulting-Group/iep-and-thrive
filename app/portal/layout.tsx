@@ -10,6 +10,7 @@ const portalLinks = [
   { label: 'Dashboard', href: '/portal', icon: '📊' },
   { label: 'Notifications', href: '/portal/notifications', icon: '📣' },
   { label: 'My Bookings', href: '/portal/bookings', icon: '📅' },
+  { label: 'Subscription', href: '/portal/subscription', icon: '💳' },
   { label: 'Resources', href: '/portal/resources', icon: '📁' },
   { label: 'Progress Reports', href: '/portal/reports', icon: '📈' },
   { label: 'My Profile', href: '/portal/profile', icon: '👤' },
