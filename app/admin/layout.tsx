@@ -14,6 +14,7 @@ const adminLinks = [
   { label: 'Pipeline', href: '/admin/pipeline', icon: '🔀' },
   { label: 'Bookings', href: '/admin/bookings', icon: '📅' },
   { label: 'Slots', href: '/admin/slots', icon: '🕐' },
+  { label: 'Subscribers', href: '/admin/subscribers', icon: '💳' },
   { label: 'Curriculum', href: '/admin/curriculum', icon: '📖' },
   { label: 'Materials', href: '/admin/materials', icon: '🧰' },
   { label: 'Probes', href: '/admin/probes', icon: '📈' },

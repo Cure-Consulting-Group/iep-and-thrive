@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   getAllStudents,
   updateEnrollmentStatus,
@@ -32,9 +33,11 @@ const TRACK_LABELS: Record<string, string> = {
 }
 
 export default function AdminStudentsPage() {
+  const searchParams = useSearchParams()
+  const initialSearch = searchParams?.get('search') || ''
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(initialSearch)
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterTrack, setFilterTrack] = useState<string>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)

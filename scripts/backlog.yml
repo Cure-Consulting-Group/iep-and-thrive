@@ -1910,6 +1910,7 @@ tickets:
     title: "/admin/subscribers list view"
     priority: "P1"
     effort: "S"
+    status: "done"
     body: |
       What: Admin-only page at /admin/subscribers showing all
       users/{uid} with active subscriptions: tier, status, sessions
