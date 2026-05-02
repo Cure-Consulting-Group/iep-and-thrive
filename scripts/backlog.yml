@@ -283,6 +283,7 @@ tickets:
     title: "Welcome email sequence post-signup (3 emails over 7 days)"
     priority: "P0"
     effort: "M"
+    done: true
     body: |
       What: Three transactional emails fired after parent account creation:
       Day 0 (welcome + portal tour link), Day 2 (intake form nudge if

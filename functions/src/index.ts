@@ -36,3 +36,9 @@ export { unsubscribe } from "./unsubscribe";
 
 // ─── G3: Pre-Program Ramp Series ───
 export { sendPreProgramRamp, previewRampEmail } from "./pre-program-ramp";
+
+// ─── B1: Welcome Email Sequence (day-0 / day-2 / day-7) ───
+export { sendWelcomeSequence } from "./welcome-sequence";
+
+// ─── Unified Email Preview (HTTPS, admin-token gated) ───
+export { previewEmail } from "./preview-email";
