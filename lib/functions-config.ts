@@ -26,9 +26,12 @@ export const CLOUD_FUNCTIONS = {
   summerGuideCapture: `${FUNCTIONS_BASE_URL}/summerGuideCapture`,
   submitEnrollmentAgreement: `${FUNCTIONS_BASE_URL}/submitEnrollmentAgreement`,
   getSignedAgreementPdf: `${FUNCTIONS_BASE_URL}/getSignedAgreementPdf`,
-  // Tutoring (Epic H) — backend wired in tickets H3/H4. The /tutoring page
-  // links to these as anchor URLs; T-2 finalizes the actual handlers.
+  // Tutoring (Epic H)
+  // H1 — drop-in + IEP review reuse the existing one-time stripeCheckout
   tutoringDropIn: `${FUNCTIONS_BASE_URL}/stripeCheckout`,
-  tutoringSubscription: `${FUNCTIONS_BASE_URL}/subscriptionCheckout`,
   tutoringIepReview: `${FUNCTIONS_BASE_URL}/stripeCheckout`,
+  // H3 — tutoring subscription checkout (Stripe subscription mode)
+  tutoringSubscription: `${FUNCTIONS_BASE_URL}/subscriptionCheckout`,
+  // H11 — Stripe customer-portal session minter
+  customerPortal: `${FUNCTIONS_BASE_URL}/customerPortal`,
 } as const;

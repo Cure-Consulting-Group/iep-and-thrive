@@ -1775,6 +1775,7 @@ tickets:
     title: "subscriptionCheckout Cloud Function (Stripe subscription mode)"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: New Cloud Function functions/src/subscription-checkout.ts
       exposing an HTTPS endpoint that creates a Stripe Checkout
@@ -1802,6 +1803,7 @@ tickets:
     title: "Stripe webhook extension for subscription + invoice events"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: Extend functions/src/stripe-webhook.ts to handle:
       - customer.subscription.created → write users/{uid}.subscription
@@ -1934,6 +1936,7 @@ tickets:
     title: "Email templates: subscription welcome, monthly receipt, forfeit reminder"
     priority: "P1"
     effort: "S"
+    status: "done"
     body: |
       What: Add to functions/src/email-templates.ts (or sibling file
       lifecycle-email-templates.ts) three new templates:
@@ -2019,6 +2022,7 @@ tickets:
     title: "customerPortal Cloud Function (Stripe billing portal session URL)"
     priority: "P0"
     effort: "S"
+    status: "done"
     body: |
       What: New HTTPS callable function customerPortal that mints a
       Stripe billing portal session URL for the authenticated parent

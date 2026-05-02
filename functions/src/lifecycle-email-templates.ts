@@ -1,11 +1,17 @@
 /**
- * B1 / G4 / G6 / G11 — Lifecycle Email Templates
+ * B1 / G4 / G6 / G11 / H8 — Lifecycle Email Templates
  *
- * Four template families layered on top of the G1 foundation:
+ * Five template families layered on top of the G1 foundation:
  *   - welcomeSequenceTemplate(phase, vars)        — B1
  *   - balanceDueReminderTemplate(phase, vars)     — G4
  *   - photoReleaseReminderTemplate(vars)          — G6
  *   - intakeIncompleteReminderTemplate(vars)      — G11
+ *   - subscriptionWelcomeTemplate(vars)           — H8
+ *   - subscriptionMonthlyReceiptTemplate(vars)    — H8
+ *   - sessionForfeitedTemplate(vars)              — H8
+ *   - subscriptionPausedTemplate(vars)            — H8
+ *   - subscriptionCanceledTemplate(vars)          — H8
+ *   - subscriptionPastDueTemplate(vars)           — H8 (recover email)
  *
  * All templates return { subject, layout: EmailLayoutOpts } shaped to be
  * fed to renderEmail() in email-templates.ts. They use kind: lifecycle
@@ -18,6 +24,8 @@ import {
   EmailLayoutOpts,
   EmailVariables,
 } from "./email-templates";
+import type { SubscriptionTier } from "../../lib/subscription";
+import { tierLabel, tierPrice } from "../../lib/subscription";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://iep-and-thrive.web.app";
 const STRIPE_CHECKOUT_BASE =
@@ -441,6 +449,274 @@ export function intakeIncompleteReminderTemplate(
           Why this matters: Day-1 readiness depends on having the medical and
           emergency-contact pages on file. Without them I cannot run sessions safely.
           That is the only reason I am nudging.
+        </p>
+        ${signOff()}
+      `,
+    },
+  };
+}
+
+// ─── H8 — Tutoring subscription lifecycle templates ───
+//
+// Reference: docs/tutoring-design.md §8. These templates are emitted by the
+// stripe-webhook handler in response to subscription / invoice events. The
+// SubscriptionState contract (lib/subscription.ts) is the source of truth
+// for tier labels and per-cycle session counts.
+
+export interface SubscriptionEmailVars extends EmailVariables {
+  tier: SubscriptionTier;
+  /** Sessions remaining this cycle (after webhook reset, if applicable). */
+  sessionsRemaining?: number;
+  /** Total per-cycle allowance, derived from tier when omitted. */
+  sessionsAllowed?: number;
+  /** Cycle end date (ISO 'YYYY-MM-DD' or full ISO timestamp). */
+  cycleEndISO?: string;
+  /** Most recent invoice amount, e.g. "$460.00". */
+  amountPaid?: string;
+  /** Customer-portal URL the parent can use for self-service billing. */
+  customerPortalUrl?: string;
+}
+
+function tutoringBookHref(): string {
+  return `${SITE_URL}/book?type=tutoring`;
+}
+
+function portalSubscriptionHref(): string {
+  return `${SITE_URL}/portal/subscription`;
+}
+
+function fmtCycleEnd(iso: string | undefined): string {
+  if (!iso) return "";
+  const datePart = iso.length >= 10 ? iso.slice(0, 10) : iso;
+  return fmtMonthDay(datePart);
+}
+
+function tierTitle(tier: SubscriptionTier): string {
+  return tierLabel(tier);
+}
+
+function tierAllowance(tier: SubscriptionTier): number {
+  return tierPrice(tier).sessionsPerCycle;
+}
+
+export function subscriptionWelcomeTemplate(
+  vars: SubscriptionEmailVars
+): { subject: string; layout: EmailLayoutOpts } {
+  const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
+  const tierName = tierTitle(vars.tier);
+  const allowance = vars.sessionsAllowed ?? tierAllowance(vars.tier);
+  const monthly = tierPrice(vars.tier).monthly;
+
+  return {
+    subject: `Welcome to ${tierName} tutoring`,
+    layout: {
+      kind: "transactional",
+      preheader: `Your ${tierName} tutoring subscription is active. Book your first session anytime.`,
+      content: `
+        ${heading(`Welcome to ${tierName} tutoring`)}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          Your <strong>${tierName}</strong> tutoring subscription is active. You can book
+          tutoring sessions any time the calendar shows availability — there is no need
+          to wait for a confirmation from me.
+        </p>
+        <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;width:40%;">Plan</td><td style="padding:8px 12px;">${tierName}</td></tr>
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Monthly rate</td><td style="padding:8px 12px;">$${monthly}</td></tr>
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Sessions per cycle</td><td style="padding:8px 12px;">${allowance}</td></tr>
+        </table>
+        ${ctaButton(tutoringBookHref(), "Book Your First Session")}
+        <h2 style="font-family:Georgia,serif;color:#1B4332;font-size:17px;margin:20px 0 8px 0;">Policy quick reference</h2>
+        <ul style="font-size:14px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;padding-left:20px;">
+          <li>Sessions reset each billing cycle. Unused sessions do not roll over.</li>
+          <li>Cancel or reschedule 24+ hours ahead — same-day cancels forfeit the session.</li>
+          <li>Manage billing anytime from <a href="${portalSubscriptionHref()}" style="color:#1B4332;font-weight:600;">your portal</a>.</li>
+          <li>Reply to this email for anything that needs a human — I read everything.</li>
+        </ul>
+        ${signOff()}
+      `,
+    },
+  };
+}
+
+export function subscriptionMonthlyReceiptTemplate(
+  vars: SubscriptionEmailVars
+): { subject: string; layout: EmailLayoutOpts } {
+  const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
+  const tierName = tierTitle(vars.tier);
+  const allowance = vars.sessionsAllowed ?? tierAllowance(vars.tier);
+  const remaining = vars.sessionsRemaining ?? allowance;
+  const cycleEnd = fmtCycleEnd(vars.cycleEndISO);
+  const amount = vars.amountPaid ? escapeHtml(vars.amountPaid) : `$${tierPrice(vars.tier).monthly}.00`;
+
+  return {
+    subject: `Your monthly receipt — IEP & Thrive`,
+    layout: {
+      kind: "transactional",
+      preheader: `${amount} for ${tierName} tutoring · ${remaining} of ${allowance} sessions available this cycle.`,
+      content: `
+        ${heading("Monthly receipt")}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          Thanks — your monthly payment for <strong>${tierName}</strong> tutoring cleared.
+          Below is your receipt and the sessions you have available this cycle.
+        </p>
+        <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;width:40%;">Plan</td><td style="padding:8px 12px;">${tierName}</td></tr>
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Amount</td><td style="padding:8px 12px;">${amount}</td></tr>
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Sessions remaining</td><td style="padding:8px 12px;"><strong>${remaining}</strong> of ${allowance}</td></tr>
+          ${cycleEnd ? `<tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Cycle ends</td><td style="padding:8px 12px;">${cycleEnd}</td></tr>` : ""}
+        </table>
+        ${ctaButton(tutoringBookHref(), "Book This Month's Sessions")}
+        <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
+          Sessions do not carry over between cycles. If something comes up that throws
+          off your week, reply to this email — easier to plan ahead than scramble.
+        </p>
+        ${signOff()}
+      `,
+    },
+  };
+}
+
+export function sessionForfeitedTemplate(
+  vars: SubscriptionEmailVars
+): { subject: string; layout: EmailLayoutOpts } {
+  const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
+  const student = vars.studentName ? escapeHtml(vars.studentName) : "your child";
+  const remaining = vars.sessionsRemaining;
+  const allowance = vars.sessionsAllowed ?? (vars.tier ? tierAllowance(vars.tier) : 4);
+
+  return {
+    subject: `Heads up — session forfeited`,
+    layout: {
+      kind: "lifecycle",
+      preheader: `Same-day cancel — the session counts. Here is what is left this cycle and the easy way to rebook.`,
+      content: `
+        ${heading("A session was forfeited")}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          ${student}'s session was cancelled within 24 hours of start time, so per the
+          policy it counts against this cycle. I know that can feel like a sting — life
+          happens — and I would rather flag it directly than have it surface as a
+          surprise on the next monthly receipt.
+        </p>
+        ${typeof remaining === "number" ? `
+        <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;width:40%;">Sessions remaining this cycle</td><td style="padding:8px 12px;"><strong>${remaining}</strong> of ${allowance}</td></tr>
+        </table>
+        ` : ""}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          Easiest path forward: book another slot for next week so the rhythm stays put.
+        </p>
+        ${ctaButton(tutoringBookHref(), "Book Another Session")}
+        <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
+          Reminder of the cancellation policy: 24 hours of notice keeps the session on
+          your balance. Less than 24 hours forfeits it. The 24-hour line is a planning
+          anchor — reply if there is something we should talk through.
+        </p>
+        ${signOff()}
+      `,
+    },
+  };
+}
+
+export function subscriptionPausedTemplate(
+  vars: SubscriptionEmailVars
+): { subject: string; layout: EmailLayoutOpts } {
+  const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
+  const tierName = tierTitle(vars.tier);
+
+  return {
+    subject: `Subscription paused`,
+    layout: {
+      kind: "transactional",
+      preheader: `Your ${tierName} subscription is paused. Resume any time from your portal.`,
+      content: `
+        ${heading("Your subscription is paused")}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          Confirming your <strong>${tierName}</strong> tutoring subscription is paused.
+          You will not be charged while it is paused, and you will not be able to book
+          new tutoring sessions until you resume.
+        </p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          When you are ready to come back, resume from your portal — no waiting period:
+        </p>
+        ${ctaButton(portalSubscriptionHref(), "Resume Subscription")}
+        <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
+          If pausing was a mistake or something is going on with your family, reply to
+          this email. I would rather hear from you than have you sitting with it.
+        </p>
+        ${signOff()}
+      `,
+    },
+  };
+}
+
+export function subscriptionCanceledTemplate(
+  vars: SubscriptionEmailVars
+): { subject: string; layout: EmailLayoutOpts } {
+  const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
+  const tierName = tierTitle(vars.tier);
+  const cycleEnd = fmtCycleEnd(vars.cycleEndISO);
+  const dateClause = cycleEnd ? `through ${cycleEnd}` : `through the end of your current cycle`;
+
+  return {
+    subject: `Subscription cancelled — sessions ${cycleEnd ? `through ${cycleEnd}` : "through current cycle"}`,
+    layout: {
+      kind: "transactional",
+      preheader: `Your subscription is cancelled. You can still use any remaining sessions ${dateClause}.`,
+      content: `
+        ${heading("Your subscription is cancelled")}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          Confirming your <strong>${tierName}</strong> tutoring subscription is cancelled.
+          You will not be charged again. You can still use any remaining sessions
+          ${dateClause}, then the calendar will lock for tutoring slots.
+        </p>
+        ${cycleEnd ? `<table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+          <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;width:40%;">Sessions usable until</td><td style="padding:8px 12px;">${cycleEnd}</td></tr>
+        </table>` : ""}
+        ${ctaButton(tutoringBookHref(), "Use Remaining Sessions")}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">
+          Come back anytime — your account is preserved, and resubscribing will pick up
+          where you left off. If there is something we should have done differently,
+          I would genuinely like to hear it. Reply to this email.
+        </p>
+        ${signOff()}
+      `,
+    },
+  };
+}
+
+export function subscriptionPastDueTemplate(
+  vars: SubscriptionEmailVars
+): { subject: string; layout: EmailLayoutOpts } {
+  const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
+  const tierName = tierTitle(vars.tier);
+  const portalHref = vars.customerPortalUrl || portalSubscriptionHref();
+
+  return {
+    subject: `Action needed — payment didn't go through`,
+    layout: {
+      kind: "transactional",
+      preheader: `Your ${tierName} subscription's last payment failed. Update the card to keep tutoring going.`,
+      content: `
+        ${heading("Your last payment didn't go through")}
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          The most recent payment for your <strong>${tierName}</strong> tutoring
+          subscription was declined by the card issuer. This is usually a fixed-card,
+          temporary-hold, or expired-card thing — not a problem with the subscription itself.
+        </p>
+        <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
+          Until the payment clears, the tutoring booking calendar is paused for your account.
+          Update your payment method in the portal and Stripe will retry automatically:
+        </p>
+        ${ctaButton(portalHref, "Update Payment Method")}
+        <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
+          If something has changed for your family or you would like to pause instead of
+          updating the card, reply to this email and I will handle it manually.
         </p>
         ${signOff()}
       `,
