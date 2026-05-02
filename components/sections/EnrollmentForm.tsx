@@ -7,6 +7,7 @@ import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { trackEnrollmentSubmit } from '@/lib/analytics'
+import EnrollmentCountdown from '@/components/ui/EnrollmentCountdown'
 
 const gradeOptions = [
   { value: 'Rising 3rd', label: 'Rising 3rd Grade' },
@@ -126,12 +127,18 @@ export default function EnrollmentForm() {
 
           {/* Right column — form card */}
           <div className="bg-white rounded-[20px] p-8 md:p-10 text-text">
-            <h3
-              className="font-display font-bold mb-6"
-              style={{ fontSize: '1.3rem' }}
-            >
-              Start Your Child&rsquo;s Enrollment
-            </h3>
+            <div className="mb-6">
+              {/* Countdown — sits at the top of the form header per ticket A3. */}
+              <div className="mb-3">
+                <EnrollmentCountdown variant="trust-row" />
+              </div>
+              <h3
+                className="font-display font-bold"
+                style={{ fontSize: '1.3rem' }}
+              >
+                Start Your Child&rsquo;s Enrollment
+              </h3>
+            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Row 1: Name + Email */}

@@ -123,7 +123,7 @@ export function summerGuideDripEmail2Template(data: {
       ${ctaButton("See Our Summer 2026 Programs &rarr;", "https://iepandthrive.com/program")}
       <p style="color: #78716C; font-size: 13px; line-height: 1.6;">
         <strong>P.S.</strong> Cohorts are limited to 6 students and filling now.
-        Early enrollment closes April 30.
+        Early enrollment closes May 30, 2026.
       </p>
       <p style="color: #78716C; font-size: 13px; margin-top: 16px;">
         &mdash; The IEP &amp; Thrive Team
