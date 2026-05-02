@@ -80,16 +80,16 @@ function WeeklyProgressTile({ student, progress, loading }: WeeklyProgressTilePr
         <div className="rounded-xl bg-cream-deep p-4">
           <p className="text-sm font-body text-text">
             <span className="font-semibold text-forest">
-              Cohort starts in {progress.state.daysUntilStart}{' '}
+              Program starts in {progress.state.daysUntilStart}{' '}
               {progress.state.daysUntilStart === 1 ? 'day' : 'days'}.
             </span>{' '}
-            Attendance tracking starts July 7.
+            Your first weekly report arrives Friday.
           </p>
         </div>
       ) : progress.state.phase === 'post' ? (
         <div className="rounded-xl bg-cream-deep p-4">
           <p className="text-sm font-body text-text">
-            Summer 2026 cohort is complete. Your final report is available below.
+            Program complete — final report available below.
           </p>
         </div>
       ) : (
@@ -126,6 +126,70 @@ function WeeklyProgressTile({ student, progress, loading }: WeeklyProgressTilePr
                 No new highlights this week — check back after Friday pickup.
               </p>
             </div>
+          )}
+
+          {/* Latest probe (D1: C4 collection) */}
+          {progress.latestProbe && (
+            <div className="rounded-xl border border-border p-4">
+              <p className="text-xs font-body font-semibold text-text-muted uppercase tracking-wide mb-1">
+                Latest probe · week {progress.latestProbe.week}
+              </p>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="font-display font-bold text-forest text-lg">
+                  {progress.latestProbe.score}
+                  {progress.latestProbe.unit ? (
+                    <span className="text-sm font-body font-semibold text-text-muted ml-0.5">
+                      {progress.latestProbe.unit}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="text-sm font-body text-text">
+                  {progress.latestProbe.type === 'phonics'
+                    ? 'phonics accuracy'
+                    : progress.latestProbe.type === 'orf'
+                      ? 'oral reading fluency'
+                      : progress.latestProbe.type}
+                </span>
+                {typeof progress.latestProbe.delta === 'number' && progress.latestProbe.delta !== 0 ? (
+                  <span
+                    className={
+                      'text-xs font-body font-semibold px-1.5 py-0.5 rounded-full ' +
+                      (progress.latestProbe.delta > 0
+                        ? 'bg-sage/30 text-forest'
+                        : 'bg-amber-light text-amber')
+                    }
+                  >
+                    {progress.latestProbe.delta > 0 ? '▲' : '▼'} {Math.abs(progress.latestProbe.delta)}
+                    {progress.latestProbe.unit || ''}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          )}
+
+          {/* Latest portfolio artifact (D1: C7 collection) */}
+          {progress.latestArtifact && (
+            <Link
+              href="/portal/portfolio"
+              className="flex items-center gap-3 rounded-xl border border-border p-3 hover:bg-forest/5 transition-colors"
+            >
+              <div
+                className="shrink-0 w-14 h-14 rounded-lg bg-cream-deep bg-cover bg-center"
+                style={{
+                  backgroundImage: `url('${progress.latestArtifact.thumbUrl || progress.latestArtifact.photoUrl}')`,
+                }}
+                aria-hidden="true"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-body font-semibold text-text-muted uppercase tracking-wide">
+                  Latest artifact · week {progress.latestArtifact.week}
+                </p>
+                <p className="font-body text-sm text-text mt-0.5 truncate">
+                  {progress.latestArtifact.caption || 'View portfolio →'}
+                </p>
+              </div>
+              <span className="text-text-muted" aria-hidden="true">→</span>
+            </Link>
           )}
 
           {/* Latest report link */}

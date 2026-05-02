@@ -85,6 +85,28 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // D1/C4 — Weekly OG probe data per student. Instructor (admin) writes;
+    // parent reads only their own student's records (gated by parentId on
+    // the document). Cloud Functions / admin SDK bypass for write paths.
+    match /probes/{probeId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // D1/C7 — Portfolio artifacts (photos/videos of student work). Same
+    // ownership shape as probes. The B6 photo/video release is enforced
+    // upstream by the writer (Cloud Function checks the parent's
+    // legalDocs/photoRelease before persisting an artifact). Rules below
+    // gate parent reads to their own student only.
+    match /portfolioArtifacts/{artifactId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.parentId == request.auth.uid);
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Notifications — parent-facing notification ledger written by Cloud Functions
     // (e.g. attendance-flag triggers). Parents read their own only; admins read
     // all. Parents may UPDATE their own notification doc but ONLY to mark it

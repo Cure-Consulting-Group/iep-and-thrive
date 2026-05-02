@@ -12,6 +12,12 @@
 // PROGRAM_START in 7-day buckets (Sun-anchored is awkward for a Tue start, so
 // we anchor on the program start itself). Attendance is counted Mon–Fri for
 // week-in-progress; the Aug 15 Sat showcase is only counted in the final week.
+//
+// D1 expansion: also surfaces latest weekly OG probe (phonics %/ORF wpm) and
+// latest portfolio artifact (photo/video). Those collections are owned by
+// Agent 4 (C4/C7); when they are absent, missing-collection or missing-index
+// errors are caught and the tile renders without those rows. This keeps the
+// portal dashboard resilient while the cohort-1 build settles.
 
 import {
   collection,
@@ -34,6 +40,8 @@ export const SHOWCASE_DATE = '2026-08-15'
 
 const ATTENDANCE_COLLECTION = 'attendance'
 const REPORTS_COLLECTION = 'progressReports'
+const PROBES_COLLECTION = 'probes'
+const PORTFOLIO_COLLECTION = 'portfolioArtifacts'
 
 export type ParentAttendanceRecord = Omit<AttendanceRecord, 'notes'>
 
@@ -188,6 +196,91 @@ export async function getLatestReportForStudent(
   return { id: d.id, ...d.data() } as ProgressReport
 }
 
+// ─── D1: probe + portfolio artifact reads ───
+
+export interface ProbeRecord {
+  id: string
+  studentId: string
+  parentId?: string
+  week: number
+  type: 'phonics' | 'orf' | string
+  score: number
+  unit?: string                  // '%' | 'wpm' | etc. — display hint
+  delta?: number | null          // optional trend vs prior week (same type)
+  capturedAt: string             // YYYY-MM-DD
+}
+
+export interface PortfolioArtifact {
+  id: string
+  studentId: string
+  parentId?: string
+  week: number
+  photoUrl: string
+  thumbUrl?: string
+  caption?: string
+  capturedAt: string             // YYYY-MM-DD
+}
+
+/**
+ * Latest weekly OG probe (phonics %/ORF wpm) for a student.
+ *
+ * The `probes` collection is owned by Agent 4 (C4). Until that ships the
+ * collection (and its `(studentId asc, capturedAt desc)` composite index)
+ * may be absent. We swallow Firestore errors and return null so the parent
+ * tile degrades to "no probe data yet" rather than blowing up the dashboard.
+ */
+export async function getLatestProbeForStudent(
+  studentId: string
+): Promise<ProbeRecord | null> {
+  try {
+    const q = query(
+      collection(db, PROBES_COLLECTION),
+      where('studentId', '==', studentId),
+      orderBy('capturedAt', 'desc'),
+      limit(1)
+    )
+    const snap = await getDocs(q)
+    if (snap.empty) return null
+    const d = snap.docs[0]
+    return { id: d.id, ...d.data() } as ProbeRecord
+  } catch (err) {
+    console.warn(
+      '[portal-progress] getLatestProbeForStudent fell back to null:',
+      err
+    )
+    return null
+  }
+}
+
+/**
+ * Latest portfolio artifact (photo/video) for a student. Owned by Agent 4
+ * (C7) and gated upstream by the photo release in B6 — when no signed
+ * release exists yet, the collection will simply be empty for this student.
+ * Same defensive try/catch as probes.
+ */
+export async function getLatestPortfolioArtifactForStudent(
+  studentId: string
+): Promise<PortfolioArtifact | null> {
+  try {
+    const q = query(
+      collection(db, PORTFOLIO_COLLECTION),
+      where('studentId', '==', studentId),
+      orderBy('capturedAt', 'desc'),
+      limit(1)
+    )
+    const snap = await getDocs(q)
+    if (snap.empty) return null
+    const d = snap.docs[0]
+    return { id: d.id, ...d.data() } as PortfolioArtifact
+  } catch (err) {
+    console.warn(
+      '[portal-progress] getLatestPortfolioArtifactForStudent fell back to null:',
+      err
+    )
+    return null
+  }
+}
+
 export interface WeeklyStudentProgress {
   state: ProgramWeekState
   daysAttended: number
@@ -195,6 +288,8 @@ export interface WeeklyStudentProgress {
   records: ParentAttendanceRecord[]
   latestNote: { date: string; parentVisibleNote: string } | null
   latestReport: ProgressReport | null
+  latestProbe: ProbeRecord | null
+  latestArtifact: PortfolioArtifact | null
 }
 
 export async function getWeeklyProgressForStudent(
@@ -202,15 +297,21 @@ export async function getWeeklyProgressForStudent(
   now: Date = new Date()
 ): Promise<WeeklyStudentProgress> {
   const state = computeProgramWeek(now)
-  const [records, latestNote, latestReport] = await Promise.all([
-    state.phase === 'active'
-      ? getWeekAttendanceForStudent(studentId, state.weekStartISO, state.weekEndISO)
-      : Promise.resolve<ParentAttendanceRecord[]>([]),
-    state.phase === 'active'
-      ? getLatestParentVisibleNote(studentId, 7, now)
-      : Promise.resolve(null),
-    getLatestReportForStudent(studentId),
-  ])
+  const [records, latestNote, latestReport, latestProbe, latestArtifact] =
+    await Promise.all([
+      state.phase === 'active'
+        ? getWeekAttendanceForStudent(studentId, state.weekStartISO, state.weekEndISO)
+        : Promise.resolve<ParentAttendanceRecord[]>([]),
+      state.phase === 'active'
+        ? getLatestParentVisibleNote(studentId, 7, now)
+        : Promise.resolve(null),
+      getLatestReportForStudent(studentId),
+      // Probes/artifacts are surfaced regardless of phase — a parent who
+      // just received their final report should still see the last probe
+      // captured during the program.
+      getLatestProbeForStudent(studentId),
+      getLatestPortfolioArtifactForStudent(studentId),
+    ])
 
   const daysAttended = records.filter((r) => r.status === 'present').length
 
@@ -221,6 +322,8 @@ export async function getWeeklyProgressForStudent(
     records,
     latestNote,
     latestReport,
+    latestProbe,
+    latestArtifact,
   }
 }
 
