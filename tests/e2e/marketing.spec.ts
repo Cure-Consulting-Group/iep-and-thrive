@@ -20,6 +20,70 @@ test.describe('Marketing site', () => {
     expect(body).not.toMatch(/Mon-Thu|Mon–Thu/)
   })
 
+  test('countdown is visible adjacent to hero CTA cluster (ticket A3)', async ({ page }) => {
+    await page.goto('/')
+    const heroCountdown = page.getByTestId('enrollment-countdown').first()
+    await expect(heroCountdown).toBeVisible()
+    // Wait for hydration so we get the live "open"/"closed" state, not the
+    // SSR placeholder.
+    await expect(heroCountdown).toHaveAttribute('data-status', /open|closed/)
+    const text = (await heroCountdown.textContent())?.trim() ?? ''
+    expect(text).toContain('Enrollment closes')
+    expect(text).toContain('May 30, 2026')
+    // Day count must parse as a positive integer.
+    const match = text.match(/Enrollment closes in (\d+) days?/)
+    expect(match, `expected day count in: ${text}`).not.toBeNull()
+    if (match) {
+      expect(Number(match[1])).toBeGreaterThan(0)
+    }
+  })
+
+  test('countdown is visible inside the standalone /enroll form header', async ({ page }) => {
+    await page.goto('/enroll')
+    const formCountdown = page.getByTestId('enrollment-countdown').first()
+    await expect(formCountdown).toBeVisible()
+    await expect(formCountdown).toHaveAttribute('data-status', /open|closed/)
+    const text = (await formCountdown.textContent())?.trim() ?? ''
+    expect(text).toContain('Enrollment closes')
+    expect(text).toContain('May 30, 2026')
+  })
+
+  test('countdown falls back to waitlist copy after the deadline', async ({ browser }) => {
+    // Inject a fake "now" well past May 30 2026 before any page script runs.
+    // Both Date() with no args and Date.now() honor the override; tagged
+    // template literals downstream consume Date through these surfaces.
+    const context = await browser.newContext()
+    await context.addInitScript(() => {
+      const fakeNow = new Date('2026-07-15T12:00:00Z').getTime()
+      const RealDate = Date
+      // @ts-ignore - intentional override for test
+      class FakeDate extends RealDate {
+        constructor(...args: unknown[]) {
+          if (args.length === 0) {
+            super(fakeNow)
+          } else {
+            // @ts-ignore - forward args verbatim
+            super(...(args as []))
+          }
+        }
+        static now() {
+          return fakeNow
+        }
+      }
+      // @ts-ignore - replace global Date
+      globalThis.Date = FakeDate
+    })
+    const page = await context.newPage()
+    await page.goto('/')
+    const heroCountdown = page.getByTestId('enrollment-countdown').first()
+    await expect(heroCountdown).toBeVisible()
+    await expect(heroCountdown).toHaveAttribute('data-status', 'closed')
+    const text = (await heroCountdown.textContent())?.trim() ?? ''
+    expect(text).toContain('Waitlist only')
+    expect(text).toContain('May 30, 2026')
+    await context.close()
+  })
+
   test('FAQ page loads', async ({ page }) => {
     const response = await page.goto('/faq')
     expect(response?.status()).toBe(200)

@@ -1,8 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
-import { daysUntilDeadline } from '@/lib/dates'
+import EnrollmentCountdown from '@/components/ui/EnrollmentCountdown'
 
 export default function Hero() {
   const avatars = [
@@ -18,11 +17,6 @@ export default function Hero() {
     { value: "6wk", label: "Program duration" },
     { value: "100%", label: "IEP-goal aligned" },
   ];
-
-  const [daysLeft, setDaysLeft] = useState<number | null>(null);
-  useEffect(() => {
-    setDaysLeft(daysUntilDeadline());
-  }, []);
 
   const features = [
     "Orton-Gillingham structured literacy — the gold standard, not a worksheet",
@@ -58,8 +52,13 @@ export default function Hero() {
             momentum, not damage control.
           </p>
 
+          {/* Countdown — adjacent to the hero CTA cluster (ticket A3). */}
+          <div className="mt-7 animate-fade-up animation-delay-400">
+            <EnrollmentCountdown variant="trust-row" />
+          </div>
+
           {/* CTA Buttons */}
-          <div className="mt-8 flex flex-wrap items-center gap-3 animate-fade-up animation-delay-400">
+          <div className="mt-4 flex flex-wrap items-center gap-3 animate-fade-up animation-delay-400">
             <a
               href="#enroll"
               className="inline-flex items-center rounded-full bg-forest px-6 py-3 text-white text-[15px] font-semibold transition-colors duration-200 hover:bg-forest-mid"
@@ -88,14 +87,7 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-[13px] text-warm-gray">
-                Cohorts limited to 6 students. Early enrollment closes May 30
-                {daysLeft !== null && daysLeft > 0 && (
-                  <> &mdash; <strong className="text-forest">{daysLeft} {daysLeft === 1 ? 'day' : 'days'} left</strong></>
-                )}
-                {daysLeft !== null && daysLeft <= 0 && (
-                  <> &mdash; <strong className="text-forest">enrollment closing soon</strong></>
-                )}
-                .
+                Cohorts limited to 6 students. Early enrollment closes May 30, 2026.
               </p>
             </div>
           </div>

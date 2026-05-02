@@ -123,6 +123,7 @@ tickets:
     title: "Add May 30 countdown to hero + enrollment form"
     priority: "P0"
     effort: "S"
+    done: true
     body: |
       What: Render a live "X days until enrollment closes" countdown
       adjacent to the hero CTA cluster and inside the enrollment form

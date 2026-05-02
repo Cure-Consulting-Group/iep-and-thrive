@@ -12,7 +12,8 @@
     "reset:test-accounts": "node scripts/reset-test-accounts.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "test:unit": "node --test tests/unit/*.mjs"
   },
   "repository": {
     "type": "git",
