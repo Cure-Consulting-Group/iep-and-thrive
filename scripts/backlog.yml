@@ -1931,6 +1931,7 @@ tickets:
     title: "Email templates: subscription welcome, monthly receipt, forfeit reminder"
     priority: "P1"
     effort: "S"
+    status: "done"
     body: |
       What: Add to functions/src/email-templates.ts (or sibling file
       lifecycle-email-templates.ts) three new templates:
