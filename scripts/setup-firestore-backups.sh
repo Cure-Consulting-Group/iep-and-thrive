@@ -28,51 +28,55 @@ set -euo pipefail
 
 PROJECT_ID="iep-and-thrive"
 BUCKET="iep-and-thrive-firestore-backups"
-REGION="us-east4"
+# Bucket location must contain the Firestore (default) database location.
+# The database is in us-central; "us" multi-region covers it.
+BUCKET_LOCATION="us"
+# Cloud Scheduler jobs themselves are regional; us-east4 keeps them close.
+SCHEDULER_REGION="us-east4"
 SA="iep-and-thrive@appspot.gserviceaccount.com"
 
-echo "[E1] Project: $PROJECT_ID"
-echo "[E1] Region:  $REGION"
-echo "[E1] Bucket:  gs://$BUCKET"
-echo "[E1] SA:      $SA"
+echo "[E1] Project:           $PROJECT_ID"
+echo "[E1] Bucket:             gs://$BUCKET ($BUCKET_LOCATION)"
+echo "[E1] Scheduler region:   $SCHEDULER_REGION"
+echo "[E1] Service account:    $SA"
 
 echo "[E1] (1/5) Creating backup bucket if missing..."
-gcloud storage buckets create "gs://$BUCKET" --project="$PROJECT_ID" --location="$REGION" --uniform-bucket-level-access --default-storage-class=STANDARD || true
-gcloud storage buckets update "gs://$BUCKET" --versioning
+gcloud storage buckets create "gs://$BUCKET" --project="$PROJECT_ID" --location="$BUCKET_LOCATION" --uniform-bucket-level-access --default-storage-class=STANDARD || true
+gcloud storage buckets update "gs://$BUCKET" --project="$PROJECT_ID" --versioning
 
 echo "[E1] (2/5) Applying lifecycle policy (daily=30d, monthly=365d)..."
 LIFECYCLE_FILE=$(mktemp -t iet-lifecycle-XXXXXX.json)
 cat > "$LIFECYCLE_FILE" <<JSONEOF
 {"lifecycle":{"rule":[{"action":{"type":"Delete"},"condition":{"age":30,"matchesPrefix":["daily/"]}},{"action":{"type":"Delete"},"condition":{"age":365,"matchesPrefix":["monthly/"]}}]}}
 JSONEOF
-gcloud storage buckets update "gs://$BUCKET" --lifecycle-file="$LIFECYCLE_FILE"
+gcloud storage buckets update "gs://$BUCKET" --project="$PROJECT_ID" --lifecycle-file="$LIFECYCLE_FILE"
 rm -f "$LIFECYCLE_FILE"
 
 echo "[E1] (3/5) Granting datastore.importExportAdmin on project..."
 gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$SA" --role="roles/datastore.importExportAdmin" --condition=None --quiet
 
 echo "[E1] (3/5) Granting storage.admin on backup bucket..."
-gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member="serviceAccount:$SA" --role="roles/storage.admin"
+gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --project="$PROJECT_ID" --member="serviceAccount:$SA" --role="roles/storage.admin"
 
 DAILY_URI="https://firestore.googleapis.com/v1/projects/$PROJECT_ID/databases/(default):exportDocuments"
 DAILY_BODY="{\"outputUriPrefix\":\"gs://$BUCKET/daily\"}"
 MONTHLY_BODY="{\"outputUriPrefix\":\"gs://$BUCKET/monthly\"}"
 
 echo "[E1] (4/5) Creating/updating daily backup scheduler..."
-if gcloud scheduler jobs describe firestore-daily-backup --location="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-  gcloud scheduler jobs update http firestore-daily-backup --location="$REGION" --project="$PROJECT_ID" --schedule="0 3 * * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$DAILY_BODY"
+if gcloud scheduler jobs describe firestore-daily-backup --location="$SCHEDULER_REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
+  gcloud scheduler jobs update http firestore-daily-backup --location="$SCHEDULER_REGION" --project="$PROJECT_ID" --schedule="0 3 * * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$DAILY_BODY"
 else
-  gcloud scheduler jobs create http firestore-daily-backup --location="$REGION" --project="$PROJECT_ID" --schedule="0 3 * * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$DAILY_BODY" --description="Nightly Firestore export to gs://$BUCKET/daily (E1 retention 30d)"
+  gcloud scheduler jobs create http firestore-daily-backup --location="$SCHEDULER_REGION" --project="$PROJECT_ID" --schedule="0 3 * * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$DAILY_BODY" --description="Nightly Firestore export to gs://$BUCKET/daily (E1 retention 30d)"
 fi
 
 echo "[E1] (5/5) Creating/updating monthly backup scheduler..."
-if gcloud scheduler jobs describe firestore-monthly-backup --location="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-  gcloud scheduler jobs update http firestore-monthly-backup --location="$REGION" --project="$PROJECT_ID" --schedule="30 3 1 * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$MONTHLY_BODY"
+if gcloud scheduler jobs describe firestore-monthly-backup --location="$SCHEDULER_REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
+  gcloud scheduler jobs update http firestore-monthly-backup --location="$SCHEDULER_REGION" --project="$PROJECT_ID" --schedule="30 3 1 * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$MONTHLY_BODY"
 else
-  gcloud scheduler jobs create http firestore-monthly-backup --location="$REGION" --project="$PROJECT_ID" --schedule="30 3 1 * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$MONTHLY_BODY" --description="Monthly (1st @ 03:30 ET) Firestore export to gs://$BUCKET/monthly (E1 retention 365d)"
+  gcloud scheduler jobs create http firestore-monthly-backup --location="$SCHEDULER_REGION" --project="$PROJECT_ID" --schedule="30 3 1 * *" --time-zone="America/New_York" --uri="$DAILY_URI" --http-method=POST --headers="Content-Type=application/json" --oauth-service-account-email="$SA" --oauth-token-scope="https://www.googleapis.com/auth/datastore" --message-body="$MONTHLY_BODY" --description="Monthly (1st @ 03:30 ET) Firestore export to gs://$BUCKET/monthly (E1 retention 365d)"
 fi
 
 echo "[E1] Done. Verify with:"
-echo "  gcloud scheduler jobs list --location=$REGION --project=$PROJECT_ID"
+echo "  gcloud scheduler jobs list --location=$SCHEDULER_REGION --project=$PROJECT_ID"
 echo "  gcloud storage buckets describe gs://$BUCKET"
 echo "  bash scripts/verify-firestore-backup.sh"
