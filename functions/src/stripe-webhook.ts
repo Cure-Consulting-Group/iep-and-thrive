@@ -45,8 +45,8 @@ import type {
   SubscriptionState,
   SubscriptionStatus,
   SubscriptionTier,
-} from "../../lib/subscription";
-import { tierPrice } from "../../lib/subscription";
+} from "./subscription-types";
+import { tierPrice } from "./subscription-types";
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");

@@ -24,8 +24,8 @@ import {
   EmailLayoutOpts,
   EmailVariables,
 } from "./email-templates";
-import type { SubscriptionTier } from "../../lib/subscription";
-import { tierLabel, tierPrice } from "../../lib/subscription";
+import type { SubscriptionTier } from "./subscription-types";
+import { tierLabel, tierPrice } from "./subscription-types";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://iep-and-thrive.web.app";
 const STRIPE_CHECKOUT_BASE =

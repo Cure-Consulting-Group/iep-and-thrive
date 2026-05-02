@@ -25,7 +25,7 @@ import {
   stripePriceIdEnvVar,
   tierLabel,
   type SubscriptionTier,
-} from "../../lib/subscription";
+} from "./subscription-types";
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
