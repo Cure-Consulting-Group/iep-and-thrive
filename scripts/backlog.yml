@@ -1741,6 +1741,7 @@ tickets:
     title: "Stripe products + customer portal config (founder runbook)"
     priority: "P0"
     effort: "S"
+    status: "done"
     body: |
       What: Document the Stripe Dashboard work the founder must do
       manually — create 4 products (Drop-in, Weekly, Twice-Weekly,
