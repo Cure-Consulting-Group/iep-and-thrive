@@ -66,6 +66,39 @@ const PERSONAS = [
     },
   },
   {
+    key: 'subscriber',
+    email: 'parent-test-subscriber@iepandthrive.com',
+    password: 'TestPass123!subscriber',
+    displayName: '[TEST] Parent — Subscriber',
+    parent: { phone: '(555) 010-0004' },
+    // Subscriber persona has an active fake tutoring subscription for E2E
+    // gate-state coverage (H10). We mirror the SubscriptionState interface
+    // from lib/subscription.ts. Stripe IDs are fake placeholders — this
+    // record never hits Stripe; it only feeds the booking-gate UI logic.
+    subscription: {
+      tier: 'weekly',
+      status: 'active',
+      stripeCustomerId: 'cus_TEST_subscriber',
+      stripeSubscriptionId: 'sub_TEST_subscriber',
+      sessionsAllowedPerCycle: 4,
+      sessionsUsedThisCycle: 1,
+      cancelAtPeriodEnd: false,
+    },
+    student: {
+      name: '[TEST] Casey Subscriber',
+      dateOfBirth: '2016-08-01',
+      grade: '4',
+      district: 'Test District (Nassau)',
+      programTrack: 'reading',
+      enrollmentStatus: 'enrolled',
+      medicalNotes: '[TEST] On weekly tutoring subscription; no allergies.',
+      iepDocumentUrl: '',
+      emergencyContacts: [
+        { name: '[TEST] Emergency Contact', phone: '(555) 010-1004', relationship: 'Grandparent' },
+      ],
+    },
+  },
+  {
     key: 'deposited',
     email: 'parent-test-deposited@iepandthrive.com',
     password: 'TestPass123!deposited',
@@ -149,14 +182,29 @@ async function seedOne(auth, db, persona) {
   })
 
   const userRef = db.collection('users').doc(created.uid)
-  await userRef.set({
+  const userDoc = {
     email: persona.email,
     displayName: persona.displayName,
     role: 'parent',
     phone: persona.parent.phone,
     isTest: true,
     createdAt: FieldValue.serverTimestamp(),
-  })
+  }
+  // H10 — optional fake subscription on the seeded user. The subscription
+  // shape mirrors lib/subscription.ts SubscriptionState; periods are
+  // anchored to "now" so the cycle-end label renders ~30 days out.
+  if (persona.subscription) {
+    const now = new Date()
+    const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+    userDoc.subscription = {
+      ...persona.subscription,
+      currentPeriodStart: now.toISOString(),
+      currentPeriodEnd: periodEnd.toISOString(),
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    }
+  }
+  await userRef.set(userDoc)
 
   const studentRef = userRef.collection('students').doc()
   await studentRef.set({

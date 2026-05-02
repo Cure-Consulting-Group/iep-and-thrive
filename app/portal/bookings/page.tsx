@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { getBookingsByParent, cancelBooking, type Booking } from '@/lib/booking-service'
+import { cancelTutoringBooking } from '@/lib/subscription-service'
 
 const TYPE_LABELS: Record<string, string> = {
   discovery_call: 'Discovery Call',
   consultation: 'Consultation',
   check_in: 'Check-In',
+  tutoring: 'Tutoring Session',
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -37,9 +39,31 @@ export default function PortalBookingsPage() {
 
   useEffect(() => { if (user) load() }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleCancel = async (bookingId: string, slotId: string) => {
-    if (!confirm('Are you sure you want to cancel this booking?')) return
-    await cancelBooking(bookingId, slotId)
+  const handleCancel = async (booking: Booking) => {
+    // Tutoring bookings have a 24-hour forfeit policy: cancellations made
+    // less than 24h before the slot still free the slot but DO NOT refund
+    // the session counter. Warn the parent before they confirm.
+    const slotStart = new Date(`${booking.date}T${booking.startTime}:00`)
+    const diffHours = (slotStart.getTime() - Date.now()) / (1000 * 60 * 60)
+    const isTutoring = booking.type === 'tutoring'
+    const forfeit = isTutoring && diffHours < 24
+    const msg = forfeit
+      ? 'This is within 24 hours of your session. Cancelling will forfeit this session (no credit back to your subscription). Continue?'
+      : isTutoring
+        ? 'Cancel this tutoring session? Your session will be credited back to your subscription.'
+        : 'Are you sure you want to cancel this booking?'
+    if (!confirm(msg)) return
+    if (!user) return
+    if (isTutoring) {
+      await cancelTutoringBooking({
+        bookingId: booking.id,
+        slotId: booking.slotId,
+        parentId: user.uid,
+        slotStart: `${booking.date}T${booking.startTime}`,
+      })
+    } else {
+      await cancelBooking(booking.id, booking.slotId)
+    }
     load()
   }
 
@@ -94,8 +118,8 @@ export default function PortalBookingsPage() {
                   <BookingCard
                     key={b.id}
                     booking={b}
-                    canCancel={canCancelBooking(b.date, b.startTime)}
-                    onCancel={() => handleCancel(b.id, b.slotId)}
+                    canCancel={canCancelBooking(b.date, b.startTime, b.type)}
+                    onCancel={() => handleCancel(b)}
                   />
                 ))}
               </div>
@@ -169,9 +193,17 @@ function BookingCard({
   )
 }
 
-function canCancelBooking(date: string, startTime: string): boolean {
+function canCancelBooking(
+  date: string,
+  startTime: string,
+  type: string
+): boolean {
   const bookingDate = new Date(`${date}T${startTime}:00`)
   const now = new Date()
   const diffHours = (bookingDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+  // Tutoring sessions are cancellable up to slot start (with same-day
+  // forfeit). Other booking types keep the strict 24h cutoff so the cancel
+  // button hides automatically when no refund is available.
+  if (type === 'tutoring') return diffHours > 0
   return diffHours >= 24
 }

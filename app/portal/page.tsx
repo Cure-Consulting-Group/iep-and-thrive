@@ -13,6 +13,8 @@ import {
   WeeklyStudentProgress,
 } from '@/lib/portal-progress'
 import { getUnreadCount } from '@/lib/notification-service'
+import { getUserSubscription } from '@/lib/subscription-service'
+import { sessionsRemaining, type SubscriptionState } from '@/lib/subscription'
 
 const STATUS_COLORS: Record<string, string> = {
   inquiry: 'bg-gray-100 text-gray-700',
@@ -235,6 +237,7 @@ export default function PortalDashboard() {
   const [progressLoading, setProgressLoading] = useState(true)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const [photoReleaseSigned, setPhotoReleaseSigned] = useState<null | { signedAt: string; checked: boolean }>(null)
+  const [subscription, setSubscription] = useState<SubscriptionState | null>(null)
 
   const load = useCallback(async () => {
     if (!user) return
@@ -244,6 +247,7 @@ export default function PortalDashboard() {
       getBookingsByParent(user.uid),
       getReportsByParent(user.uid),
       getUnreadCount(user.uid),
+      getUserSubscription(user.uid),
     ])
     if (results[0].status === 'fulfilled') setStudents(results[0].value)
     else console.error('Failed to load students:', results[0].reason)
@@ -253,6 +257,8 @@ export default function PortalDashboard() {
     else console.error('Failed to load reports:', results[2].reason)
     if (results[3].status === 'fulfilled') setUnreadNotifications(results[3].value)
     else console.error('Failed to load notifications:', results[3].reason)
+    if (results[4].status === 'fulfilled') setSubscription(results[4].value)
+    else console.error('Failed to load subscription:', results[4].reason)
     setLoading(false)
   }, [user])
 
@@ -448,6 +454,34 @@ export default function PortalDashboard() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Subscription tile — surfaces when an active tutoring sub exists */}
+          {subscription && subscription.status === 'active' && (
+            <Link
+              href="/portal/subscription"
+              data-testid="dashboard-subscription-tile"
+              className="block bg-white rounded-2xl border border-sage p-5 mb-6 hover:bg-sage/5 transition-colors"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-body font-semibold uppercase tracking-[0.1em] text-forest-light">
+                    Tutoring subscription
+                  </p>
+                  <p className="font-body font-semibold text-text mt-1">
+                    {sessionsRemaining(subscription)} of{' '}
+                    {subscription.sessionsAllowedPerCycle} sessions remaining
+                  </p>
+                  <p className="text-xs font-body text-text-muted">
+                    {subscription.tier === 'weekly' ? 'Weekly' : 'Twice-Weekly'} plan ·
+                    Manage subscription →
+                  </p>
+                </div>
+                <span className="text-2xl shrink-0" aria-hidden="true">
+                  💳
+                </span>
+              </div>
+            </Link>
           )}
 
           {/* Next Booking */}

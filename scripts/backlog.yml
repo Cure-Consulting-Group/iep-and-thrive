@@ -1837,6 +1837,7 @@ tickets:
     title: "BookingGate + SegmentedControl + tutoring slot type on /book"
     priority: "P0"
     effort: "L"
+    status: "done"
     body: |
       What: Extend app/book/page.tsx with a SegmentedControl tab
       (Discovery call / Tutoring session / Drop-in). Render gate
@@ -1878,6 +1879,7 @@ tickets:
     title: "/portal/subscription page (status + sessions tracker + portal link)"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: New parent-portal page at /portal/subscription per
       docs/tutoring-design.md §7. 4 cards: Plan summary,
@@ -1988,6 +1990,7 @@ tickets:
     title: "Playwright e2e: drop-in checkout, subscription checkout, subscriber booking"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: New tests/e2e/tutoring.spec.ts covering:
       - /tutoring page renders with correct prices from
