@@ -57,3 +57,6 @@ export { submitPhotoRelease } from "./photo-release";
 
 // ─── E3: Enrollment Agreement E-Signature ───
 export { submitEnrollmentAgreement, getSignedAgreementPdf } from "./e-signature";
+
+// ─── H3: Tutoring Subscription Checkout (Stripe subscription mode) ───
+export { subscriptionCheckout } from "./subscription-checkout";

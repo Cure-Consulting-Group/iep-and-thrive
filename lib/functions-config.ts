@@ -26,4 +26,6 @@ export const CLOUD_FUNCTIONS = {
   summerGuideCapture: `${FUNCTIONS_BASE_URL}/summerGuideCapture`,
   submitEnrollmentAgreement: `${FUNCTIONS_BASE_URL}/submitEnrollmentAgreement`,
   getSignedAgreementPdf: `${FUNCTIONS_BASE_URL}/getSignedAgreementPdf`,
+  // H3 — tutoring subscription checkout (Stripe subscription mode)
+  tutoringSubscription: `${FUNCTIONS_BASE_URL}/subscriptionCheckout`,
 } as const;

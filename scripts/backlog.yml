@@ -1773,6 +1773,7 @@ tickets:
     title: "subscriptionCheckout Cloud Function (Stripe subscription mode)"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: New Cloud Function functions/src/subscription-checkout.ts
       exposing an HTTPS endpoint that creates a Stripe Checkout
