@@ -51,3 +51,6 @@ export { sendPhotoReleaseReminder } from "./photo-release-reminder";
 
 // ─── G11: Intake Started-but-Incomplete Reminder ───
 export { sendIntakeIncompleteReminder } from "./intake-incomplete-reminder";
+
+// ─── B6: Photo/Video Release E-Signature ───
+export { submitPhotoRelease } from "./photo-release";

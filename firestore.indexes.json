@@ -126,6 +126,14 @@
       "collectionGroup": "probeResults",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "studentId", "order": "ASCENDING" },
+        { "fieldPath": "capturedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "probeResults",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "week", "order": "ASCENDING" },
         { "fieldPath": "type", "order": "ASCENDING" }
       ]
@@ -144,6 +152,14 @@
       "fields": [
         { "fieldPath": "type", "order": "ASCENDING" },
         { "fieldPath": "administeredAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "portfolioArtifacts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "studentId", "order": "ASCENDING" },
+        { "fieldPath": "capturedAt", "order": "DESCENDING" }
       ]
     }
   ],

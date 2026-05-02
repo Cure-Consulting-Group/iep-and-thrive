@@ -380,6 +380,7 @@ tickets:
     title: "Photo/video release e-signature capture"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: Dedicated e-sign step in onboarding for photo/video release,
       separate from the enrollment agreement (E3). Stores signed PDF and
@@ -644,6 +645,7 @@ tickets:
     title: "Parent dashboard: \"This week's progress\" tile"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: Always-visible tile on the parent portal home summarizing the
       current week — attendance, latest probe data, latest portfolio
