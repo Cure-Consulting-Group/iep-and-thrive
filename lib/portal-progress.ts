@@ -40,7 +40,7 @@ export const SHOWCASE_DATE = '2026-08-15'
 
 const ATTENDANCE_COLLECTION = 'attendance'
 const REPORTS_COLLECTION = 'progressReports'
-const PROBES_COLLECTION = 'probes'
+const PROBES_COLLECTION = 'probeResults'
 const PORTFOLIO_COLLECTION = 'portfolioArtifacts'
 
 export type ParentAttendanceRecord = Omit<AttendanceRecord, 'notes'>
