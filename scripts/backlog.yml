@@ -378,6 +378,7 @@ tickets:
     title: "Photo/video release e-signature capture"
     priority: "P0"
     effort: "M"
+    status: "done"
     body: |
       What: Dedicated e-sign step in onboarding for photo/video release,
       separate from the enrollment agreement (E3). Stores signed PDF and

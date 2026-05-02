@@ -107,6 +107,16 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // B6 — Per-parent legal document signatures (photo release, enrollment
+    // agreement). Server-only writes via Admin SDK; parents read their own
+    // for portal display ("Signed on YYYY-MM-DD"). The signed PDF lives in
+    // Firebase Storage (see storage.rules); this Firestore doc is the audit
+    // record only.
+    match /users/{userId}/legalDocs/{docId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if false; // server-only via Admin SDK
+    }
+
     // Notifications — parent-facing notification ledger written by Cloud Functions
     // (e.g. attendance-flag triggers). Parents read their own only; admins read
     // all. Parents may UPDATE their own notification doc but ONLY to mark it

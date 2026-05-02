@@ -36,3 +36,6 @@ export { unsubscribe } from "./unsubscribe";
 
 // ─── G3: Pre-Program Ramp Series ───
 export { sendPreProgramRamp, previewRampEmail } from "./pre-program-ramp";
+
+// ─── B6: Photo/Video release e-signature ───
+export { submitPhotoRelease } from "./photo-release";

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 import { useAuth } from '@/lib/auth-context'
 import { getBookingsByParent, Booking } from '@/lib/booking-service'
 import { getReportsByParent, ProgressReport } from '@/lib/report-service'
@@ -232,6 +234,7 @@ export default function PortalDashboard() {
   const [loading, setLoading] = useState(true)
   const [progressLoading, setProgressLoading] = useState(true)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const [photoReleaseSigned, setPhotoReleaseSigned] = useState<null | { signedAt: string; checked: boolean }>(null)
 
   const load = useCallback(async () => {
     if (!user) return
@@ -254,6 +257,30 @@ export default function PortalDashboard() {
   }, [user])
 
   useEffect(() => { load() }, [load])
+
+  // Probe whether the parent has already signed the B6 photo/video release.
+  // Cheap single doc read; surfaces a sticky banner until present.
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const ref = doc(db, 'users', user.uid, 'legalDocs', 'photoRelease')
+        const snap = await getDoc(ref)
+        if (cancelled) return
+        if (snap.exists()) {
+          const data = snap.data() as { signedAt?: string }
+          setPhotoReleaseSigned({ signedAt: data.signedAt || '', checked: true })
+        } else {
+          setPhotoReleaseSigned({ signedAt: '', checked: true })
+        }
+      } catch (err) {
+        console.warn('[portal] photo release probe fell back to null:', err)
+        if (!cancelled) setPhotoReleaseSigned({ signedAt: '', checked: true })
+      }
+    })()
+    return () => { cancelled = true }
+  }, [user])
 
   // Load weekly progress per enrolled student once the student list is known.
   useEffect(() => {
@@ -310,6 +337,41 @@ export default function PortalDashboard() {
           Here&apos;s an overview of your IEP &amp; Thrive account.
         </p>
       </div>
+
+      {/* B6 - Photo/video release banner. Shows when an enrolled student has
+          no signed release on file. Once signed, swap to a confirmation chip. */}
+      {!loading && photoReleaseSigned?.checked && enrolledStudents.length > 0 && !photoReleaseSigned.signedAt && (
+        <Link
+          href="/portal/photo-release"
+          className="mb-6 flex items-center gap-3 rounded-2xl bg-amber-light border border-amber/40 px-5 py-4 hover:bg-amber/20 transition-colors group sticky top-2 z-30"
+        >
+          <span className="shrink-0 w-9 h-9 rounded-full bg-amber/30 flex items-center justify-center text-lg" aria-hidden>
+            📸
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="font-body font-semibold text-text">
+              Sign your photo/video release
+            </p>
+            <p className="text-xs font-body text-text-muted mt-0.5">
+              Required before any portfolio photos can be captured. About 2 minutes.
+            </p>
+          </div>
+          <span className="text-text-muted group-hover:text-forest transition-colors" aria-hidden>
+            →
+          </span>
+        </Link>
+      )}
+      {!loading && photoReleaseSigned?.checked && photoReleaseSigned.signedAt && (
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-sage-pale border border-sage px-3 py-1.5">
+          <span className="text-sm" aria-hidden>✓</span>
+          <span className="text-xs font-body font-semibold text-forest">
+            Photo release signed
+            {photoReleaseSigned.signedAt
+              ? ' on ' + new Date(photoReleaseSigned.signedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : ''}
+          </span>
+        </div>
+      )}
 
       {!loading && unreadNotifications > 0 && (
         <Link
