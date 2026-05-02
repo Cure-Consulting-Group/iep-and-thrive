@@ -1549,6 +1549,7 @@ tickets:
     title: "Intake form started-but-incomplete reminder"
     priority: "P1"
     effort: "S"
+    done: true
     body: |
       What: Reminder email if a deposited family has started intake
       (any field filled) but not submitted within 7 days. Includes

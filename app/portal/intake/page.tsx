@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
+import { useAuth } from '@/lib/auth-context'
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -173,10 +176,58 @@ export default function IntakePage() {
   const [data, setData] = useState<IntakeFormData>(INITIAL_DATA)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
+  const { user } = useAuth()
+  const studentDocIdRef = useRef<string | null>(null)
+  const intakeStartedWrittenRef = useRef<boolean>(false)
+
+  // G11: persist intake draft state so the lifecycle reminder can fire.
+  useEffect(() => {
+    let cancelled = false
+    async function loadDraft() {
+      if (!user) return
+      try {
+        const fb = await import('firebase/firestore')
+        const snap = await fb.getDocs(fb.collection(db, 'users', user.uid, 'students'))
+        if (cancelled) return
+        const first = snap.docs[0]
+        if (first) {
+          studentDocIdRef.current = first.id
+          const sd = first.data() as Record<string, unknown>
+          if (sd.intakeStartedAt) intakeStartedWrittenRef.current = true
+          if (sd.intakeSubmitted === true) setSubmitted(true)
+        }
+      } catch (err) {
+        console.warn('[intake] failed to load draft state:', err)
+      }
+    }
+    loadDraft()
+    return () => { cancelled = true }
+  }, [user])
+
+  async function persistIntakeStartedOnce() {
+    if (intakeStartedWrittenRef.current) return
+    if (!user) return
+    intakeStartedWrittenRef.current = true
+    try {
+      const sid = studentDocIdRef.current
+      if (!sid) return
+      const ref = doc(db, 'users', user.uid, 'students', sid)
+      const snap = await getDoc(ref)
+      const existing = snap.exists() ? (snap.data() as Record<string, unknown>) : {}
+      if (!existing.intakeStartedAt) {
+        await setDoc(ref, { intakeStartedAt: serverTimestamp() }, { merge: true })
+      }
+    } catch (err) {
+      console.warn('[intake] intakeStartedAt write failed:', err)
+    }
+  }
+
 
   /* helpers */
   const set = <K extends keyof IntakeFormData>(key: K, value: IntakeFormData[K]) => {
     setData((prev) => ({ ...prev, [key]: value }))
+    // G11: first-interaction write of intakeStartedAt for the reminder pipeline.
+    void persistIntakeStartedOnce()
     // Clear error on change
     if (errors[key]) {
       setErrors((prev) => {
@@ -248,9 +299,61 @@ export default function IntakePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateStep(5)) return
     console.log('Intake form submitted:', data)
+    // G11: persist intake submission for the lifecycle pipeline.
+    try {
+      if (user) {
+        const sid = studentDocIdRef.current
+        if (sid) {
+          await setDoc(
+            doc(db, 'users', user.uid, 'students', sid),
+            {
+              intakeSubmitted: true,
+              intakeSubmittedAt: serverTimestamp(),
+              intakeFields: {
+                studentLegalName: data.studentLegalName,
+                preferredName: data.preferredName,
+                dateOfBirth: data.dateOfBirth,
+                currentGrade: data.currentGrade,
+                schoolDistrict: data.schoolDistrict,
+                currentSchool: data.currentSchool,
+                primaryDiagnosis: data.primaryDiagnosis,
+                additionalDiagnoses: data.additionalDiagnoses,
+                hasCurrentIEP: data.hasCurrentIEP,
+                iepClassification: data.iepClassification,
+                relatedServices: data.relatedServices,
+                esyHistory: data.esyHistory,
+                currentReadingLevel: data.currentReadingLevel,
+                currentMathLevel: data.currentMathLevel,
+                areasOfConcern: data.areasOfConcern,
+                whatHasWorked: data.whatHasWorked,
+                whatHasNotWorked: data.whatHasNotWorked,
+                sensoryConsiderations: data.sensoryConsiderations,
+                behavioralTriggers: data.behavioralTriggers,
+                allergies: data.allergies,
+                medications: data.medications,
+                medicalConditions: data.medicalConditions,
+                emergencyContact1Name: data.emergencyContact1Name,
+                emergencyContact1Relationship: data.emergencyContact1Relationship,
+                emergencyContact1Phone: data.emergencyContact1Phone,
+                emergencyContact2Name: data.emergencyContact2Name,
+                emergencyContact2Relationship: data.emergencyContact2Relationship,
+                emergencyContact2Phone: data.emergencyContact2Phone,
+                authorizedPickup: data.authorizedPickup,
+                photoVideoRelease: data.photoVideoRelease,
+                confirmAccurate: data.confirmAccurate,
+                consentIEPReview: data.consentIEPReview,
+              },
+            },
+            { merge: true }
+          )
+        }
+      }
+    } catch (err) {
+      console.warn('[intake] submit persistence failed:', err)
+    }
     setSubmitted(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }

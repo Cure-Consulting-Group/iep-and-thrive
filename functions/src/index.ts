@@ -48,3 +48,6 @@ export { sendBalanceDueReminders } from "./balance-due-reminders";
 
 // ─── G6: Photo / Video Release Reminder (T-14) ───
 export { sendPhotoReleaseReminder } from "./photo-release-reminder";
+
+// ─── G11: Intake Started-but-Incomplete Reminder ───
+export { sendIntakeIncompleteReminder } from "./intake-incomplete-reminder";
