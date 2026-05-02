@@ -1432,6 +1432,7 @@ tickets:
     title: "Photo/video release reminder (pre-Day 1)"
     priority: "P0"
     effort: "S"
+    done: true
     body: |
       What: Reminder email if a deposited family has not yet returned
       a signed photo/video release by T-14 days. Includes the release
