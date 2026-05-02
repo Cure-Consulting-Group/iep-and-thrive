@@ -1,0 +1,10 @@
+{
+  "_comment": "Weekly tutoring template. Times are HH:mm in local (Long Island, ET). Edit before running scripts/seed-tutoring-slots.mjs --template scripts/tutoring-slot-template.json. Empty arrays = no slots that day.",
+  "monday":    ["16:00", "17:00", "18:00"],
+  "tuesday":   [],
+  "wednesday": ["16:00", "17:00"],
+  "thursday":  [],
+  "friday":    ["15:00", "16:00", "17:00"],
+  "saturday":  ["10:00", "11:00", "12:00"],
+  "sunday":    []
+}

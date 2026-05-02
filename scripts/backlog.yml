@@ -1742,6 +1742,7 @@ tickets:
     title: "Stripe products + customer portal config (founder runbook)"
     priority: "P0"
     effort: "S"
+    status: "done"
     body: |
       What: Document the Stripe Dashboard work the founder must do
       manually — create 4 products (Drop-in, Weekly, Twice-Weekly,
@@ -1910,6 +1911,7 @@ tickets:
     title: "/admin/subscribers list view"
     priority: "P1"
     effort: "S"
+    status: "done"
     body: |
       What: Admin-only page at /admin/subscribers showing all
       users/{uid} with active subscriptions: tier, status, sessions
@@ -1958,6 +1960,7 @@ tickets:
     title: "Slot seeding tool / runbook for founder weekly availability"
     priority: "P0"
     effort: "S"
+    status: "done"
     body: |
       What: scripts/seed-tutoring-slots.mjs that takes a JSON-ish
       week template (e.g., "Mon/Wed/Fri 4pm, 5pm, 6pm") and writes
