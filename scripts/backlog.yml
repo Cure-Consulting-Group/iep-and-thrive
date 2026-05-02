@@ -1710,6 +1710,7 @@ tickets:
     title: "/tutoring marketing one-pager (hero + 3 pricing cards + IEP add-on + FAQ)"
     priority: "P0"
     effort: "M"
+    done: true
     body: |
       What: Build the public-facing /tutoring page per docs/tutoring-design.md §1-5.
       Sections: TutoringHero, Trust Strip, Who This Is For (4 cards), 3

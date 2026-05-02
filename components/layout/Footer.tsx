@@ -10,6 +10,14 @@ const programLinks = [
   { label: 'IEP Advocacy Services', href: '/contact' },
 ]
 
+const tutoringLinks = [
+  { label: 'Year-Round Tutoring', href: '/tutoring' },
+  { label: 'Single Session ($125)', href: '/tutoring#pricing-drop-in' },
+  { label: 'Weekly Subscription', href: '/tutoring#pricing-weekly' },
+  { label: 'Twice-Weekly Subscription', href: '/tutoring#pricing-twice-weekly' },
+  { label: 'IEP Review Session', href: '/tutoring#iep-review' },
+]
+
 const baseEnrollLinks = [
   { label: 'Reserve a Spot', href: '/enroll' },
   { label: 'Book Discovery Call', href: '/contact' },
@@ -31,12 +39,16 @@ export default function Footer() {
     : { label: 'Parent Login', href: '/login' }
   const enrollLinks = loading
     ? baseEnrollLinks
-    : [...baseEnrollLinks, portalLink]
+    : [
+        ...baseEnrollLinks,
+        portalLink,
+        { label: 'My Subscription', href: '/portal/subscription' },
+      ]
 
   return (
     <footer className="bg-[#111810] text-white/60" role="contentinfo">
       <div className="mx-auto max-w-7xl px-8 py-10 md:py-[3rem] md:px-12 lg:px-[5rem]">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr]">
           {/* Column 1 — Logo + description */}
           <div>
             <Link href="/" className="font-display text-xl font-bold">
@@ -70,7 +82,26 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* Column 3 — Enroll */}
+          {/* Column 3 — Tutoring (Subscription) */}
+          <nav aria-label="Tutoring links">
+            <h4 className="mb-4 text-sm font-semibold text-white/80 font-body">
+              Tutoring
+            </h4>
+            <ul className="space-y-2.5">
+              {tutoringLinks.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Column 4 — Enroll */}
           <nav aria-label="Enrollment links">
             <h4 className="mb-4 text-sm font-semibold text-white/80 font-body">
               Enroll
@@ -89,7 +120,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* Column 4 — Contact */}
+          {/* Column 5 — Contact */}
           <nav aria-label="Contact links">
             <h4 className="mb-4 text-sm font-semibold text-white/80 font-body">
               Contact

@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 
 const navLinks = [
-  { label: 'About', href: '#about' },
-  { label: 'Program', href: '#program' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'About', href: '/#about' },
+  { label: 'Program', href: '/#program' },
+  { label: 'Tutoring', href: '/tutoring' },
+  { label: 'How It Works', href: '/#how-it-works' },
+  { label: 'FAQ', href: '/faq' },
 ]
 
 export default function Nav() {
@@ -77,7 +78,7 @@ export default function Nav() {
             </Link>
           )}
           <a
-            href="#enroll"
+            href="/#enroll"
             className="inline-flex items-center rounded-full bg-forest px-5 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-forest-mid"
           >
             Reserve a Spot
@@ -135,7 +136,7 @@ export default function Nav() {
               </Link>
             )}
             <a
-              href="#enroll"
+              href="/#enroll"
               onClick={() => setMobileOpen(false)}
               className="inline-flex items-center rounded-full bg-forest px-8 py-3 text-base font-semibold text-white transition-colors duration-200 hover:bg-forest-mid"
             >
