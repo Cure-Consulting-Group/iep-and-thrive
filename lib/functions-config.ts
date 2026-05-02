@@ -28,4 +28,6 @@ export const CLOUD_FUNCTIONS = {
   getSignedAgreementPdf: `${FUNCTIONS_BASE_URL}/getSignedAgreementPdf`,
   // H3 — tutoring subscription checkout (Stripe subscription mode)
   tutoringSubscription: `${FUNCTIONS_BASE_URL}/subscriptionCheckout`,
+  // H11 — Stripe customer-portal session minter
+  customerPortal: `${FUNCTIONS_BASE_URL}/customerPortal`,
 } as const;

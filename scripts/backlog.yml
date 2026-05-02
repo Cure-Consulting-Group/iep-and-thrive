@@ -2017,6 +2017,7 @@ tickets:
     title: "customerPortal Cloud Function (Stripe billing portal session URL)"
     priority: "P0"
     effort: "S"
+    status: "done"
     body: |
       What: New HTTPS callable function customerPortal that mints a
       Stripe billing portal session URL for the authenticated parent
