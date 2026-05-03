@@ -12,6 +12,7 @@ import {
 
 const SLOT_TYPES: { value: AvailableSlot['type']; label: string }[] = [
   { value: 'discovery_call', label: 'Discovery Call' },
+  { value: 'tutoring', label: 'Tutoring Session' },
   { value: 'consultation', label: 'Consultation' },
   { value: 'check_in', label: 'Check-In' },
 ]

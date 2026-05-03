@@ -20,6 +20,7 @@ import { CLOUD_FUNCTIONS } from '@/lib/functions-config'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import BookingGate from '@/components/portal/BookingGate'
 import SessionsCounter from '@/components/portal/SessionsCounter'
+import MonthCalendar from '@/components/booking/MonthCalendar'
 
 const TYPE_LABELS: Record<string, string> = {
   discovery_call: 'Discovery Call',
@@ -405,7 +406,7 @@ function BookingPageInner() {
   // Calendar / Gate views
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <main id="main" className="max-w-3xl mx-auto px-4 py-12">
+    <main id="main" className="max-w-5xl mx-auto px-4 py-12">
       <h1 className="font-display text-3xl font-bold text-forest mb-2">
         Book a Session
       </h1>
@@ -516,86 +517,60 @@ function CalendarBody({
   onSelectSlot,
   disabled = false,
 }: CalendarBodyProps) {
+  const countsByDate = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(slotsByDate).map(([d, arr]) => [d, arr.length])
+      ),
+    [slotsByDate]
+  )
+
   return (
     <div
-      className={`space-y-4 ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
+      className={`grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6 ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
       aria-disabled={disabled || undefined}
     >
-      {/* Date selector */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {availableDates.map((date) => {
-          const d = new Date(date + 'T00:00:00')
-          const isSelected = selectedDate === date
-          return (
-            <button
-              key={date}
-              onClick={() => setSelectedDate(date)}
-              className={`flex flex-col items-center min-w-[72px] px-4 py-3 rounded-2xl border-2 transition-all duration-200 ${
-                isSelected
-                  ? 'border-forest bg-forest text-white'
-                  : 'border-border bg-white text-text hover:border-forest/30'
-              }`}
-            >
-              <span
-                className={`text-xs font-body font-semibold uppercase ${
-                  isSelected ? 'text-white/70' : 'text-text-muted'
-                }`}
-              >
-                {d.toLocaleDateString('en-US', { weekday: 'short' })}
-              </span>
-              <span className="text-lg font-display font-bold">{d.getDate()}</span>
-              <span
-                className={`text-xs font-body ${
-                  isSelected ? 'text-white/70' : 'text-text-muted'
-                }`}
-              >
-                {d.toLocaleDateString('en-US', { month: 'short' })}
-              </span>
-              <span
-                className={`mt-1 text-xs font-body font-semibold ${
-                  isSelected ? 'text-white' : 'text-forest'
-                }`}
-              >
-                {slotsByDate[date].length} slot
-                {slotsByDate[date].length !== 1 ? 's' : ''}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+      {/* Left: month calendar */}
+      <MonthCalendar
+        availableDates={availableDates}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        countsByDate={countsByDate}
+      />
 
-      {/* Time slots */}
-      {selectedDate && slotsByDate[selectedDate] && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h2 className="font-display text-lg font-semibold text-forest mb-4">
-            {formatDate(selectedDate)}
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {slotsByDate[selectedDate].map((slot) => (
-              <button
-                key={slot.id}
-                onClick={() => onSelectSlot(slot)}
-                className="flex flex-col items-center p-4 rounded-xl border-2 border-border bg-white hover:border-forest hover:bg-forest/5 transition-all duration-200 group"
-              >
-                <span className="text-sm font-body font-bold text-forest group-hover:text-forest">
-                  {slot.startTime}
-                </span>
-                <span className="text-xs font-body text-text-muted mt-0.5">
-                  {slot.duration} min · {TYPE_LABELS[slot.type] || slot.type}
-                </span>
-              </button>
-            ))}
+      {/* Right: time slots */}
+      <div>
+        {selectedDate && slotsByDate[selectedDate] ? (
+          <div className="bg-white rounded-2xl border border-border p-6">
+            <h2 className="font-display text-lg font-semibold text-forest mb-4">
+              {formatDate(selectedDate)}
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {slotsByDate[selectedDate].map((slot) => (
+                <button
+                  key={slot.id}
+                  onClick={() => onSelectSlot(slot)}
+                  className="flex flex-col items-center p-4 rounded-xl border-2 border-border bg-white hover:border-forest hover:bg-forest/5 transition-all duration-200 group"
+                >
+                  <span className="text-sm font-body font-bold text-forest group-hover:text-forest">
+                    {slot.startTime}
+                  </span>
+                  <span className="text-xs font-body text-text-muted mt-0.5">
+                    {slot.duration} min · {TYPE_LABELS[slot.type] || slot.type}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-
-      {!selectedDate && (
-        <div className="bg-sage/5 rounded-2xl p-8 text-center">
-          <p className="text-text-muted font-body text-sm">
-            👆 Select a date above to see available times
-          </p>
-        </div>
-      )}
+        ) : (
+          <div className="bg-sage/5 rounded-2xl p-8 text-center h-full flex flex-col items-center justify-center">
+            <span className="text-3xl mb-3">📅</span>
+            <p className="text-text-muted font-body text-sm">
+              Select a date to see available times.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
