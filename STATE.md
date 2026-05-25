@@ -1,16 +1,30 @@
 # IEP & Thrive — Build State
 
-## Status: SPRINT 5 COMPLETE — LAUNCH READY
+## Status: SPRINT 6 — iOS PIVOT IN PROGRESS
+We are currently in Phase 3 (Engineering Backlog) and transitioning to Phase 4 (Implementation) of the iOS Pivot. High-fidelity designs are complete, and the native iOS project has been scaffolded using **The Composable Architecture (TCA)**.
 
-## Stack
-- Next.js 14 (App Router, static export)
-- Tailwind CSS v4
-- Google Fonts: Playfair Display + DM Sans
-- React Hook Form + Zod
-- Stripe Checkout
-- **Firebase** (Auth, Firestore, Storage, Cloud Functions)
-- Firebase Hosting (deployment)
-- Google Analytics 4
+## Tech Stack (iOS)
+- **Framework:** SwiftUI
+- **State Management:** TCA (The Composable Architecture)
+- **Engine:** SpriteKit (for interactive modules)
+- **Data:** SwiftData (Local Source of Truth) + Firebase (Sync)
+- **Design:** Stitch-generated design system (Forest/Sage/Cream palette)
+
+## Recent Progress
+- **Strategy:** Finalized student-first PRD, Roadmap, and Backlog.
+- **Design:** Generated all core screens via Stitch MCP (Journey, Onboarding, Sand Tray, Physics Blocks, Safe Space).
+- **Architecture:** Refactored Xcode project to TCA structure. Implemented Root, Journey, Onboarding, Literacy, Math, and SafeSpace features.
+- **Tokens:** Implemented `Theme.swift` with custom colors and typography matching the HIG design.
+
+## Next Steps
+- Implement SwiftData model container and TCA dependency wrapper.
+- Build the SpriteKit physics engine for the Math module (Snap Cubes).
+- Build the custom touch tracking for the Literacy module (Sand Tray).
+
+---
+
+## Status (Web): SPRINT 5 COMPLETE — LAUNCH READY
+(Note: The web platform is now considered the legacy portal/landing page as we pivot to native iOS).
 
 ## Firebase Project
 - **Project ID:** `iep-and-thrive`
