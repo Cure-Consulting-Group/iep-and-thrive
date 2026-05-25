@@ -5,36 +5,43 @@ struct LiteracyView: View {
     let store: StoreOf<LiteracyFeature>
     
     var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
+        WithViewStore(self.store, observe: { \$0 }) { viewStore in
             ZStack {
-                Theme.Colors.creamDeep.ignoresSafeArea()
+                Theme.Colors.cream.ignoresSafeArea()
                 
-                VStack {
-                    Text("Trace the letter \(viewStore.currentLetter)")
-                        .font(Theme.Fonts.display(size: 28))
-                        .padding()
-                    
-                    Spacer()
-                    
-                    // Sand Tray Placeholder
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.orange.opacity(0.1))
-                        .overlay(
-                            Text(viewStore.currentLetter)
-                                .font(.system(size: 200, weight: .thin))
-                                .foregroundColor(.gray.opacity(0.3))
-                        )
-                        .padding()
-                    
-                    Spacer()
-                    
-                    Button("Done") {
-                        viewStore.send(.doneTapped)
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        Button {
+                            // Back action
+                        } label: {
+                            Image(systemName: "chevron.left.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundColor(Theme.Colors.forest)
+                        }
+                        
+                        Spacer()
+                        
+                        Text("Literacy: Letter Sounds")
+                            .font(Theme.Fonts.display(size: 24))
+                            .foregroundColor(Theme.Colors.forest)
+                        
+                        Spacer()
+                        
+                        // Placeholder for progress or sparks
+                        Circle()
+                            .fill(Theme.Colors.amber)
+                            .frame(width: 32, height: 32)
                     }
                     .padding()
-                    .background(Theme.Colors.sage)
-                    .foregroundColor(.white)
-                    .clipShape(Capsule())
+                    
+                    Text("Trace the letter \(viewStore.currentLetter)")
+                        .font(Theme.Fonts.body(size: 20, weight: .medium))
+                        .foregroundColor(Theme.Colors.textMuted)
+                        .padding(.bottom)
+                    
+                    // The Interactive Module
+                    SandTrayView(store: store)
                 }
             }
         }
