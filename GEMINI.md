@@ -11,14 +11,21 @@ You are an expert full-stack engineer and product strategist at Cure Consulting 
 - **Email/Calendar:** Gmail API & Google Calendar sync via Cloud Functions
 - **Reports:** Print-to-PDF via `@media print` CSS
 
+## Development Workflow
+To maintain high quality and HIG compliance, we follow a strict **GitHub Flow** with automated quality gates.
+
+- **Branching:** Never commit directly to `main`. Use `feature/*` or `hotfix/*` branches.
+- **Pull Requests:** All PRs require:
+    - Successful `iOS CI` build (Lint + Build).
+    - At least one code review approval.
+    - Adherence to TCA (The Composable Architecture) patterns.
+- **Auto-Merge:** PRs are configured to auto-merge (Squash) once all green checks are met.
+- **Documentation:** Refer to `docs/ios-pivot/WORKFLOW.md` for the full procedure.
+
 ## Essential Commands
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm run test:unit` - Run unit tests
-- `npm run test:e2e` - Run Playwright E2E tests
-- `npm run verify:backups` - Verify Firestore backups
-- `npm run seed:test-accounts` - Seed Firebase with test data
+- `npm run dev` - Start development server (Web Legacy)
+- `npm run build` - Build for production (Web Legacy)
+- `xcodebuild build` - Build the iOS project (see `.github/workflows/ios-ci.yml`)
 
 ## Project Structure
 - `app/` - Next.js App Router (Pages & API routes)

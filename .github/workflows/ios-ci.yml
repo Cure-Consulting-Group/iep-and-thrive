@@ -1,0 +1,35 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [main]
+    paths: ['ios/**', '.github/workflows/ios-ci.yml']
+  pull_request:
+    branches: [main]
+    paths: ['ios/**', '.github/workflows/ios-ci.yml']
+
+jobs:
+  build:
+    name: Build and Check
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.3.app
+
+      - name: Build Project
+        run: |
+          xcodebuild build \
+            -project ios/IEPAndThrive.xcodeproj \
+            -scheme IEPAndThrive \
+            -destination 'platform=iOS Simulator,name=iPad (10th generation)' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      # We can add SwiftLint here once configured
+      # - name: SwiftLint
+      #   run: swiftlint
