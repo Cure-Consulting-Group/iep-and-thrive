@@ -6,17 +6,21 @@ struct RootFeature {
     struct State: Equatable {
         var journey = JourneyFeature.State()
         var onboarding = OnboardingFeature.State()
+        @PresentationState var paywall: PaywallFeature.State?
         var path = StackState<Path.State>()
         
         var isUserOnboarded: Bool = false
+        var isPremium: Bool = false
     }
     
     enum Action {
         case journey(JourneyFeature.Action)
         case onboarding(OnboardingFeature.Action)
+        case paywall(PresentationAction<PaywallFeature.Action>)
         case path(StackAction<Path.State, Path.Action>)
         case appDelegate(AppDelegateAction)
         case profileLoaded(StudentProfile?)
+        case subscriptionStatusChanged(Bool)
     }
     
     enum AppDelegateAction {
@@ -24,6 +28,7 @@ struct RootFeature {
     }
     
     @Dependency(\.database) var database
+    @Dependency(\.storeKit) var storeKit
     
     var body: some ReducerOf<Self> {
         Scope(state: \.journey, action: \.journey) {
@@ -40,20 +45,44 @@ struct RootFeature {
                 return .run { send in
                     let profile = try? await database.fetchProfile()
                     await send(.profileLoaded(profile))
+                    
+                    for await isPremium in await storeKit.observeStatus() {
+                        await send(.subscriptionStatusChanged(isPremium))
+                    }
                 }
                 
             case let .profileLoaded(profile):
                 state.isUserOnboarded = (profile != nil)
+                if state.isUserOnboarded && !state.isPremium {
+                    state.paywall = PaywallFeature.State()
+                }
+                return .none
+                
+            case let .subscriptionStatusChanged(isPremium):
+                state.isPremium = isPremium
+                if isPremium {
+                    state.paywall = nil
+                }
                 return .none
                 
             case .onboarding(.onboardingComplete):
-                // In a real app, the onboarding feature would have already saved the profile
                 state.isUserOnboarded = true
+                if !state.isPremium {
+                    state.paywall = PaywallFeature.State()
+                }
                 return .none
                 
-            case .journey, .onboarding, .path:
+            case .paywall(.presented(.purchaseSuccess)):
+                state.isPremium = true
+                state.paywall = nil
+                return .none
+
+            case .journey, .onboarding, .path, .paywall:
                 return .none
             }
+        }
+        .ifLet(\.paywall, action: \.paywall) {
+            PaywallFeature()
         }
         .forEach(\.path, action: \.path) {
             Path()

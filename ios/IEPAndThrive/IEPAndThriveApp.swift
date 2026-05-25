@@ -30,26 +30,15 @@ struct RootView: View {
                     OnboardingView(store: self.store.scope(state: \.onboarding, action: \.onboarding))
                 }
             } destination: { state in
-                switch state {
-                case .literacy:
-                    CaseLet(
-                        /RootFeature.Path.State.literacy,
-                        action: RootFeature.Path.Action.literacy,
-                        then: LiteracyView.init(store:)
-                    )
-                case .math:
-                    CaseLet(
-                        /RootFeature.Path.State.math,
-                        action: RootFeature.Path.Action.math,
-                        then: MathView.init(store:)
-                    )
-                case .safeSpace:
-                    CaseLet(
-                        /RootFeature.Path.State.safeSpace,
-                        action: RootFeature.Path.Action.safeSpace,
-                        then: SafeSpaceView.init(store:)
-                    )
-                }
+                // ...
+            }
+            .sheet(
+                store: self.store.scope(
+                    state: \.$paywall,
+                    action: \.paywall
+                )
+            ) { store in
+                PaywallView(store: store)
             }
         }
     }
