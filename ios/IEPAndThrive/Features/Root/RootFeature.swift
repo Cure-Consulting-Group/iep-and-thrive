@@ -16,11 +16,14 @@ struct RootFeature {
         case onboarding(OnboardingFeature.Action)
         case path(StackAction<Path.State, Path.Action>)
         case appDelegate(AppDelegateAction)
+        case profileLoaded(StudentProfile?)
     }
     
     enum AppDelegateAction {
         case didFinishLaunching
     }
+    
+    @Dependency(\.database) var database
     
     var body: some ReducerOf<Self> {
         Scope(state: \.journey, action: \.journey) {
@@ -34,10 +37,17 @@ struct RootFeature {
         Reduce { state, action in
             switch action {
             case .appDelegate(.didFinishLaunching):
-                // Logic to check if user is onboarded via SwiftData/UserDefaults
+                return .run { send in
+                    let profile = try? await database.fetchProfile()
+                    await send(.profileLoaded(profile))
+                }
+                
+            case let .profileLoaded(profile):
+                state.isUserOnboarded = (profile != nil)
                 return .none
                 
             case .onboarding(.onboardingComplete):
+                // In a real app, the onboarding feature would have already saved the profile
                 state.isUserOnboarded = true
                 return .none
                 

@@ -11,6 +11,9 @@ struct IEPAndThriveApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(store: store)
+                .onAppear {
+                    store.send(.appDelegate(.didFinishLaunching))
+                }
         }
     }
 }
