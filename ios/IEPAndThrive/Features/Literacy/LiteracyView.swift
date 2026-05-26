@@ -5,7 +5,7 @@ struct LiteracyView: View {
     let store: StoreOf<LiteracyFeature>
     
     var body: some View {
-        WithViewStore(self.store, observe: { \$0 }) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
                 Theme.Colors.cream.ignoresSafeArea()
                 

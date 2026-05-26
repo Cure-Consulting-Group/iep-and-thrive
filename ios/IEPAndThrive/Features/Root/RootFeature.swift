@@ -76,9 +76,9 @@ struct RootFeature {
                 state.journey.levelPreview = nil
                 switch level.category {
                 case .literacy:
-                    state.path.append(.literacy(LiteracyFeature.State(level: level)))
+                    state.path.append(Path.State.literacy(LiteracyFeature.State(level: level)))
                 case .math:
-                    state.path.append(.math(MathFeature.State(level: level)))
+                    state.path.append(Path.State.math(MathFeature.State(level: level)))
                 }
                 return .none
                 
@@ -86,7 +86,7 @@ struct RootFeature {
                 return .none
             }
         }
-        .ifLet(\.paywall, action: \.paywall) {
+        .ifLet(\.$paywall, action: \.paywall) {
             PaywallFeature()
         }
         .forEach(\.path, action: \.path) {

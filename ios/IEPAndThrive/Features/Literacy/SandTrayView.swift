@@ -10,7 +10,7 @@ struct SandTrayView: View {
     @State private var hapticEngine: CHHapticEngine?
     
     var body: some View {
-        WithViewStore(self.store, observe: { \$0 }) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
                 // The Wooden Tray Frame
                 RoundedRectangle(cornerRadius: 30)
@@ -135,7 +135,9 @@ struct SandTrayView: View {
 
 #Preview {
     SandTrayView(
-        store: Store(initialState: LiteracyFeature.State()) {
+        store: Store(initialState: LiteracyFeature.State(
+            level: LevelDefinition(id: "test", title: "Test", category: .literacy, targetValue: "a", biome: .forest)
+        )) {
             LiteracyFeature()
         }
     )

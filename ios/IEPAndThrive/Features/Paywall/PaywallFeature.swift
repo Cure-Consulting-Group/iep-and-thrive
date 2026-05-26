@@ -12,11 +12,11 @@ struct PaywallFeature {
     
     enum Action {
         case task
-        case productsResponse(Result<[Product], Error>)
+        case productsResponse(Result<[Product], PaywallError>)
         case purchaseButtonTapped(Product)
-        case purchaseResponse(Result<Transaction?, Error>)
+        case purchaseResponse(Result<Transaction?, PaywallError>)
         case restoreButtonTapped
-        case restoreResponse(Result<Void, Error>)
+        case restoreResponse(Result<Void, PaywallError>)
         case dismissButtonTapped
     }
     
@@ -34,13 +34,13 @@ struct PaywallFeature {
                         let products = try await storeKit.products()
                         await send(.productsResponse(.success(products)))
                     } catch {
-                        await send(.productsResponse(.failure(error)))
+                        await send(.productsResponse(.failure(.loadFailed(error.localizedDescription))))
                     }
                 }
                 
             case let .productsResponse(.success(products)):
                 state.isLoading = false
-                state.products = products.sorted(by: { \$0.price < \$1.price })
+                state.products = products.sorted(by: { $0.price < $1.price })
                 return .none
                 
             case let .productsResponse(.failure(error)):
@@ -56,7 +56,7 @@ struct PaywallFeature {
                         let transaction = try await storeKit.purchase(product)
                         await send(.purchaseResponse(.success(transaction)))
                     } catch {
-                        await send(.purchaseResponse(.failure(error)))
+                        await send(.purchaseResponse(.failure(.purchaseFailed(error.localizedDescription))))
                     }
                 }
                 
@@ -80,7 +80,7 @@ struct PaywallFeature {
                         try await storeKit.restorePurchases()
                         await send(.restoreResponse(.success(())))
                     } catch {
-                        await send(.restoreResponse(.failure(error)))
+                        await send(.restoreResponse(.failure(.restoreFailed(error.localizedDescription))))
                     }
                 }
                 
@@ -100,8 +100,16 @@ struct PaywallFeature {
     }
 }
 
-extension Error: Equatable {
-    public static func == (lhs: Error, rhs: Error) -> Bool {
-        lhs.localizedDescription == rhs.localizedDescription
+enum PaywallError: Error, Equatable {
+    case loadFailed(String)
+    case purchaseFailed(String)
+    case restoreFailed(String)
+    
+    var localizedDescription: String {
+        switch self {
+        case let .loadFailed(msg), let .purchaseFailed(msg), let .restoreFailed(msg):
+            return msg
+        }
     }
 }
+
