@@ -1,25 +1,52 @@
 # IEP & Thrive — Build State
 
-## Status: SPRINT 6 — iOS PIVOT IN PROGRESS
-We are currently in Phase 3 (Engineering Backlog) and transitioning to Phase 4 (Implementation) of the iOS Pivot. High-fidelity designs are complete, and the native iOS project has been scaffolded using **The Composable Architecture (TCA)**.
+## Status: SPRINT 6 — CORE LEARNING LOOP SHIPPED
+The end-to-end student loop (Onboarding → Journey → Literacy/Math mission → Mission Complete) now works on device with real validation. P0 silent-correctness bugs, P1 UX gaps, the SpriteKit Math engine, and Sand Tray shape matching are all merged into `main`. Remaining work is design assets, telemetry-driven tuning, and a test harness.
 
 ## Tech Stack (iOS)
 - **Framework:** SwiftUI
 - **State Management:** TCA (The Composable Architecture)
-- **Engine:** SpriteKit (for interactive modules)
-- **Data:** SwiftData (Local Source of Truth) + Firebase (Sync)
+- **Engine:** SpriteKit (Math Snap Cubes), CoreText + CoreGraphics (Sand Tray validation), CoreHaptics (multisensory feedback)
+- **Data:** SwiftData (Local Source of Truth) + Firebase (Sync — not yet wired)
 - **Design:** Stitch-generated design system (Forest/Sage/Cream palette)
+- **Build:** XcodeGen (`ios/project.yml` is the source of truth — run `xcodegen generate` after adding/removing `.swift` files)
 
-## Recent Progress
-- **Strategy:** Finalized student-first PRD, Roadmap, and Backlog.
-- **Design:** Generated all core screens via Stitch MCP (Journey, Onboarding, Sand Tray, Physics Blocks, Safe Space).
-- **Architecture:** Refactored Xcode project to TCA structure. Implemented Root, Journey, Onboarding, Literacy, Math, and SafeSpace features.
-- **Tokens:** Implemented `Theme.swift` with custom colors and typography matching the HIG design.
+## Recent Progress (Sprint 6 ship)
+
+Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
+
+### PR #9 — P0 silent-correctness fixes
+- Safe Space Exit + Journey leaf FAB wired through `RootFeature` (was no-op).
+- Literacy back chevron sends new `.backTapped` action (no longer silently awarded mission completion on exit).
+- Math `.checkAnswerTapped` gated on placement; explicit back button added.
+
+### PR #13 — P1 UX improvements
+- **Onboarding:** age picker (5–11) + primary-focus selector (Reading/Math/Both); Continue disabled until name non-empty; `StudentProfile` persisted to SwiftData.
+- **Journey:** `currentLevelIndex` gating with locked/active/completed node states; dashed sage trail (`TrailPath`) between nodes; per-biome gradient overlays (forest/desert/mountain) until distinct art lands.
+- **`MissionCompleteFeature`** + sheet — star-burst, level title, +sparks chip, "Keep Exploring" CTA.
+- **Sparks counter** animates increments via `contentTransition(.numericText)`.
+- **`LevelDefinition.missionDescription`** — `targetValue` ids (`ai`, `x5`, `predict`) mapped to parent-readable copy on the level preview sheet.
+- **`GEMINI.md`** refocused on the iOS pivot stack.
+
+### PR #14 — SpriteKit Snap Cubes + scaffold cleanup
+- **`SnapCubesScene`** (SpriteKit): edge-loop physics, gravity, 56pt amber cubes, tap-to-spawn, drag-to-move, 20-cube cap.
+- **`SnapCubesView`** (SwiftUI wrapper): holds scene as `@State`, Remove + Clear buttons.
+- **`LevelDefinition.targetCount`**: per-level cube goals (`add` → 5, `x2` → 4, `arrays` → 6, `x10` → 10). `nil` for abstract levels (rounding, estimation) — those keep the "any placement" fallback.
+- **`MathFeature.State.isCorrect`** gates completion on `count == target` when known; incorrect attempts surface a friendly hint ("Almost! Add 2 more.") and keep the child on screen.
+- **Cleanup:** deleted stranded pre-TCA scaffolding (`Presentation/Views/MainJourneyView.swift`, `Presentation/ViewModels/JourneyViewModel.swift`, `Domain/Models/JourneyNode.swift`).
+
+### PR #15 — Sand Tray stroke validation
+- **`LetterTracer`** — CoreText glyph paths → flipped/centered `CGPath` → stroke-inflated for `contains(point)` accuracy + sampled anchors for coverage. Pass requires accuracy ≥ 0.55 AND coverage ≥ 0.45 (forgiving for SPED motor-skill learners).
+- **`SandTrayView`** — `GeometryReader` captures canvas size for the tracer; strokes shift to forestLight on a passing trace; Done button morphs into "✓ Great Job!" capsule; new undo button; amber hint chip on misses. Done remains always-tappable — visual feedback is the carrot, not the stick.
 
 ## Next Steps
-- Implement SwiftData model container and TCA dependency wrapper.
-- Build the SpriteKit physics engine for the Math module (Snap Cubes).
-- Build the custom touch tracking for the Literacy module (Sand Tray).
+- **Design assets:** Distinct `BiomeDesert.imageset` and `BiomeMountain.imageset` art (currently empty — only `BiomeForest` has a real image, biomes are differentiated via gradient overlay).
+- **Firebase sync:** Wire `StudentProfile`, `LessonProgress`, and `SparksRecord` to Firestore (SwiftData is local-only today).
+- **CI:** Bump the GitHub Actions Swift toolchain to 6.1 — TCA 1.25.5 requires it; `Build and Check` is currently red on every PR. Restore the GitHub Packages auth token for Playwright `npm ci`.
+- **Test harness:** No XCTest/TestStore target in `project.yml` yet. Adding one unlocks unit tests for the reducers and the `LetterTracer` math.
+- **Threshold tuning:** Sand Tray accuracy/coverage thresholds (0.55/0.45) and Math `targetCount` values are starting points — revisit once we have real session telemetry.
+- **Paywall UX:** Currently auto-presents after onboarding (`RootFeature.swift:56–58, 70–72`) before the child sees any of the journey. Consider deferring until N levels completed.
+- **Per-glyph stroke order:** Sand Tray validates final shape, not stroke sequence. Out of scope for this sprint; future enhancement.
 
 ---
 
