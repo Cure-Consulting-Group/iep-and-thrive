@@ -33,7 +33,7 @@ struct LevelPreviewView: View {
                         .kerning(1.2)
                 }
                 
-                Text("Help your Explorer master \(viewStore.level.targetValue) in the \(viewStore.level.biome.rawValue) biome.")
+                Text(viewStore.level.missionDescription)
                     .font(Theme.Fonts.body(size: 18))
                     .foregroundColor(Theme.Colors.text)
                     .multilineTextAlignment(.center)

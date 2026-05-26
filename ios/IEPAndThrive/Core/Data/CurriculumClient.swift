@@ -7,16 +7,72 @@ struct LevelDefinition: Equatable, Identifiable {
     let category: Category
     let targetValue: String
     let biome: Biome
-    
+
     enum Category: String, Codable {
         case literacy
         case math
     }
-    
+
     enum Biome: String, Codable {
         case forest
         case desert
         case mountain
+    }
+
+    /// Parent-facing description of what the child will practice, shown on the
+    /// level preview sheet. Falls back to a sensible default when no explicit
+    /// mapping exists for the `targetValue`.
+    var missionDescription: String {
+        switch category {
+        case .literacy:
+            return literacyDescription
+        case .math:
+            return mathDescription
+        }
+    }
+
+    private var literacyDescription: String {
+        switch targetValue {
+        case "a", "e", "i", "o", "u":
+            return "Help your Explorer master the short '\(targetValue)' sound."
+        case "sh", "ch", "th", "wh", "ck":
+            return "Practice the '\(targetValue)' digraph — two letters, one sound."
+        case "ai", "ay", "ee", "ea", "oa", "ow":
+            return "Meet the '\(targetValue)' vowel team and the sound they share."
+        case "bl, st, fl":
+            return "Blend beginning consonants together: bl, st, fl."
+        case "nd, st, nt":
+            return "Catch ending blends like nd, st, and nt."
+        case "predict":   return "Learn to predict what happens next in a story."
+        case "monitor":   return "Practice checking your own understanding as you read."
+        case "retell":    return "Retell a story with a beginning, middle, and end."
+        case "main-idea": return "Find the main idea — what the text is mostly about."
+        case "details":   return "Spot the details that support the main idea."
+        case "topic":     return "Write a strong topic sentence."
+        case "sentence-details": return "Add detail sentences that bring writing to life."
+        default:
+            return title
+        }
+    }
+
+    private var mathDescription: String {
+        switch targetValue {
+        case "1000":   return "Build place value all the way to 1,000."
+        case "10000":  return "Stretch place value to 10,000."
+        case "round-10":  return "Round numbers to the nearest 10."
+        case "round-100": return "Round numbers to the nearest 100."
+        case "estimate":  return "Estimate before you compute."
+        case "add":  return "Build addition fluency with quick wins."
+        case "sub":  return "Build subtraction fluency with quick wins."
+        case "equal-groups": return "Make equal groups to set up multiplication."
+        case "arrays": return "Use arrays — rows and columns — to multiply."
+        case "x0-x1":  return "Master the 0× and 1× facts."
+        case "x2":     return "Master the 2× facts."
+        case "x5":     return "Master the 5× facts."
+        case "x10":    return "Master the 10× facts."
+        default:
+            return title
+        }
     }
 }
 
