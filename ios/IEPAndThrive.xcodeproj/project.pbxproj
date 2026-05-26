@@ -32,6 +32,7 @@
 		BD8557FC81324535BFA99E81 /* OnboardingFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = B309FFB8FF9C45E6E27FF359 /* OnboardingFeature.swift */; };
 		C341E46F1998B13A35471CD0 /* SafeSpaceFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9D2734ECEE31FC77C549D8 /* SafeSpaceFeature.swift */; };
 		C4F3A72A7740EA990A51C5BF /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 582C7ABEF95C41320D9BB225 /* ComposableArchitecture */; };
+		C74597AEA07DCAF43141C090 /* LetterTracer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C1754652EA74DC454588 /* LetterTracer.swift */; };
 		CCDEB50E1A2F277B4FCD2F37 /* JourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0951E0242990B2EBBF92BACD /* JourneyView.swift */; };
 		DC08E5B51199475F82170487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B6EB7E24CB242E803113D13 /* Assets.xcassets */; };
 		DDD614E1375A2AA913D8E02D /* IEPAndThriveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DFFD46B290A9E69C9F18A1 /* IEPAndThriveApp.swift */; };
@@ -46,6 +47,7 @@
 		0B21B34CA778C5279EAF9F9D /* IEPAndThrive.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IEPAndThrive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1517E63F9D4532DD4D131426 /* RootFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootFeature.swift; sourceTree = "<group>"; };
 		212AB81B43DEB9B917F4F091 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		22E9C1754652EA74DC454588 /* LetterTracer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterTracer.swift; sourceTree = "<group>"; };
 		30A114507FB80443206E2FF3 /* SpeechClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechClient.swift; sourceTree = "<group>"; };
 		3A9156D7940AD4543C691BD0 /* MissionCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionCompleteView.swift; sourceTree = "<group>"; };
 		3B01DC43CB2605246AB27E97 /* MathFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathFeature.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 		3E634799674A4249426ED154 /* Literacy */ = {
 			isa = PBXGroup;
 			children = (
+				22E9C1754652EA74DC454588 /* LetterTracer.swift */,
 				ACAF25BA0BFB1D42FF99C1BD /* LiteracyFeature.swift */,
 				016321022F483F8A84357FD2 /* LiteracyView.swift */,
 				5162DE32F9146FE4E65EBF05 /* SandTrayView.swift */,
@@ -342,6 +345,7 @@
 				DDD614E1375A2AA913D8E02D /* IEPAndThriveApp.swift in Sources */,
 				0503ACDE3BA999D90708B38E /* JourneyFeature.swift in Sources */,
 				CCDEB50E1A2F277B4FCD2F37 /* JourneyView.swift in Sources */,
+				C74597AEA07DCAF43141C090 /* LetterTracer.swift in Sources */,
 				0DA201E9AC11EA090BF5437C /* LevelPreviewView.swift in Sources */,
 				7EDD844C0A9FDAD15A3E36B8 /* LiteracyFeature.swift in Sources */,
 				2C591572EC20F9C6A5CFBEEB /* LiteracyView.swift in Sources */,
