@@ -74,6 +74,35 @@ struct LevelDefinition: Equatable, Identifiable {
             return title
         }
     }
+
+    /// The cube count the child must place into the tray for this Math level
+    /// to be considered complete. Returns `nil` for levels where the Snap
+    /// Cubes interaction doesn't yet have a defined goal — those still gate
+    /// on `currentCount > 0` (any placement) as the P0 fallback.
+    var targetCount: Int? {
+        guard category == .math else { return nil }
+        switch targetValue {
+        case "add":   return 5  // "Make 5"
+        case "sub":   return 3
+        case "x0-x1": return 1
+        case "x2":    return 4  // 2 × 2
+        case "x5":    return 5
+        case "x10":   return 10
+        case "equal-groups": return 6  // two groups of 3
+        case "arrays":       return 6  // 2 × 3 array
+        default:
+            return nil
+        }
+    }
+
+    /// Parent-facing label shown above the Snap Cubes tray.
+    var mathPrompt: String {
+        guard category == .math else { return title }
+        if let target = targetCount {
+            return "Make \(target)"
+        }
+        return title
+    }
 }
 
 struct CurriculumClient {
