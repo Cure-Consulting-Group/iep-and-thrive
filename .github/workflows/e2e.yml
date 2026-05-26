@@ -26,12 +26,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # `registry-url` + `scope` makes setup-node write a scoped .npmrc
+      # that routes @cure-consulting-group/* through GitHub Packages while
+      # leaving the default npm registry intact for every other dep.
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@cure-consulting-group'
 
+      # GITHUB_TOKEN can't read the private @cure-consulting-group/* scope
+      # because the package's source repo doesn't grant this repo access
+      # via Manage Actions access. Use a classic PAT with `read:packages`.
       - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PACKAGES_READ_TOKEN }}
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
