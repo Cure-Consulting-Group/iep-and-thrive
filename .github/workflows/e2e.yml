@@ -17,6 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    # Required so npm can read @cure-consulting-group/* from GitHub Packages
+    # using the workflow's GITHUB_TOKEN.
+    permissions:
+      contents: read
+      packages: read
+
     env:
       E2E_BASE_URL: https://iep-and-thrive.web.app
       E2E_INQUIRY_PASSWORD: ${{ secrets.E2E_INQUIRY_PASSWORD }}
@@ -26,12 +32,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # `registry-url` + `scope` makes setup-node write a scoped .npmrc
+      # that routes @cure-consulting-group/* through GitHub Packages while
+      # leaving the default npm registry intact for every other dep.
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@cure-consulting-group'
 
       - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
