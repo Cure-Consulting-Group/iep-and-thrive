@@ -17,12 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    # Required so npm can read @cure-consulting-group/* from GitHub Packages
-    # using the workflow's GITHUB_TOKEN.
-    permissions:
-      contents: read
-      packages: read
-
     env:
       E2E_BASE_URL: https://iep-and-thrive.web.app
       E2E_INQUIRY_PASSWORD: ${{ secrets.E2E_INQUIRY_PASSWORD }}
@@ -42,9 +36,12 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@cure-consulting-group'
 
+      # GITHUB_TOKEN can't read the private @cure-consulting-group/* scope
+      # because the package's source repo doesn't grant this repo access
+      # via Manage Actions access. Use a classic PAT with `read:packages`.
       - run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PACKAGES_READ_TOKEN }}
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
