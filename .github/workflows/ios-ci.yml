@@ -11,21 +11,27 @@ on:
 jobs:
   build:
     name: Build and Check
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode Version
-        run: sudo xcode-select -s /Applications/Xcode_15.3.app
+      # Xcode 16.4 ships Swift 6.1, required by TCA 1.25.5 (see project.yml).
+      - name: Select Xcode 16.4 (Swift 6.1)
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+
+      - name: Verify Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
 
       - name: Build Project
         run: |
           xcodebuild build \
             -project ios/IEPAndThrive.xcodeproj \
             -scheme IEPAndThrive \
-            -destination 'platform=iOS Simulator,name=iPad (10th generation)' \
+            -destination 'generic/platform=iOS Simulator' \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
