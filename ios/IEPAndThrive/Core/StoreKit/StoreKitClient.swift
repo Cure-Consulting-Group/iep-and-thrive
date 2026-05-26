@@ -8,6 +8,7 @@ public struct StoreKitClient {
     public var currentEntitlements: @Sendable () async -> [Transaction]
     public var restorePurchases: @Sendable () async throws -> Void
     public var observeTransactions: @Sendable () -> AsyncStream<VerificationResult<Transaction>>
+    public var observeStatus: @Sendable () -> AsyncStream<Bool>
 }
 
 extension StoreKitClient: DependencyKey {
@@ -49,7 +50,46 @@ extension StoreKitClient: DependencyKey {
             try await AppStore.sync()
         },
         observeTransactions: {
-            Transaction.updates
+            AsyncStream { continuation in
+                let task = Task {
+                    for await update in Transaction.updates {
+                        continuation.yield(update)
+                    }
+                }
+                continuation.onTermination = { _ in
+                    task.cancel()
+                }
+            }
+        },
+        observeStatus: {
+            AsyncStream { continuation in
+                let task = Task {
+                    // Check initial status
+                    var hasPremium = false
+                    for await result in Transaction.currentEntitlements {
+                        if case .verified = result {
+                            hasPremium = true
+                            break
+                        }
+                    }
+                    continuation.yield(hasPremium)
+                    
+                    // Observe updates
+                    for await _ in Transaction.updates {
+                        var updatedPremium = false
+                        for await result in Transaction.currentEntitlements {
+                            if case .verified = result {
+                                updatedPremium = true
+                                break
+                            }
+                        }
+                        continuation.yield(updatedPremium)
+                    }
+                }
+                continuation.onTermination = { _ in
+                    task.cancel()
+                }
+            }
         }
     )
     
@@ -58,7 +98,8 @@ extension StoreKitClient: DependencyKey {
         purchase: { _ in nil },
         currentEntitlements: { [] },
         restorePurchases: {},
-        observeTransactions: { AsyncStream { _ in } }
+        observeTransactions: { AsyncStream { _ in } },
+        observeStatus: { AsyncStream { _ in } }
     )
 }
 

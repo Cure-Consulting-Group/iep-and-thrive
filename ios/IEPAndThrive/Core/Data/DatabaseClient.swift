@@ -14,38 +14,38 @@ struct DatabaseClient {
 extension DatabaseClient: DependencyKey {
     static let liveValue = Self(
         fetchProfile: {
-            let context = try await context()
+            let modelContext = try await Self.context()
             let descriptor = FetchDescriptor<StudentProfile>()
-            return try context.fetch(descriptor).first
+            return try modelContext.fetch(descriptor).first
         },
         saveProfile: { profile in
-            let context = try await context()
-            context.insert(profile)
-            try context.save()
+            let modelContext = try await Self.context()
+            modelContext.insert(profile)
+            try modelContext.save()
         },
         fetchProgress: { category in
-            let context = try await context()
+            let modelContext = try await Self.context()
             let descriptor = FetchDescriptor<LessonProgress>(
-                predicate: #Predicate { \$0.category == category },
+                predicate: #Predicate { $0.category == category },
                 sortBy: [SortDescriptor(\.levelIndex)]
             )
-            return try context.fetch(descriptor)
+            return try modelContext.fetch(descriptor)
         },
         saveProgress: { progress in
-            let context = try await context()
-            context.insert(progress)
-            try context.save()
+            let modelContext = try await Self.context()
+            modelContext.insert(progress)
+            try modelContext.save()
         },
         fetchSparksTotal: {
-            let context = try await context()
+            let modelContext = try await Self.context()
             let descriptor = FetchDescriptor<SparksRecord>()
-            let records = try context.fetch(descriptor)
-            return records.reduce(0) { \$0 + \$1.amount }
+            let records = try modelContext.fetch(descriptor)
+            return records.reduce(0) { $0 + $1.amount }
         },
         addSparks: { amount, reason in
-            let context = try await context()
-            context.insert(SparksRecord(amount: amount, reason: reason))
-            try context.save()
+            let modelContext = try await Self.context()
+            modelContext.insert(SparksRecord(amount: amount, reason: reason))
+            try modelContext.save()
         }
     )
     

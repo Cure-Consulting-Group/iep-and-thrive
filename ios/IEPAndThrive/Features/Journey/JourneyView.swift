@@ -5,21 +5,22 @@ struct JourneyView: View {
     let store: StoreOf<JourneyFeature>
     
     var body: some View {
-        WithViewStore(self.store, observe: { \$0 }) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
                 // Biome Backgrounds
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        // Mountain Biome (Top)
-                        BiomeSection(title: "The Snowy Peaks", color: Theme.Colors.white)
+                    ZStack(alignment: .top) {
+                        VStack(spacing: 0) {
+                            // Mountain Biome (Top)
+                            BiomeSection(title: "The Snowy Peaks", color: Color(white: 0.95))
+                            
+                            // Desert Biome (Mid)
+                            BiomeSection(title: "The Golden Dunes", color: Color(red: 0.98, green: 0.92, blue: 0.8))
+                            
+                            // Forest Biome (Bottom)
+                            BiomeSection(title: "The Whispering Woods", color: Theme.Colors.sagePale)
+                        }
                         
-                        // Desert Biome (Mid)
-                        BiomeSection(title: "The Golden Dunes", color: Theme.Colors.amberLight)
-                        
-                        // Forest Biome (Bottom)
-                        BiomeSection(title: "The Whispering Woods", color: Theme.Colors.sagePale)
-                    }
-                    .overlay(
                         VStack(spacing: 120) {
                             ForEach(viewStore.levels) { level in
                                 JourneyNodeView(
@@ -33,7 +34,7 @@ struct JourneyView: View {
                             }
                         }
                         .padding(.vertical, 200)
-                    )
+                    }
                 }
                 .background(Theme.Colors.cream)
                 .onAppear { viewStore.send(.onAppear) }
