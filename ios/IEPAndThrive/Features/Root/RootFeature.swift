@@ -81,20 +81,37 @@ struct RootFeature {
                     state.path.append(Path.State.math(MathFeature.State(level: level)))
                 }
                 return .none
-                
+
+            case .journey(.safeSpaceTapped):
+                state.path.append(Path.State.safeSpace(SafeSpaceFeature.State()))
+                return .none
+
             case let .path(.element(id: _, action: .literacy(.doneTapped))):
                 if case let .literacy(literacyState) = state.path.last {
                     state.path.removeLast()
                     return .send(.journey(.missionComplete(literacyState.level)))
                 }
                 return .none
-                
+
+            case .path(.element(id: _, action: .literacy(.backTapped))):
+                state.path.removeLast()
+                return .none
+
             case let .path(.element(id: _, action: .math(.checkAnswerTapped))):
-                // Simplified for MVP: tapping check answer acts as done
-                if case let .math(mathState) = state.path.last {
-                    state.path.removeLast()
-                    return .send(.journey(.missionComplete(mathState.level)))
+                // Award only when the child has actually placed blocks.
+                // Real validation lands with the SpriteKit engine.
+                guard case let .math(mathState) = state.path.last, mathState.currentCount > 0 else {
+                    return .none
                 }
+                state.path.removeLast()
+                return .send(.journey(.missionComplete(mathState.level)))
+
+            case .path(.element(id: _, action: .math(.backTapped))):
+                state.path.removeLast()
+                return .none
+
+            case .path(.element(id: _, action: .safeSpace(.exitTapped))):
+                state.path.removeLast()
                 return .none
 
             case .journey, .onboarding, .path, .paywall:

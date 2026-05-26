@@ -18,6 +18,7 @@ struct LiteracyFeature {
         case onAppear
         case tracingEnded(Bool)
         case speakLetterTapped
+        case backTapped
         case doneTapped
     }
     
@@ -37,7 +38,10 @@ struct LiteracyFeature {
             case .speakLetterTapped:
                 let text = state.currentLetter
                 return .run { _ in await speechClient.speak(text) }
-                
+
+            case .backTapped:
+                return .none
+
             case .doneTapped:
                 return .none
             }

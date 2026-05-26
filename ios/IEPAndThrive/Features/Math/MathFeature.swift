@@ -16,14 +16,17 @@ struct MathFeature {
     
     enum Action {
         case blocksChanged(Int)
+        case backTapped
         case checkAnswerTapped
     }
-    
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case let .blocksChanged(count):
                 state.currentCount = count
+                return .none
+            case .backTapped:
                 return .none
             case .checkAnswerTapped:
                 return .none
