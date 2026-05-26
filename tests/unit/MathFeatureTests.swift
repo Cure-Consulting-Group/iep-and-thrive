@@ -5,12 +5,13 @@ import ComposableArchitecture
 @MainActor
 final class MathFeatureTests: XCTestCase {
     func testBlocksChanged() async {
-        let store = TestStore(initialState: MathFeature.State()) {
+        let level = LevelDefinition(id: "test", title: "Test", category: .math, targetValue: "3 + 2 = ?", biome: .mountain)
+        let store = TestStore(initialState: MathFeature.State(level: level)) {
             MathFeature()
         }
         
         await store.send(.blocksChanged(5)) {
-            $0.currentCount = 5
+            \$0.currentCount = 5
         }
     }
 }

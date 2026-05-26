@@ -72,11 +72,16 @@ struct RootFeature {
                 }
                 return .none
                 
-            case .paywall(.presented(.purchaseSuccess)):
-                state.isPremium = true
-                state.paywall = nil
+            case let .journey(.levelPreview(.presented(.startButtonTapped(level)))):
+                state.journey.levelPreview = nil
+                switch level.category {
+                case .literacy:
+                    state.path.append(.literacy(LiteracyFeature.State(level: level)))
+                case .math:
+                    state.path.append(.math(MathFeature.State(level: level)))
+                }
                 return .none
-
+                
             case .journey, .onboarding, .path, .paywall:
                 return .none
             }

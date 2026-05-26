@@ -4,8 +4,14 @@ import SwiftUI
 @Reducer
 struct LiteracyFeature {
     struct State: Equatable {
-        var currentLetter: String = "a"
+        let level: LevelDefinition
+        var currentLetter: String
         var isTracingComplete: Bool = false
+        
+        init(level: LevelDefinition) {
+            self.level = level
+            self.currentLetter = level.targetValue
+        }
     }
     
     enum Action {

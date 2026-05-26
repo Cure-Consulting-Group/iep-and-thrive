@@ -4,8 +4,14 @@ import SwiftUI
 @Reducer
 struct MathFeature {
     struct State: Equatable {
-        var equation: String = "3 + 2 = ?"
+        let level: LevelDefinition
+        var equation: String
         var currentCount: Int = 0
+        
+        init(level: LevelDefinition) {
+            self.level = level
+            self.equation = level.targetValue
+        }
     }
     
     enum Action {
