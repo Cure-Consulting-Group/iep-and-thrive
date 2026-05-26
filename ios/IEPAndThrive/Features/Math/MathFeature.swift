@@ -5,19 +5,37 @@ import SwiftUI
 struct MathFeature {
     struct State: Equatable {
         let level: LevelDefinition
-        var equation: String
+        let prompt: String
+        let targetCount: Int?
         var currentCount: Int = 0
-        
+        var showIncorrectHint: Bool = false
+
         init(level: LevelDefinition) {
             self.level = level
-            self.equation = level.targetValue
+            self.prompt = level.mathPrompt
+            self.targetCount = level.targetCount
+        }
+
+        var canCheck: Bool {
+            currentCount > 0
+        }
+
+        /// True when the placed cube count satisfies the level's goal.
+        /// Levels without a defined `targetCount` fall back to "any
+        /// placement" — `currentCount > 0` — as the P0 fallback.
+        var isCorrect: Bool {
+            if let target = targetCount {
+                return currentCount == target
+            }
+            return currentCount > 0
         }
     }
-    
+
     enum Action {
         case blocksChanged(Int)
         case backTapped
         case checkAnswerTapped
+        case dismissHint
     }
 
     var body: some ReducerOf<Self> {
@@ -25,10 +43,23 @@ struct MathFeature {
             switch action {
             case let .blocksChanged(count):
                 state.currentCount = count
+                if state.showIncorrectHint && state.isCorrect {
+                    state.showIncorrectHint = false
+                }
                 return .none
+
             case .backTapped:
                 return .none
+
             case .checkAnswerTapped:
+                if !state.isCorrect {
+                    state.showIncorrectHint = true
+                    return .none
+                }
+                return .none
+
+            case .dismissHint:
+                state.showIncorrectHint = false
                 return .none
             }
         }
