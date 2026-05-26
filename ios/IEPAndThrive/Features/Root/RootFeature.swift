@@ -82,6 +82,21 @@ struct RootFeature {
                 }
                 return .none
                 
+            case let .path(.element(id: _, action: .literacy(.doneTapped))):
+                if case let .literacy(literacyState) = state.path.last {
+                    state.path.removeLast()
+                    return .send(.journey(.missionComplete(literacyState.level)))
+                }
+                return .none
+                
+            case let .path(.element(id: _, action: .math(.checkAnswerTapped))):
+                // Simplified for MVP: tapping check answer acts as done
+                if case let .math(mathState) = state.path.last {
+                    state.path.removeLast()
+                    return .send(.journey(.missionComplete(mathState.level)))
+                }
+                return .none
+
             case .journey, .onboarding, .path, .paywall:
                 return .none
             }

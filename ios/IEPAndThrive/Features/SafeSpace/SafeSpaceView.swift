@@ -7,50 +7,25 @@ struct SafeSpaceView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
-                // Background: Hand-painted room placeholder matching "Island of Discovery" vibe
-                LinearGradient(
-                    gradient: Gradient(colors: [Theme.Colors.sagePale, Theme.Colors.creamDeep]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                
-                // Room details
-                GeometryReader { geo in
-                    // Floor
-                    Rectangle()
-                        .fill(Theme.Colors.creamDeep)
-                        .frame(height: geo.size.height * 0.3)
-                        .position(x: geo.size.width / 2, y: geo.size.height * 0.85)
-                    
-                    // A "window" with forest view (Stitch design placeholder)
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Theme.Colors.forestLight.opacity(0.3))
-                        .frame(width: 120, height: 160)
-                        .overlay(
-                            VStack {
-                                Text("🌲")
-                                    .font(.system(size: 40))
-                                Text("Forest View")
-                                    .font(Theme.Fonts.body(size: 12))
-                                    .foregroundColor(Theme.Colors.forest)
-                            }
-                        )
-                        .position(x: geo.size.width * 0.2, y: geo.size.height * 0.3)
-                    
-                    // Wall decoration
-                    Circle()
-                        .fill(Theme.Colors.amber.opacity(0.2))
-                        .frame(width: 200, height: 200)
-                        .blur(radius: 50)
-                        .position(x: geo.size.width * 0.8, y: geo.size.height * 0.2)
-                }
+                // Immersive hand-painted room illustration from Stitch
+                Image("SafeSpaceBg")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .ignoresSafeArea()
                 
                 VStack {
-                    Text("Safe Space")
-                        .font(Theme.Fonts.display(size: 32))
+                    HStack {
+                        Button("Exit Safe Space") {
+                            // Exit action
+                        }
+                        .padding()
+                        .background(Theme.Colors.sage.opacity(0.8))
                         .foregroundColor(Theme.Colors.forest)
-                        .padding(.top, 40)
+                        .clipShape(Capsule())
+                        
+                        Spacer()
+                    }
+                    .padding()
                     
                     Spacer()
                     
@@ -64,33 +39,30 @@ struct SafeSpaceView: View {
                         Text(moodText(for: viewStore.petMood))
                             .font(Theme.Fonts.body(size: 18))
                             .foregroundColor(Theme.Colors.textMuted)
-                            .transition(.opacity)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
                     }
                     
                     Spacer()
                     
                     // Audio Controls
-                    VStack(spacing: 16) {
-                        Text("Ambient Volume")
-                            .font(Theme.Fonts.body(size: 14, weight: .bold))
+                    HStack(spacing: 20) {
+                        Image(systemName: "leaf.fill")
                             .foregroundColor(Theme.Colors.forest)
                         
-                        HStack(spacing: 20) {
-                            Image(systemName: "speaker.fill")
-                                .foregroundColor(Theme.Colors.forest)
-                            
-                            Slider(value: viewStore.binding(
-                                get: \.volume,
-                                send: SafeSpaceFeature.Action.volumeChanged
-                            ))
-                            .accentColor(Theme.Colors.forest)
-                            
-                            Image(systemName: "speaker.wave.3.fill")
-                                .foregroundColor(Theme.Colors.forest)
-                        }
-                        .padding(.horizontal, 40)
+                        Slider(value: viewStore.binding(
+                            get: \.volume,
+                            send: SafeSpaceFeature.Action.volumeChanged
+                        ))
+                        .accentColor(Theme.Colors.forest)
+                        .frame(width: 200)
                     }
-                    .padding(.bottom, 60)
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .padding(.bottom, 40)
                 }
             }
             .onAppear {

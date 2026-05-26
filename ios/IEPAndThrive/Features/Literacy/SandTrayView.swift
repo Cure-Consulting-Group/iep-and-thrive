@@ -16,13 +16,9 @@ struct SandTrayView: View {
                 RoundedRectangle(cornerRadius: 30)
                     .stroke(Theme.Colors.forest, lineWidth: 15)
                     .background(
-                        Theme.Colors.creamDeep // Placeholder for high-res sand texture
-                            .overlay(
-                                Image(systemName: "square.fill") // Patterned texture placeholder
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .opacity(0.05)
-                            )
+                        Image("SandTexture")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 30))
                     .padding(20)
@@ -74,7 +70,7 @@ struct SandTrayView: View {
                 VStack {
                     HStack {
                         Button {
-                            // Audio repeat logic
+                            viewStore.send(.speakLetterTapped)
                         } label: {
                             Image(systemName: "speaker.wave.2.circle.fill")
                                 .font(.system(size: 44))

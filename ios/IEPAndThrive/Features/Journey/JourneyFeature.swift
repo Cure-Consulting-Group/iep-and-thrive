@@ -16,9 +16,11 @@ struct JourneyFeature {
         case nodeTapped(LevelDefinition)
         case safeSpaceTapped
         case levelPreview(PresentationAction<LevelPreviewFeature.Action>)
+        case missionComplete(LevelDefinition)
     }
     
     @Dependency(\.curriculumClient) var curriculumClient
+    @Dependency(\.database) var database
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -36,6 +38,15 @@ struct JourneyFeature {
                 // For MVP, we'll assume all levels are clickable for testing
                 state.levelPreview = LevelPreviewFeature.State(level: level)
                 return .none
+                
+            case let .missionComplete(level):
+                state.sparksCount += 10
+                if let index = state.levels.firstIndex(of: level), index == state.currentLevelIndex {
+                    state.currentLevelIndex += 1
+                }
+                return .run { [sparks = state.sparksCount] _ in
+                    try? await database.addSparks(10, "mission_complete")
+                }
                 
             case .safeSpaceTapped:
                 return .none

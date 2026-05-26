@@ -13,7 +13,7 @@ struct LiteracyView: View {
                     // Header
                     HStack {
                         Button {
-                            // Back action
+                            viewStore.send(.doneTapped) // Back acts as done for now to pop
                         } label: {
                             Image(systemName: "chevron.left.circle.fill")
                                 .font(.system(size: 32))

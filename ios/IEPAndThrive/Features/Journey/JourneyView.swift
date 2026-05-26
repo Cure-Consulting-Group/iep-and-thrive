@@ -12,13 +12,13 @@ struct JourneyView: View {
                     ZStack(alignment: .top) {
                         VStack(spacing: 0) {
                             // Mountain Biome (Top)
-                            BiomeSection(title: "The Snowy Peaks", color: Color(white: 0.95))
+                            BiomeSection(title: "The Snowy Peaks", imageName: "BiomeForest") // Using Forest for all for now since we have one multi-biome image
                             
                             // Desert Biome (Mid)
-                            BiomeSection(title: "The Golden Dunes", color: Color(red: 0.98, green: 0.92, blue: 0.8))
+                            BiomeSection(title: "The Golden Dunes", imageName: "BiomeForest")
                             
                             // Forest Biome (Bottom)
-                            BiomeSection(title: "The Whispering Woods", color: Theme.Colors.sagePale)
+                            BiomeSection(title: "The Whispering Woods", imageName: "BiomeForest")
                         }
                         
                         VStack(spacing: 120) {
@@ -85,14 +85,20 @@ struct JourneyView: View {
 
 struct BiomeSection: View {
     let title: String
-    let color: Color
+    let imageName: String
     
     var body: some View {
         ZStack {
-            color.frame(height: 1000)
+            Image(imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 1000)
+                .clipped()
+            
             Text(title)
                 .font(Theme.Fonts.display(size: 40))
-                .foregroundColor(Theme.Colors.forest.opacity(0.2))
+                .foregroundColor(Theme.Colors.forest.opacity(0.4))
+                .shadow(color: .white, radius: 2)
         }
     }
 }

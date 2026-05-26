@@ -18,6 +18,7 @@
 		410C56A037A7A120CD9BDDA8 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6054114615EB7B0D510461CC /* Theme.swift */; };
 		426A50F8F2C772DE837F739C /* StoreKitClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857FFBDD078E2E25D5349F46 /* StoreKitClient.swift */; };
 		4567834D4682137C4B24E9BF /* MathFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B01DC43CB2605246AB27E97 /* MathFeature.swift */; };
+		45FF0EC1B4D3EA1AB30588B9 /* SpeechClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A114507FB80443206E2FF3 /* SpeechClient.swift */; };
 		4C885A7BE8C2D00E06790601 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E071B1F27BDFAF913966D2FC /* OnboardingView.swift */; };
 		5DB7F1ECA737D5B4EEE2EEFB /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD8190FA86DDDC439DA16B4D /* SwiftData.framework */; };
 		5ECB8FCF4C706BA59628BF7D /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63AB19E977899BBFB9AAC6E4 /* CoreHaptics.framework */; };
@@ -32,6 +33,7 @@
 		C341E46F1998B13A35471CD0 /* SafeSpaceFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9D2734ECEE31FC77C549D8 /* SafeSpaceFeature.swift */; };
 		C4F3A72A7740EA990A51C5BF /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 582C7ABEF95C41320D9BB225 /* ComposableArchitecture */; };
 		CCDEB50E1A2F277B4FCD2F37 /* JourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0951E0242990B2EBBF92BACD /* JourneyView.swift */; };
+		DC08E5B51199475F82170487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B6EB7E24CB242E803113D13 /* Assets.xcassets */; };
 		DDD614E1375A2AA913D8E02D /* IEPAndThriveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DFFD46B290A9E69C9F18A1 /* IEPAndThriveApp.swift */; };
 		E6499A4EB042649D11AFDBBA /* SandTrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5162DE32F9146FE4E65EBF05 /* SandTrayView.swift */; };
 		F0B3F685FB1751714EBC0DEA /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3A88B65FA36D1F3723BBBFF /* SpriteKit.framework */; };
@@ -45,12 +47,14 @@
 		0B21B34CA778C5279EAF9F9D /* IEPAndThrive.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IEPAndThrive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1517E63F9D4532DD4D131426 /* RootFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootFeature.swift; sourceTree = "<group>"; };
 		212AB81B43DEB9B917F4F091 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		30A114507FB80443206E2FF3 /* SpeechClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechClient.swift; sourceTree = "<group>"; };
 		3B01DC43CB2605246AB27E97 /* MathFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathFeature.swift; sourceTree = "<group>"; };
 		5162DE32F9146FE4E65EBF05 /* SandTrayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SandTrayView.swift; sourceTree = "<group>"; };
 		53F76F228901784BA5554093 /* MainJourneyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainJourneyView.swift; sourceTree = "<group>"; };
 		6006BC1D49290D3010D60799 /* PaywallFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallFeature.swift; sourceTree = "<group>"; };
 		6054114615EB7B0D510461CC /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		63AB19E977899BBFB9AAC6E4 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
+		7B6EB7E24CB242E803113D13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		857FFBDD078E2E25D5349F46 /* StoreKitClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitClient.swift; sourceTree = "<group>"; };
 		8AEA2FF64C50E4A19F70B34E /* MathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathView.swift; sourceTree = "<group>"; };
 		A238A77DC8A262815D31267D /* DatabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseClient.swift; sourceTree = "<group>"; };
@@ -248,6 +252,7 @@
 		E09AC4293C791A0A7E198037 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7B6EB7E24CB242E803113D13 /* Assets.xcassets */,
 				F09BDECB1508AF4ED1D5E2EE /* Info.plist */,
 			);
 			path = Resources;
@@ -294,11 +299,12 @@
 			isa = PBXGroup;
 			children = (
 				F78598283E84A8525888BED2 /* AudioClient.swift */,
+				30A114507FB80443206E2FF3 /* SpeechClient.swift */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
 		};
-		"TEMP_49056A78-5755-4B5C-B5ED-F4FB3CD2BBAA" /* Data */ = {
+		"TEMP_21A2B2E3-C660-4286-A6A7-F6757AD9E674" /* Data */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -313,6 +319,7 @@
 			buildConfigurationList = BEC6073838EE311837FF9E5C /* Build configuration list for PBXNativeTarget "IEPAndThrive" */;
 			buildPhases = (
 				1E0A87D502485BDA381EB12B /* Sources */,
+				EAFBFB4B57D315802CB339FF /* Resources */,
 				2F70031513EBBCDF19F03C91 /* Frameworks */,
 			);
 			buildRules = (
@@ -360,6 +367,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		EAFBFB4B57D315802CB339FF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC08E5B51199475F82170487 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		1E0A87D502485BDA381EB12B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -388,6 +406,7 @@
 				C341E46F1998B13A35471CD0 /* SafeSpaceFeature.swift in Sources */,
 				7A0AE192A325D186339022E9 /* SafeSpaceView.swift in Sources */,
 				E6499A4EB042649D11AFDBBA /* SandTrayView.swift in Sources */,
+				45FF0EC1B4D3EA1AB30588B9 /* SpeechClient.swift in Sources */,
 				426A50F8F2C772DE837F739C /* StoreKitClient.swift in Sources */,
 				410C56A037A7A120CD9BDDA8 /* Theme.swift in Sources */,
 			);
