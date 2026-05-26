@@ -11,6 +11,7 @@
 		0DA201E9AC11EA090BF5437C /* LevelPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E483DAE34FFBF1C04981A12F /* LevelPreviewView.swift */; };
 		101F13FA4EE32347D7C073FB /* CurriculumClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEAD98C88CD4C3A002998EC /* CurriculumClient.swift */; };
 		153BB9AEC862C770399118BB /* PaywallFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6006BC1D49290D3010D60799 /* PaywallFeature.swift */; };
+		178AF21A9D44FB8B17A4B5CB /* SnapCubesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11212CC390C798F6623E0AC /* SnapCubesView.swift */; };
 		1857869860160586757CF86B /* AudioClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78598283E84A8525888BED2 /* AudioClient.swift */; };
 		1A3617F1257647986321D89F /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212AB81B43DEB9B917F4F091 /* PaywallView.swift */; };
 		2C591572EC20F9C6A5CFBEEB /* LiteracyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016321022F483F8A84357FD2 /* LiteracyView.swift */; };
@@ -26,6 +27,7 @@
 		61454E6BDD96128B963845B2 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2AE62A9C3D3C67EE392272 /* Models.swift */; };
 		7A0AE192A325D186339022E9 /* SafeSpaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A53B3292024EDC9F29F2C0 /* SafeSpaceView.swift */; };
 		7EDD844C0A9FDAD15A3E36B8 /* LiteracyFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAF25BA0BFB1D42FF99C1BD /* LiteracyFeature.swift */; };
+		7F8B8E67FDECD62D73F20D9B /* SnapCubesScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC9F611AB7CA4368F7879B7 /* SnapCubesScene.swift */; };
 		B3C967352E075141A8700A62 /* MathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEA2FF64C50E4A19F70B34E /* MathView.swift */; };
 		BD8557FC81324535BFA99E81 /* OnboardingFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = B309FFB8FF9C45E6E27FF359 /* OnboardingFeature.swift */; };
 		C341E46F1998B13A35471CD0 /* SafeSpaceFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9D2734ECEE31FC77C549D8 /* SafeSpaceFeature.swift */; };
@@ -54,6 +56,7 @@
 		7B6EB7E24CB242E803113D13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		857FFBDD078E2E25D5349F46 /* StoreKitClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitClient.swift; sourceTree = "<group>"; };
 		8AEA2FF64C50E4A19F70B34E /* MathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathView.swift; sourceTree = "<group>"; };
+		A11212CC390C798F6623E0AC /* SnapCubesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapCubesView.swift; sourceTree = "<group>"; };
 		A238A77DC8A262815D31267D /* DatabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseClient.swift; sourceTree = "<group>"; };
 		ACAF25BA0BFB1D42FF99C1BD /* LiteracyFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiteracyFeature.swift; sourceTree = "<group>"; };
 		AD8190FA86DDDC439DA16B4D /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
@@ -61,6 +64,7 @@
 		C3A88B65FA36D1F3723BBBFF /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
 		C6A53B3292024EDC9F29F2C0 /* SafeSpaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeSpaceView.swift; sourceTree = "<group>"; };
 		CF9D2734ECEE31FC77C549D8 /* SafeSpaceFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeSpaceFeature.swift; sourceTree = "<group>"; };
+		DDC9F611AB7CA4368F7879B7 /* SnapCubesScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapCubesScene.swift; sourceTree = "<group>"; };
 		E071B1F27BDFAF913966D2FC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		E483DAE34FFBF1C04981A12F /* LevelPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelPreviewView.swift; sourceTree = "<group>"; };
 		E5DFFD46B290A9E69C9F18A1 /* IEPAndThriveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEPAndThriveApp.swift; sourceTree = "<group>"; };
@@ -189,6 +193,8 @@
 			children = (
 				3B01DC43CB2605246AB27E97 /* MathFeature.swift */,
 				8AEA2FF64C50E4A19F70B34E /* MathView.swift */,
+				DDC9F611AB7CA4368F7879B7 /* SnapCubesScene.swift */,
+				A11212CC390C798F6623E0AC /* SnapCubesView.swift */,
 			);
 			path = Math;
 			sourceTree = "<group>";
@@ -351,6 +357,8 @@
 				C341E46F1998B13A35471CD0 /* SafeSpaceFeature.swift in Sources */,
 				7A0AE192A325D186339022E9 /* SafeSpaceView.swift in Sources */,
 				E6499A4EB042649D11AFDBBA /* SandTrayView.swift in Sources */,
+				7F8B8E67FDECD62D73F20D9B /* SnapCubesScene.swift in Sources */,
+				178AF21A9D44FB8B17A4B5CB /* SnapCubesView.swift in Sources */,
 				45FF0EC1B4D3EA1AB30588B9 /* SpeechClient.swift in Sources */,
 				426A50F8F2C772DE837F739C /* StoreKitClient.swift in Sources */,
 				410C56A037A7A120CD9BDDA8 /* Theme.swift in Sources */,

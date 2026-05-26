@@ -98,9 +98,10 @@ struct RootFeature {
                 return .none
 
             case let .path(.element(id: _, action: .math(.checkAnswerTapped))):
-                // Award only when the child has actually placed blocks.
-                // Real validation lands with the SpriteKit engine.
-                guard case let .math(mathState) = state.path.last, mathState.currentCount > 0 else {
+                // Only pop + award when the tray actually matches the
+                // level's target count. Incorrect attempts surface a
+                // hint in the Math reducer and stay on the screen.
+                guard case let .math(mathState) = state.path.last, mathState.isCorrect else {
                     return .none
                 }
                 state.path.removeLast()
