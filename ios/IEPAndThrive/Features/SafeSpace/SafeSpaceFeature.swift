@@ -16,6 +16,7 @@ struct SafeSpaceFeature {
         case onAppear
         case volumeChanged(Double)
         case petTapped
+        case exitTapped
     }
     
     @Dependency(\.audioClient) var audioClient
@@ -44,6 +45,9 @@ struct SafeSpaceFeature {
                     state.petMood = .happy
                 }
                 return .none
+
+            case .exitTapped:
+                return .run { _ in await audioClient.stop() }
             }
         }
     }

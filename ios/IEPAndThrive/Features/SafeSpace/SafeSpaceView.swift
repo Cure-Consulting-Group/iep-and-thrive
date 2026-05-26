@@ -16,13 +16,13 @@ struct SafeSpaceView: View {
                 VStack {
                     HStack {
                         Button("Exit Safe Space") {
-                            // Exit action
+                            viewStore.send(.exitTapped)
                         }
                         .padding()
                         .background(Theme.Colors.sage.opacity(0.8))
                         .foregroundColor(Theme.Colors.forest)
                         .clipShape(Capsule())
-                        
+
                         Spacer()
                     }
                     .padding()

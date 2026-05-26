@@ -13,11 +13,12 @@ struct LiteracyView: View {
                     // Header
                     HStack {
                         Button {
-                            viewStore.send(.doneTapped) // Back acts as done for now to pop
+                            viewStore.send(.backTapped)
                         } label: {
                             Image(systemName: "chevron.left.circle.fill")
                                 .font(.system(size: 32))
                                 .foregroundColor(Theme.Colors.forest)
+                                .accessibilityLabel("Back to journey")
                         }
                         
                         Spacer()
