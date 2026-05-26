@@ -102,6 +102,15 @@
 *   **[ENG-701] StoreKit 2 Client (TCA)**
     *   **Description:** Implement native Apple In-App Subscriptions wrapped in a TCA `StoreKitClient` dependency. Build the Paywall UI (`PaywallFeature`).
     *   **Acceptance Criteria:** Subscriptions process successfully. Premium state is reflected in the Root Reducer.
-*   **[ENG-702] Cloud Functions Push Notification Engine**
-    *   **Description:** Write a Firebase Cloud Function that triggers weekly to aggregate `LessonProgress` and send APNs push notifications.
-    *   **Acceptance Criteria:** Notification is delivered formatting the data cleanly.
+---
+
+## Epic 8: Content Sprint (Weeks 1 & 2)
+**Goal:** Transition from a technical demo to a viable V1 by digitizing the first two weeks of the Orton-Gillingham and CRA Math curriculum.
+
+### Tickets
+*   **[ENG-801] CurriculumProvider & Level Mapping**
+    *   **Description:** Create a `CurriculumClient` TCA dependency. Map the Week 1 & 2 grid from `curriculum/scope-and-sequence.md` into a structured Swift data source. Feed the `LiteracyFeature` and `MathFeature` with specific level data (target letters, equations, biome context).
+    *   **Acceptance Criteria:** Store can fetch 30+ distinct level definitions. Nodes on the Journey Map are correctly assigned to their curriculum content.
+*   **[ENG-802] Level Preview Popup & Lesson Launch**
+    *   **Description:** Build the `LevelPreview` UI (as suggested in Stitch). A beautiful modal that appears when a node is tapped, showing the level title, learning goal, and a "Start" button.
+    *   **Acceptance Criteria:** Tapping a node in `JourneyView` presents the popup. Tapping "Start" routes the user into the correct `Literacy` or `Math` engine via the Root navigation stack.

@@ -5,12 +5,13 @@ import ComposableArchitecture
 @MainActor
 final class JourneyFeatureTests: XCTestCase {
     func testNodeTapped() async {
-        let store = TestStore(initialState: JourneyFeature.State(unlockedLevels: [1])) {
+        let level = LevelDefinition(id: "test", title: "Test", category: .literacy, targetValue: "a", biome: .forest)
+        let store = TestStore(initialState: JourneyFeature.State(levels: [level])) {
             JourneyFeature()
         }
         
-        await store.send(.nodeTapped(1)) {
-            $0.selectedLevel = 1
+        await store.send(.nodeTapped(level)) {
+            \$0.levelPreview = LevelPreviewFeature.State(level: level)
         }
     }
 }

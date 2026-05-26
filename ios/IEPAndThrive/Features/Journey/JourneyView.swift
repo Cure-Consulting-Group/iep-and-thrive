@@ -5,51 +5,93 @@ struct JourneyView: View {
     let store: StoreOf<JourneyFeature>
     
     var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
+        WithViewStore(self.store, observe: { \$0 }) { viewStore in
             ZStack {
-                Theme.Colors.cream.ignoresSafeArea()
+                // Biome Backgrounds
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        // Mountain Biome (Top)
+                        BiomeSection(title: "The Snowy Peaks", color: Theme.Colors.white)
+                        
+                        // Desert Biome (Mid)
+                        BiomeSection(title: "The Golden Dunes", color: Theme.Colors.amberLight)
+                        
+                        // Forest Biome (Bottom)
+                        BiomeSection(title: "The Whispering Woods", color: Theme.Colors.sagePale)
+                    }
+                    .overlay(
+                        VStack(spacing: 120) {
+                            ForEach(viewStore.levels) { level in
+                                JourneyNodeView(
+                                    level: (viewStore.levels.firstIndex(of: level) ?? 0) + 1,
+                                    isActive: level.id == (viewStore.levels.indices.contains(viewStore.currentLevelIndex) ? viewStore.levels[viewStore.currentLevelIndex].id : ""),
+                                    isUnlocked: true // Placeholder: All unlocked for now
+                                ) {
+                                    viewStore.send(.nodeTapped(level))
+                                }
+                                .offset(x: offsetForLevel(level, in: viewStore.levels))
+                            }
+                        }
+                        .padding(.vertical, 200)
+                    )
+                }
+                .background(Theme.Colors.cream)
+                .onAppear { viewStore.send(.onAppear) }
                 
+                // Floating UI Overlays
                 VStack {
                     HStack {
                         Spacer()
                         SparksCounter(count: viewStore.sparksCount)
                             .padding()
                     }
-                    
-                    ScrollView {
-                        VStack(spacing: 40) {
-                            ForEach(1...10, id: \.self) { level in
-                                JourneyNodeView(
-                                    level: level,
-                                    isActive: level == viewStore.currentLevel,
-                                    isUnlocked: viewStore.unlockedLevels.contains(level)
-                                ) {
-                                    viewStore.send(.nodeTapped(level))
-                                }
-                            }
-                        }
-                        .padding(.vertical, 100)
-                    }
-                }
-                
-                VStack {
                     Spacer()
                     HStack {
                         Button {
                             viewStore.send(.safeSpaceTapped)
                         } label: {
-                            Image(systemName: "heart.fill")
+                            Image(systemName: "leaf.fill")
+                                .font(.title)
                                 .foregroundColor(.white)
                                 .padding()
                                 .background(Theme.Colors.sage)
                                 .clipShape(Circle())
-                                .shadow(radius: 5)
+                                .shadow(radius: 10)
                         }
-                        .padding()
+                        .padding(30)
                         Spacer()
                     }
                 }
             }
+            .sheet(
+                store: self.store.scope(
+                    state: \.$levelPreview,
+                    action: \.levelPreview
+                )
+            ) { store in
+                LevelPreviewView(store: store)
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
+        }
+    }
+    
+    private func offsetForLevel(_ level: LevelDefinition, in levels: [LevelDefinition]) -> CGFloat {
+        guard let index = levels.firstIndex(of: level) else { return 0 }
+        return CGFloat(sin(Double(index) * 0.8) * 100)
+    }
+}
+
+struct BiomeSection: View {
+    let title: String
+    let color: Color
+    
+    var body: some View {
+        ZStack {
+            color.frame(height: 1000)
+            Text(title)
+                .font(Theme.Fonts.display(size: 40))
+                .foregroundColor(Theme.Colors.forest.opacity(0.2))
         }
     }
 }
