@@ -26,12 +26,18 @@ jobs:
           xcodebuild -version
           swift --version
 
+      # TCA + swift-case-paths + swift-dependencies + swift-perception
+      # all ship compiler-plugin macros. Xcode 15+ requires explicit trust
+      # before they'll run, which isn't possible in headless CI — the
+      # `-skipMacroValidation` flag tells xcodebuild to trust them.
       - name: Build Project
         run: |
           xcodebuild build \
             -project ios/IEPAndThrive.xcodeproj \
             -scheme IEPAndThrive \
             -destination 'generic/platform=iOS Simulator' \
+            -skipMacroValidation \
+            -skipPackagePluginValidation \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
