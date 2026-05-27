@@ -41,6 +41,15 @@ struct OnboardingView: View {
                         .disabled(!viewStore.canContinue)
                         .padding(.horizontal)
                         .padding(.top, 8)
+
+                        Button {
+                            viewStore.send(.signInTapped)
+                        } label: {
+                            Text("Already have an account? Sign in")
+                                .font(Theme.Fonts.body(size: 14))
+                                .foregroundColor(Theme.Colors.forestMid)
+                        }
+                        .padding(.top, 4)
                     }
                     .padding(.bottom, 40)
                 }

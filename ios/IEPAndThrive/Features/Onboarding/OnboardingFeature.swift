@@ -37,6 +37,10 @@ struct OnboardingFeature {
         case continueTapped
         case profileSaved
         case onboardingComplete
+        /// Parent-only affordance — surfaces the auth modal at the
+        /// RootFeature level. Carries no payload; the modal manages
+        /// its own state.
+        case signInTapped
     }
 
     @Dependency(\.database) var database
@@ -74,6 +78,10 @@ struct OnboardingFeature {
             case .profileSaved:
                 return .send(.onboardingComplete)
             case .onboardingComplete:
+                return .none
+            case .signInTapped:
+                // RootFeature consumes this — nothing for the local
+                // reducer to do beyond passing it up the chain.
                 return .none
             }
         }

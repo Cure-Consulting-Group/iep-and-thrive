@@ -76,10 +76,11 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
   cases on top of the previous 44).
 
 ### Phase 2 — staged delivery
-- **2.1 (open PR)** — `LessonProgress` write path. `JourneyFeature.missionComplete` now constructs and persists a `LessonProgress(levelIndex, category, isCompleted=true, score=10)` alongside the existing `SparksRecord`, with Firestore lockstep IDs.
-- **2.2** — Email/password login UI + anon UID → authenticated UID data migration.
+- **2.1 — merged (#21)** — `LessonProgress` write path. `JourneyFeature.missionComplete` constructs + persists + syncs a `LessonProgress` alongside the `SparksRecord`, lockstep IDs.
+- **2.2 — open PR** — Email/password login UI + anon → authenticated UID data migration. `AuthClient` extended with `signIn` / `signUp` / `signOut`. `FirestoreClient` extended with read methods + `migrateAnonData(anon, authed)`. `AuthFeature` reducer + `AuthView` modal sheet. Parent-only "Already have an account? Sign in" link on Onboarding. 59 tests passing.
 - **2.3** — Google Sign-In, Sign in with Apple (Apple requires SIWA if Google is offered).
 - **2.4** — Child picker against `users/{authedUid}/students/` (multi-child households).
+- **2.x deferred** — Sign-out UI surface (no current way to log out without app reinstall).
 
 ## Next Steps
 - **Design assets:** Distinct `BiomeDesert.imageset` and `BiomeMountain.imageset` art (currently empty — only `BiomeForest` has a real image, biomes are differentiated via gradient overlay).
