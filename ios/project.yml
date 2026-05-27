@@ -12,6 +12,16 @@ targets:
       - sdk: SpriteKit.framework
       - sdk: SwiftData.framework
       - package: ComposableArchitecture
+      # `Dependencies` and `CasePaths` are transitive products that TCA
+      # pulls in via swift-dependencies / swift-case-paths. The regular
+      # `xcodebuild build` flow links them automatically, but the
+      # build-for-testing flow (which builds the app as a test host)
+      # drops the transitive links — emit explicit references so test
+      # runs find the symbols they need.
+      - package: ComposableArchitecture
+        product: Dependencies
+      - package: ComposableArchitecture
+        product: CasePaths
     settings:
       INFOPLIST_FILE: IEPAndThrive/Resources/Info.plist
       GENERATE_INFOPLIST_FILE: YES
@@ -25,6 +35,14 @@ targets:
     dependencies:
       - target: IEPAndThrive
       - package: ComposableArchitecture
+      # Same transitive-link workaround as the app target. We avoid
+      # referencing any other transitive TCA package directly (Concurrency-
+      # Extras, CustomDump, etc.) from test code so we don't have to chase
+      # more explicit-product entries — see Box helper in TestHelpers.swift.
+      - package: ComposableArchitecture
+        product: Dependencies
+      - package: ComposableArchitecture
+        product: CasePaths
     settings:
       GENERATE_INFOPLIST_FILE: YES
 

@@ -52,7 +52,7 @@ final class OnboardingFeatureTests: XCTestCase {
     }
 
     func test_continueTapped_savesProfileAndCompletes() async {
-        let saved = LockIsolated<StudentProfile?>(nil)
+        let saved = Box<StudentProfile?>(nil)
 
         let store = TestStore(
             initialState: OnboardingFeature.State()
@@ -77,7 +77,7 @@ final class OnboardingFeatureTests: XCTestCase {
     }
 
     func test_continueTapped_trimsWhitespaceBeforeSaving() async {
-        let saved = LockIsolated<StudentProfile?>(nil)
+        let saved = Box<StudentProfile?>(nil)
 
         let store = TestStore(
             initialState: OnboardingFeature.State()

@@ -57,7 +57,7 @@ final class JourneyFeatureTests: XCTestCase {
     }
 
     func test_missionComplete_advancesIndexAndAwardsSparks() async {
-        let sparksAwarded = LockIsolated<(Int, String)?>(nil)
+        let sparksAwarded = Box<(Int, String)?>(nil)
 
         let store = TestStore(
             initialState: JourneyFeature.State(

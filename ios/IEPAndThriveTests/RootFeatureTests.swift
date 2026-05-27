@@ -110,7 +110,9 @@ final class RootFeatureTests: XCTestCase {
             $0.database.addSparks = { _, _ in }
         }
 
-        let id = initial.path.ids.last!
+        // StackElementID conforms to ExpressibleByIntegerLiteral in tests;
+        // pushing the first element gives it id 0.
+        let id: StackElementID = 0
         await store.send(.path(.element(id: id, action: .literacy(.doneTapped)))) {
             $0.path.removeLast()
         }
@@ -142,7 +144,9 @@ final class RootFeatureTests: XCTestCase {
             RootFeature()
         }
 
-        let id = initial.path.ids.last!
+        // StackElementID conforms to ExpressibleByIntegerLiteral in tests;
+        // pushing the first element gives it id 0.
+        let id: StackElementID = 0
         await store.send(.path(.element(id: id, action: .literacy(.backTapped)))) {
             $0.path.removeLast()
         }
@@ -166,7 +170,9 @@ final class RootFeatureTests: XCTestCase {
             $0.database.addSparks = { _, _ in }
         }
 
-        let id = initial.path.ids.last!
+        // StackElementID conforms to ExpressibleByIntegerLiteral in tests;
+        // pushing the first element gives it id 0.
+        let id: StackElementID = 0
         await store.send(.path(.element(id: id, action: .math(.checkAnswerTapped)))) {
             $0.path.removeLast()
         }
@@ -200,7 +206,9 @@ final class RootFeatureTests: XCTestCase {
         // it. We only care about RootFeature's routing decision.
         store.exhaustivity = .off
 
-        let id = initial.path.ids.last!
+        // StackElementID conforms to ExpressibleByIntegerLiteral in tests;
+        // pushing the first element gives it id 0.
+        let id: StackElementID = 0
         await store.send(.path(.element(id: id, action: .math(.checkAnswerTapped))))
         await store.finish()
 
@@ -222,7 +230,9 @@ final class RootFeatureTests: XCTestCase {
             RootFeature()
         }
 
-        let id = initial.path.ids.last!
+        // StackElementID conforms to ExpressibleByIntegerLiteral in tests;
+        // pushing the first element gives it id 0.
+        let id: StackElementID = 0
         await store.send(.path(.element(id: id, action: .math(.backTapped)))) {
             $0.path.removeLast()
         }
@@ -240,7 +250,9 @@ final class RootFeatureTests: XCTestCase {
             RootFeature()
         }
 
-        let id = initial.path.ids.last!
+        // StackElementID conforms to ExpressibleByIntegerLiteral in tests;
+        // pushing the first element gives it id 0.
+        let id: StackElementID = 0
         await store.send(.path(.element(id: id, action: .safeSpace(.exitTapped)))) {
             $0.path.removeLast()
         }

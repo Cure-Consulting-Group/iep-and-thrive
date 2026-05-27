@@ -42,7 +42,8 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 ## Sprint 7 — In Flight
 
 ### PR (open) — Test harness
-- `IEPAndThriveTests` XCTest target added to `project.yml`.
+- `IEPAndThriveTests` XCTest target added to `project.yml` — 44 tests
+  passing, 0 failures.
 - TCA `TestStore` coverage for `OnboardingFeature`, `JourneyFeature`,
   `MathFeature`, `LiteracyFeature`, and `RootFeature` orchestration —
   with explicit regression guards on the PR #9 silent-correctness bugs
@@ -52,9 +53,12 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
   thresholds.
 - `DatabaseClient` got a `testValue` stub (TCA hygiene — was missing).
 - CI workflow runs `xcodebuild test` after `build` on macos-15 / Xcode
-  16.4. Note: local Xcode 26 build-for-testing trips a transitive-Swift
-  package linker issue (`Dependencies`, `CasePathsCore`); CI is the
-  source of truth.
+  16.4. Both Xcode 26 (local) and 16.4 (CI) needed `Dependencies` +
+  `CasePaths` explicitly linked under `build-for-testing` — added as
+  explicit `product:` entries on both app and test targets. Test code
+  avoids touching other transitive TCA products (no `LockIsolated`, no
+  `state.path.ids` — small `Box` helper + `StackElementID` integer
+  literals instead) so the explicit-link list stays short.
 
 ## Next Steps
 - **Firebase sync:** Wire `StudentProfile`, `LessonProgress`, and `SparksRecord` to Firestore (SwiftData is local-only today).

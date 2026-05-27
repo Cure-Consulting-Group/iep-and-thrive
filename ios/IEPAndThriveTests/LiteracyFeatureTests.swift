@@ -11,7 +11,7 @@ final class LiteracyFeatureTests: XCTestCase {
     )
 
     func test_onAppear_speaksTargetLetter() async {
-        let spoken = LockIsolated<String?>(nil)
+        let spoken = Box<String?>(nil)
         let store = TestStore(
             initialState: LiteracyFeature.State(level: level)
         ) {
@@ -28,7 +28,7 @@ final class LiteracyFeatureTests: XCTestCase {
     }
 
     func test_speakLetterTapped_repeatsLetter() async {
-        let callCount = LockIsolated(0)
+        let callCount = Box(0)
         let store = TestStore(
             initialState: LiteracyFeature.State(level: level)
         ) {
