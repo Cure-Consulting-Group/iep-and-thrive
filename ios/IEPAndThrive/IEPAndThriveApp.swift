@@ -1,6 +1,7 @@
 import SwiftUI
 import ComposableArchitecture
 import FirebaseCore
+import GoogleSignIn
 
 @main
 struct IEPAndThriveApp: App {
@@ -21,6 +22,12 @@ struct IEPAndThriveApp: App {
             RootView(store: store)
                 .onAppear {
                     store.send(.appDelegate(.didFinishLaunching))
+                }
+                // Google Sign-In's OAuth flow ends with the browser
+                // calling back into the app via our REVERSED_CLIENT_ID
+                // URL scheme. GIDSignIn picks up the token here.
+                .onOpenURL { url in
+                    GIDSignIn.sharedInstance.handle(url)
                 }
         }
     }

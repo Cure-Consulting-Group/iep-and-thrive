@@ -60,6 +60,9 @@ struct AuthFeature {
         /// Apple returned an ID token. AuthFeature exchanges it (plus
         /// the stored nonce) for a Firebase credential via the client.
         case appleCredentialReceived(idToken: String, fullName: PersonNameComponents?)
+        /// One-shot Google sign-in trigger. The client owns the OAuth
+        /// flow; we just await the resulting Firebase UID.
+        case googleSignInTapped
         /// Fired up to the parent once auth resolves with a UID — the
         /// parent runs migration and updates RootFeature.currentUid.
         case delegate(Delegate)
@@ -147,6 +150,18 @@ struct AuthFeature {
                 return .run { [authClient] send in
                     do {
                         let uid = try await authClient.signInWithApple(idToken, nonce, fullName)
+                        await send(.authSucceeded(uid: uid))
+                    } catch {
+                        await send(.authFailed(message: error.localizedDescription))
+                    }
+                }
+
+            case .googleSignInTapped:
+                state.isSubmitting = true
+                state.errorMessage = nil
+                return .run { [authClient] send in
+                    do {
+                        let uid = try await authClient.signInWithGoogle()
                         await send(.authSucceeded(uid: uid))
                     } catch {
                         await send(.authFailed(message: error.localizedDescription))

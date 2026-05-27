@@ -1,6 +1,9 @@
 import ComposableArchitecture
 import FirebaseAuth
+import FirebaseCore
 import Foundation
+import GoogleSignIn
+import UIKit
 #if canImport(AuthenticationServices)
 import AuthenticationServices
 #endif
@@ -40,6 +43,29 @@ struct AuthClient {
         _ rawNonce: String,
         _ fullName: PersonNameComponents?
     ) async throws -> String
+
+    /// One-shot Google Sign-In: shows the SDK's OAuth flow, picks up
+    /// the resulting ID + access tokens, and exchanges them for a
+    /// Firebase credential. Presenter is resolved internally from the
+    /// active UIWindowScene — callers don't pass a UIViewController.
+    var signInWithGoogle: @Sendable () async throws -> String
+}
+
+enum AuthClientError: LocalizedError {
+    case noFirebaseClientId
+    case noPresentingViewController
+    case missingGoogleIDToken
+
+    var errorDescription: String? {
+        switch self {
+        case .noFirebaseClientId:
+            return "Firebase clientID is missing — check GoogleService-Info.plist."
+        case .noPresentingViewController:
+            return "Could not find a window to present sign-in. Try again."
+        case .missingGoogleIDToken:
+            return "Google did not return an ID token. Try again."
+        }
+    }
 }
 
 extension AuthClient: DependencyKey {
@@ -73,6 +99,37 @@ extension AuthClient: DependencyKey {
             )
             let result = try await Auth.auth().signIn(with: credential)
             return result.user.uid
+        },
+        signInWithGoogle: {
+            guard let clientID = FirebaseApp.app()?.options.clientID else {
+                throw AuthClientError.noFirebaseClientId
+            }
+            GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+
+            // Resolve the presenter on the main actor — UIKit's window
+            // graph isn't Sendable, so we capture the UIViewController
+            // and hop back off MainActor for the SDK call.
+            let presenter: UIViewController? = await MainActor.run {
+                UIApplication.shared.connectedScenes
+                    .compactMap { $0 as? UIWindowScene }
+                    .flatMap { $0.windows }
+                    .first(where: { $0.isKeyWindow })?
+                    .rootViewController
+            }
+            guard let presenter else {
+                throw AuthClientError.noPresentingViewController
+            }
+
+            let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: presenter)
+            guard let idToken = result.user.idToken?.tokenString else {
+                throw AuthClientError.missingGoogleIDToken
+            }
+            let credential = GoogleAuthProvider.credential(
+                withIDToken: idToken,
+                accessToken: result.user.accessToken.tokenString
+            )
+            let authResult = try await Auth.auth().signIn(with: credential)
+            return authResult.user.uid
         }
     )
 
@@ -82,7 +139,8 @@ extension AuthClient: DependencyKey {
         signIn: { _, _ in "authed-uid" },
         signUp: { _, _ in "authed-uid" },
         signOut: { },
-        signInWithApple: { _, _, _ in "authed-uid" }
+        signInWithApple: { _, _, _ in "authed-uid" },
+        signInWithGoogle: { "google-authed-uid" }
     )
 }
 

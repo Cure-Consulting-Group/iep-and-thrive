@@ -12,7 +12,10 @@ struct AuthView: View {
                     VStack(alignment: .leading, spacing: 24) {
                         header(viewStore: viewStore)
 
-                        appleButton(viewStore: viewStore)
+                        VStack(spacing: 12) {
+                            appleButton(viewStore: viewStore)
+                            googleButton(viewStore: viewStore)
+                        }
                         orDivider
 
                         VStack(alignment: .leading, spacing: 16) {
@@ -188,6 +191,35 @@ struct AuthView: View {
         .signInWithAppleButtonStyle(.black)
         .frame(height: 50)
         .clipShape(Capsule())
+    }
+
+    // MARK: - Google Sign-In
+
+    private func googleButton(viewStore: ViewStoreOf<AuthFeature>) -> some View {
+        Button {
+            viewStore.send(.googleSignInTapped)
+        } label: {
+            HStack(spacing: 12) {
+                // Inline "G" mark — avoids bundling the Google logo
+                // asset for now. Phase 2.3.b polish can swap in the
+                // official mark per Google's brand guidelines.
+                Text("G")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(Theme.Colors.forest)
+                    .frame(width: 22, height: 22)
+                    .background(Color.white.clipShape(Circle()))
+                Text(viewStore.mode == .signIn
+                     ? "Sign in with Google"
+                     : "Sign up with Google")
+                    .font(Theme.Fonts.body(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(Theme.Colors.forest)
+            .clipShape(Capsule())
+        }
+        .disabled(viewStore.isSubmitting)
     }
 
     private var orDivider: some View {
