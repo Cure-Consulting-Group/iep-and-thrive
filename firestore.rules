@@ -30,6 +30,17 @@ service cloud.firestore {
         allow create: if isOwner(userId);
         allow update: if isOwner(userId) || isAdmin();
         allow delete: if isOwner(userId) || isAdmin();
+
+        // iOS app — per-student lesson + sparks logs. The iOS app
+        // authenticates anonymously in Phase 1, so isOwner(userId)
+        // = the anon UID matches the document path. Phase 2 will
+        // migrate this data under the parent's authenticated UID.
+        match /lessons/{lessonId} {
+          allow read, write: if isOwner(userId) || isAdmin();
+        }
+        match /sparks/{sparkId} {
+          allow read, write: if isOwner(userId) || isAdmin();
+        }
       }
     }
 

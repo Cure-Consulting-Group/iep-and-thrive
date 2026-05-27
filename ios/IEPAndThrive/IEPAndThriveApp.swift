@@ -1,8 +1,16 @@
 import SwiftUI
 import ComposableArchitecture
+import FirebaseCore
 
 @main
 struct IEPAndThriveApp: App {
+    init() {
+        // Loads GoogleService-Info.plist from the bundle and configures
+        // FirebaseAuth + FirebaseFirestore against the iep-and-thrive
+        // project. Must run before any Auth / Firestore calls.
+        FirebaseApp.configure()
+    }
+
     let store = Store(initialState: RootFeature.State()) {
         RootFeature()
             ._printChanges()

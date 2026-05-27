@@ -41,27 +41,47 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 
 ## Sprint 7 — In Flight
 
-### PR (open) — Test harness
-- `IEPAndThriveTests` XCTest target added to `project.yml` — 44 tests
-  passing, 0 failures.
-- TCA `TestStore` coverage for `OnboardingFeature`, `JourneyFeature`,
-  `MathFeature`, `LiteracyFeature`, and `RootFeature` orchestration —
-  with explicit regression guards on the PR #9 silent-correctness bugs
-  (back chevron / incorrect Math attempts must NOT award completion).
-- `LetterTracer` geometry tests cover empty / single-point / off-canvas
-  / dense-trace cases at the production 0.55 accuracy / 0.45 coverage
-  thresholds.
-- `DatabaseClient` got a `testValue` stub (TCA hygiene — was missing).
-- CI workflow runs `xcodebuild test` after `build` on macos-15 / Xcode
-  16.4. Both Xcode 26 (local) and 16.4 (CI) needed `Dependencies` +
-  `CasePaths` explicitly linked under `build-for-testing` — added as
-  explicit `product:` entries on both app and test targets. Test code
-  avoids touching other transitive TCA products (no `LockIsolated`, no
-  `state.path.ids` — small `Box` helper + `StackElementID` integer
-  literals instead) so the explicit-link list stays short.
+### Merged — Test harness (PR #19)
+- `IEPAndThriveTests` XCTest target with TCA `TestStore` coverage for
+  Onboarding / Journey / Math / Literacy reducers + `RootFeature`
+  orchestration. Regression guards on PR #9 silent-correctness bugs.
+- `LetterTracer` geometry tests at production thresholds.
+- CI runs `xcodebuild test` after `build`; explicit `Dependencies` +
+  `CasePaths` package product links (transitive-link workaround that
+  affects both Xcode 16.4 and Xcode 26).
+
+### PR (open) — Firebase sync Phase 1
+- iOS Firebase app registered (`1:564060847585:ios:ac9aef618a24bff69166a0`,
+  bundle `com.cureconsulting.IEPAndThrive`).
+- `firebase-ios-sdk` 12.x added to `project.yml` (FirebaseAuth +
+  FirebaseFirestore products).
+- `AuthClient` — anonymous Firebase Auth, idempotent. Device-bound UID
+  survives reinstalls.
+- `FirestoreClient` — write-through for `StudentProfile` / `SparksRecord`
+  at `users/{uid}/students/default/{profile|sparks/{id}}`. Mirrors the
+  web platform's existing schema so Phase 2 can lift-and-shift the data
+  under a parent's authenticated UID.
+- `FirestoreDTOs` — Codable mirrors of SwiftData `@Model` classes so we
+  don't have to fight `@Model` ↔ `Codable` synthesis. SwiftData stays
+  the local source of truth; DTOs are the wire format.
+- `DatabaseClient.addSparks` now takes a `SparksRecord` so the same
+  UUID can persist locally AND sync to Firestore (lockstep IDs).
+- `RootFeature.appDelegate.didFinishLaunching` resolves anonymous auth
+  before fetching profile / starting StoreKit observation.
+- Firestore rules add `users/{uid}/students/{studentId}/lessons` and
+  `.../sparks` subcollections (owner-only). Not auto-deployed by the
+  existing `deploy.yml` workflow — needs `firebase deploy --only
+  firestore:rules` after merge.
+- 46 tests passing locally (added auth bootstrap + skip-sync-without-uid
+  cases on top of the previous 44).
+
+### Phase 2 — not in this PR
+- Email/password + Google Sign-In on iOS (matching web platform auth).
+- Child picker against `users/{authedUid}/students/`.
+- Anon UID → authenticated UID data migration on first login.
+- `LessonProgress` write path (model exists, no callers yet).
 
 ## Next Steps
-- **Firebase sync:** Wire `StudentProfile`, `LessonProgress`, and `SparksRecord` to Firestore (SwiftData is local-only today).
 - **Design assets:** Distinct `BiomeDesert.imageset` and `BiomeMountain.imageset` art (currently empty — only `BiomeForest` has a real image, biomes are differentiated via gradient overlay).
 - **Threshold tuning:** Sand Tray accuracy/coverage thresholds (0.55/0.45) and Math `targetCount` values are starting points — revisit once we have real session telemetry.
 - **Paywall UX:** Currently auto-presents after onboarding (`RootFeature.swift:56–58, 70–72`) before the child sees any of the journey. Consider deferring until N levels completed.

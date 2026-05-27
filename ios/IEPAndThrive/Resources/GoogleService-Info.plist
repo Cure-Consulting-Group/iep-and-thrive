@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>564060847585-qja9of7p712opgo2splebbae8tq2pejm.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.564060847585-qja9of7p712opgo2splebbae8tq2pejm</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCYoG6H1iWGIChXxUsEd3tm4A8s158GcJU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>564060847585</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.cureconsulting.IEPAndThrive</string>
+	<key>PROJECT_ID</key>
+	<string>iep-and-thrive</string>
+	<key>STORAGE_BUCKET</key>
+	<string>iep-and-thrive.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:564060847585:ios:ac9aef618a24bff69166a0</string>
+</dict>
+</plist>

@@ -8,7 +8,9 @@ struct DatabaseClient {
     var fetchProgress: @Sendable (String) async throws -> [LessonProgress]
     var saveProgress: @Sendable (LessonProgress) async throws -> Void
     var fetchSparksTotal: @Sendable () async throws -> Int
-    var addSparks: @Sendable (Int, String) async throws -> Void
+    // Takes the constructed record so callers can also hand it to
+    // FirestoreClient for cloud sync with the same UUID.
+    var addSparks: @Sendable (SparksRecord) async throws -> Void
 }
 
 extension DatabaseClient: DependencyKey {
@@ -42,9 +44,9 @@ extension DatabaseClient: DependencyKey {
             let records = try modelContext.fetch(descriptor)
             return records.reduce(0) { $0 + $1.amount }
         },
-        addSparks: { amount, reason in
+        addSparks: { record in
             let modelContext = try await Self.context()
-            modelContext.insert(SparksRecord(amount: amount, reason: reason))
+            modelContext.insert(record)
             try modelContext.save()
         }
     )
@@ -55,7 +57,7 @@ extension DatabaseClient: DependencyKey {
         fetchProgress: { _ in [] },
         saveProgress: { _ in },
         fetchSparksTotal: { 0 },
-        addSparks: { _, _ in }
+        addSparks: { _ in }
     )
 
     // Internal helper to get/create context on a background actor
