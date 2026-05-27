@@ -1,3 +1,4 @@
+import AuthenticationServices
 import ComposableArchitecture
 import SwiftUI
 
@@ -10,6 +11,9 @@ struct AuthView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         header(viewStore: viewStore)
+
+                        appleButton(viewStore: viewStore)
+                        orDivider
 
                         VStack(alignment: .leading, spacing: 16) {
                             emailField(viewStore: viewStore)
@@ -140,6 +144,63 @@ struct AuthView: View {
                 .font(Theme.Fonts.body(size: 14))
                 .foregroundColor(Theme.Colors.forestMid)
                 .frame(maxWidth: .infinity)
+        }
+    }
+
+    // MARK: - Sign in with Apple
+
+    private func appleButton(viewStore: ViewStoreOf<AuthFeature>) -> some View {
+        SignInWithAppleButton(
+            viewStore.mode == .signIn ? .signIn : .signUp,
+            onRequest: { request in
+                let nonce = NonceGenerator.random()
+                request.requestedScopes = [.fullName, .email]
+                request.nonce = NonceGenerator.sha256(nonce)
+                viewStore.send(.appleNonceGenerated(nonce))
+            },
+            onCompletion: { result in
+                switch result {
+                case let .success(authorization):
+                    guard
+                        let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+                        let identityToken = credential.identityToken,
+                        let tokenString = String(data: identityToken, encoding: .utf8)
+                    else {
+                        viewStore.send(.authFailed(
+                            message: "Sign in with Apple did not return a valid credential."
+                        ))
+                        return
+                    }
+                    viewStore.send(.appleCredentialReceived(
+                        idToken: tokenString,
+                        fullName: credential.fullName
+                    ))
+                case let .failure(error):
+                    // ASAuthorizationError.canceled is a user-initiated
+                    // dismiss — don't shout "Error" at them for it.
+                    if (error as? ASAuthorizationError)?.code == .canceled {
+                        return
+                    }
+                    viewStore.send(.authFailed(message: error.localizedDescription))
+                }
+            }
+        )
+        .signInWithAppleButtonStyle(.black)
+        .frame(height: 50)
+        .clipShape(Capsule())
+    }
+
+    private var orDivider: some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .fill(Theme.Colors.forest.opacity(0.15))
+                .frame(height: 1)
+            Text("or")
+                .font(Theme.Fonts.body(size: 12, weight: .medium))
+                .foregroundColor(Theme.Colors.textMuted)
+            Rectangle()
+                .fill(Theme.Colors.forest.opacity(0.15))
+                .frame(height: 1)
         }
     }
 }

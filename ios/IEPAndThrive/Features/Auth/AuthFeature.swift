@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import SwiftUI
 
 /// Parent-facing email/password auth modal. Opened from the Onboarding
@@ -13,6 +14,11 @@ struct AuthFeature {
         var mode: Mode = .signIn
         var isSubmitting: Bool = false
         var errorMessage: String? = nil
+        /// Raw nonce generated for the in-flight Sign in with Apple
+        /// request. Stored between `appleNonceGenerated` (issued at
+        /// button tap) and `appleCredentialReceived` (returned by
+        /// Apple). Reset to nil after each attempt.
+        var pendingAppleNonce: String? = nil
 
         enum Mode: String, Equatable, CaseIterable, Identifiable {
             case signIn, signUp
@@ -46,6 +52,14 @@ struct AuthFeature {
         case authSucceeded(uid: String)
         case authFailed(message: String)
         case dismissTapped
+        /// Stores the raw nonce that AuthView hashed before sending to
+        /// Apple. Must arrive before the credential — the view is
+        /// expected to dispatch this from the `onRequest` callback of
+        /// SignInWithAppleButton.
+        case appleNonceGenerated(String)
+        /// Apple returned an ID token. AuthFeature exchanges it (plus
+        /// the stored nonce) for a Firebase credential via the client.
+        case appleCredentialReceived(idToken: String, fullName: PersonNameComponents?)
         /// Fired up to the parent once auth resolves with a UID — the
         /// parent runs migration and updates RootFeature.currentUid.
         case delegate(Delegate)
@@ -108,10 +122,36 @@ struct AuthFeature {
             case let .authFailed(message):
                 state.isSubmitting = false
                 state.errorMessage = message
+                state.pendingAppleNonce = nil
                 return .none
 
             case .dismissTapped:
                 return .run { _ in await dismiss() }
+
+            case let .appleNonceGenerated(nonce):
+                state.pendingAppleNonce = nonce
+                state.errorMessage = nil
+                return .none
+
+            case let .appleCredentialReceived(idToken, fullName):
+                guard let nonce = state.pendingAppleNonce else {
+                    // Apple returned a credential before AuthView's
+                    // onRequest dispatched its nonce. Shouldn't happen
+                    // in practice — guard against replay attempts.
+                    state.errorMessage = "Sign in with Apple did not start cleanly. Please try again."
+                    return .none
+                }
+                state.isSubmitting = true
+                state.errorMessage = nil
+                state.pendingAppleNonce = nil
+                return .run { [authClient] send in
+                    do {
+                        let uid = try await authClient.signInWithApple(idToken, nonce, fullName)
+                        await send(.authSucceeded(uid: uid))
+                    } catch {
+                        await send(.authFailed(message: error.localizedDescription))
+                    }
+                }
 
             case .delegate:
                 return .none
