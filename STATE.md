@@ -75,11 +75,11 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 - 46 tests passing locally (added auth bootstrap + skip-sync-without-uid
   cases on top of the previous 44).
 
-### Phase 2 — not in this PR
-- Email/password + Google Sign-In on iOS (matching web platform auth).
-- Child picker against `users/{authedUid}/students/`.
-- Anon UID → authenticated UID data migration on first login.
-- `LessonProgress` write path (model exists, no callers yet).
+### Phase 2 — staged delivery
+- **2.1 (open PR)** — `LessonProgress` write path. `JourneyFeature.missionComplete` now constructs and persists a `LessonProgress(levelIndex, category, isCompleted=true, score=10)` alongside the existing `SparksRecord`, with Firestore lockstep IDs.
+- **2.2** — Email/password login UI + anon UID → authenticated UID data migration.
+- **2.3** — Google Sign-In, Sign in with Apple (Apple requires SIWA if Google is offered).
+- **2.4** — Child picker against `users/{authedUid}/students/` (multi-child households).
 
 ## Next Steps
 - **Design assets:** Distinct `BiomeDesert.imageset` and `BiomeMountain.imageset` art (currently empty — only `BiomeForest` has a real image, biomes are differentiated via gradient overlay).

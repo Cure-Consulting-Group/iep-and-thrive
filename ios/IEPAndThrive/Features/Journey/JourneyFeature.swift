@@ -50,7 +50,8 @@ struct JourneyFeature {
 
             case let .missionComplete(level):
                 state.sparksCount += 10
-                if let index = state.levels.firstIndex(of: level), index == state.currentLevelIndex {
+                let levelIndex = state.levels.firstIndex(of: level)
+                if let index = levelIndex, index == state.currentLevelIndex {
                     state.currentLevelIndex += 1
                 }
                 state.missionComplete = MissionCompleteFeature.State(
@@ -58,12 +59,21 @@ struct JourneyFeature {
                     sparksAwarded: 10
                 )
                 return .run { [authClient, firestoreClient, database] _ in
-                    // Build the record once and persist it both places
-                    // with a shared UUID so cloud/local stay in lockstep.
-                    let record = SparksRecord(amount: 10, reason: "mission_complete")
-                    try? await database.addSparks(record)
+                    // Build both records once with stable UUIDs so the
+                    // local SwiftData write and the Firestore sync stay
+                    // in lockstep — same id on both sides.
+                    let sparks = SparksRecord(amount: 10, reason: "mission_complete")
+                    let progress = LessonProgress(
+                        levelIndex: levelIndex ?? 0,
+                        category: level.category.rawValue,
+                        isCompleted: true,
+                        score: 10
+                    )
+                    try? await database.addSparks(sparks)
+                    try? await database.saveProgress(progress)
                     if let uid = authClient.currentUserId() {
-                        try? await firestoreClient.syncSparks(uid, record.dto)
+                        try? await firestoreClient.syncSparks(uid, sparks.dto)
+                        try? await firestoreClient.syncLesson(uid, progress.dto)
                     }
                 }
 
