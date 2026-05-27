@@ -42,6 +42,21 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
+      # Run unit tests (TCA TestStore reducer coverage + LetterTracer
+      # geometry). Uses a concrete simulator destination instead of the
+      # generic one — `xcodebuild test` requires a real device.
+      - name: Run Unit Tests
+        run: |
+          xcodebuild test \
+            -project ios/IEPAndThrive.xcodeproj \
+            -scheme IEPAndThrive \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -skipMacroValidation \
+            -skipPackagePluginValidation \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
       # We can add SwiftLint here once configured
       # - name: SwiftLint
       #   run: swiftlint

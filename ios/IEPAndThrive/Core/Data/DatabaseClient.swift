@@ -48,7 +48,16 @@ extension DatabaseClient: DependencyKey {
             try modelContext.save()
         }
     )
-    
+
+    static let testValue = Self(
+        fetchProfile: { nil },
+        saveProfile: { _ in },
+        fetchProgress: { _ in [] },
+        saveProgress: { _ in },
+        fetchSparksTotal: { 0 },
+        addSparks: { _, _ in }
+    )
+
     // Internal helper to get/create context on a background actor
     private static func context() async throws -> ModelContext {
         // This is a simplified pattern for the boilerplate.
