@@ -15,6 +15,32 @@ final class RootFeatureTests: XCTestCase {
         category: .math, targetValue: "add", biome: .mountain
     )
 
+    // MARK: - Auth bootstrap
+
+    func test_didFinishLaunching_resolvesAnonymousAuth() async {
+        // Phase 1 of Firebase sync: anonymous Firebase Auth runs first on
+        // launch so the UID is available before any Firestore writes.
+        let store = TestStore(initialState: RootFeature.State()) {
+            RootFeature()
+        } withDependencies: {
+            $0.authClient.signInAnonymously = { "anon-uid-123" }
+            $0.database.fetchProfile = { nil }
+            // Finish the subscription stream immediately so the .run
+            // effect completes within the test — the live stream is
+            // long-lived but tests don't exercise subscription updates.
+            $0.storeKit.observeStatus = {
+                AsyncStream { $0.finish() }
+            }
+        }
+
+        await store.send(.appDelegate(.didFinishLaunching))
+        await store.receive(\.authResolved) {
+            $0.currentUid = "anon-uid-123"
+        }
+        await store.receive(\.profileLoaded)
+        await store.finish()
+    }
+
     // MARK: - Onboarding → Paywall
 
     func test_onboardingComplete_marksOnboardedAndPresentsPaywall() async {
@@ -107,7 +133,7 @@ final class RootFeatureTests: XCTestCase {
         let store = TestStore(initialState: initial) {
             RootFeature()
         } withDependencies: {
-            $0.database.addSparks = { _, _ in }
+            $0.database.addSparks = { _ in }
         }
 
         // StackElementID conforms to ExpressibleByIntegerLiteral in tests;
@@ -167,7 +193,7 @@ final class RootFeatureTests: XCTestCase {
         let store = TestStore(initialState: initial) {
             RootFeature()
         } withDependencies: {
-            $0.database.addSparks = { _, _ in }
+            $0.database.addSparks = { _ in }
         }
 
         // StackElementID conforms to ExpressibleByIntegerLiteral in tests;

@@ -8,9 +8,12 @@ struct RootFeature {
         var onboarding = OnboardingFeature.State()
         @PresentationState var paywall: PaywallFeature.State?
         var path = StackState<Path.State>()
-        
+
         var isUserOnboarded: Bool = false
         var isPremium: Bool = false
+        /// Anonymous Firebase UID, populated once `authClient.signInAnonymously()`
+        /// resolves on launch. Used downstream for Firestore sync addressing.
+        var currentUid: String? = nil
     }
     
     enum Action {
@@ -19,16 +22,18 @@ struct RootFeature {
         case paywall(PresentationAction<PaywallFeature.Action>)
         case path(StackAction<Path.State, Path.Action>)
         case appDelegate(AppDelegateAction)
+        case authResolved(String)
         case profileLoaded(StudentProfile?)
         case subscriptionStatusChanged(Bool)
     }
-    
+
     enum AppDelegateAction {
         case didFinishLaunching
     }
-    
+
     @Dependency(\.database) var database
     @Dependency(\.storeKit) var storeKit
+    @Dependency(\.authClient) var authClient
     
     var body: some ReducerOf<Self> {
         Scope(state: \.journey, action: \.journey) {
@@ -42,15 +47,28 @@ struct RootFeature {
         Reduce { state, action in
             switch action {
             case .appDelegate(.didFinishLaunching):
-                return .run { send in
+                return .run { [authClient, database, storeKit] send in
+                    // Anonymous Firebase Auth runs first — both the local
+                    // profile fetch and Firestore sync downstream need a
+                    // UID. signInAnonymously is idempotent: it reuses the
+                    // cached session on relaunch, so the UID is stable
+                    // across app starts and survives reinstalls of the
+                    // app on the same device.
+                    if let uid = try? await authClient.signInAnonymously() {
+                        await send(.authResolved(uid))
+                    }
                     let profile = try? await database.fetchProfile()
                     await send(.profileLoaded(profile))
-                    
+
                     for await isPremium in await storeKit.observeStatus() {
                         await send(.subscriptionStatusChanged(isPremium))
                     }
                 }
-                
+
+            case let .authResolved(uid):
+                state.currentUid = uid
+                return .none
+
             case let .profileLoaded(profile):
                 state.isUserOnboarded = (profile != nil)
                 if state.isUserOnboarded && !state.isPremium {

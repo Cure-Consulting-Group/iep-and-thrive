@@ -28,6 +28,8 @@ struct JourneyFeature {
 
     @Dependency(\.curriculumClient) var curriculumClient
     @Dependency(\.database) var database
+    @Dependency(\.firestoreClient) var firestoreClient
+    @Dependency(\.authClient) var authClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -55,8 +57,14 @@ struct JourneyFeature {
                     levelTitle: level.title,
                     sparksAwarded: 10
                 )
-                return .run { _ in
-                    try? await database.addSparks(10, "mission_complete")
+                return .run { [authClient, firestoreClient, database] _ in
+                    // Build the record once and persist it both places
+                    // with a shared UUID so cloud/local stay in lockstep.
+                    let record = SparksRecord(amount: 10, reason: "mission_complete")
+                    try? await database.addSparks(record)
+                    if let uid = authClient.currentUserId() {
+                        try? await firestoreClient.syncSparks(uid, record.dto)
+                    }
                 }
 
             case .safeSpaceTapped:

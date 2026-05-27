@@ -40,6 +40,8 @@ struct OnboardingFeature {
     }
 
     @Dependency(\.database) var database
+    @Dependency(\.firestoreClient) var firestoreClient
+    @Dependency(\.authClient) var authClient
 
     static let ageRange: ClosedRange<Int> = 5...11
 
@@ -62,8 +64,11 @@ struct OnboardingFeature {
                     age: state.age,
                     primaryFocus: state.primaryFocus.rawValue
                 )
-                return .run { send in
+                return .run { [authClient, firestoreClient, database] send in
                     try? await database.saveProfile(profile)
+                    if let uid = authClient.currentUserId() {
+                        try? await firestoreClient.syncProfile(uid, profile.dto)
+                    }
                     await send(.profileSaved)
                 }
             case .profileSaved:

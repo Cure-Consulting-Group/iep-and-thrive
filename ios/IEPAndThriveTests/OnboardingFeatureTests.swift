@@ -53,6 +53,7 @@ final class OnboardingFeatureTests: XCTestCase {
 
     func test_continueTapped_savesProfileAndCompletes() async {
         let saved = Box<StudentProfile?>(nil)
+        let firestoreSync = Box<(String, StudentProfileDTO)?>(nil)
 
         let store = TestStore(
             initialState: OnboardingFeature.State()
@@ -60,6 +61,10 @@ final class OnboardingFeatureTests: XCTestCase {
             OnboardingFeature()
         } withDependencies: {
             $0.database.saveProfile = { profile in saved.setValue(profile) }
+            $0.authClient.currentUserId = { "test-uid" }
+            $0.firestoreClient.syncProfile = { uid, dto in
+                firestoreSync.setValue((uid, dto))
+            }
         }
 
         await store.send(.nameChanged("Maya")) { $0.childName = "Maya" }
@@ -74,6 +79,37 @@ final class OnboardingFeatureTests: XCTestCase {
         XCTAssertEqual(profile?.firstName, "Maya")
         XCTAssertEqual(profile?.age, 8)
         XCTAssertEqual(profile?.primaryFocus, "both")
+        // Same write should have reached Firestore with the same UUID.
+        XCTAssertEqual(firestoreSync.value?.0, "test-uid")
+        XCTAssertEqual(firestoreSync.value?.1.firstName, "Maya")
+        XCTAssertEqual(firestoreSync.value?.1.id, profile?.id)
+    }
+
+    func test_continueTapped_skipsFirestoreSync_whenNotAuthenticated() async {
+        // If anonymous auth hasn't resolved yet (network blip on launch),
+        // the local save still completes — the next foreground will
+        // pick up the queued state. We must not crash when uid is nil.
+        let firestoreSync = Box<Bool>(false)
+
+        let store = TestStore(
+            initialState: OnboardingFeature.State()
+        ) {
+            OnboardingFeature()
+        } withDependencies: {
+            $0.database.saveProfile = { _ in }
+            $0.authClient.currentUserId = { nil }
+            $0.firestoreClient.syncProfile = { _, _ in
+                firestoreSync.setValue(true)
+            }
+        }
+
+        await store.send(.nameChanged("Aiden")) { $0.childName = "Aiden" }
+        await store.send(.continueTapped)
+        await store.receive(\.profileSaved)
+        await store.receive(\.onboardingComplete)
+
+        XCTAssertFalse(firestoreSync.value,
+            "Firestore sync must be skipped when there is no authenticated UID.")
     }
 
     func test_continueTapped_trimsWhitespaceBeforeSaving() async {

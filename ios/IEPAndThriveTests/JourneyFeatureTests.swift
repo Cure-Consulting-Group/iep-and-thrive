@@ -57,7 +57,8 @@ final class JourneyFeatureTests: XCTestCase {
     }
 
     func test_missionComplete_advancesIndexAndAwardsSparks() async {
-        let sparksAwarded = Box<(Int, String)?>(nil)
+        let sparksAwarded = Box<SparksRecord?>(nil)
+        let firestoreSync = Box<(String, SparksRecordDTO)?>(nil)
 
         let store = TestStore(
             initialState: JourneyFeature.State(
@@ -67,8 +68,12 @@ final class JourneyFeatureTests: XCTestCase {
         ) {
             JourneyFeature()
         } withDependencies: {
-            $0.database.addSparks = { amount, reason in
-                sparksAwarded.setValue((amount, reason))
+            $0.database.addSparks = { record in
+                sparksAwarded.setValue(record)
+            }
+            $0.authClient.currentUserId = { "test-uid" }
+            $0.firestoreClient.syncSparks = { uid, dto in
+                firestoreSync.setValue((uid, dto))
             }
         }
 
@@ -83,8 +88,12 @@ final class JourneyFeatureTests: XCTestCase {
         }
 
         await store.finish()
-        XCTAssertEqual(sparksAwarded.value?.0, 10)
-        XCTAssertEqual(sparksAwarded.value?.1, "mission_complete")
+        XCTAssertEqual(sparksAwarded.value?.amount, 10)
+        XCTAssertEqual(sparksAwarded.value?.reason, "mission_complete")
+        // The same record (same UUID) must reach Firestore.
+        XCTAssertEqual(firestoreSync.value?.0, "test-uid")
+        XCTAssertEqual(firestoreSync.value?.1.id, sparksAwarded.value?.id,
+            "Local + cloud writes must share a UUID so they stay in lockstep.")
     }
 
     func test_missionComplete_doesNotAdvanceIndex_whenReplayingPreviousLevel() async {
@@ -99,7 +108,8 @@ final class JourneyFeatureTests: XCTestCase {
         ) {
             JourneyFeature()
         } withDependencies: {
-            $0.database.addSparks = { _, _ in }
+            $0.database.addSparks = { _ in }
+            $0.authClient.currentUserId = { nil }
         }
 
         let replay = Self.testLevels[0]
