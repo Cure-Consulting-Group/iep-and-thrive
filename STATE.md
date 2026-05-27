@@ -76,9 +76,10 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
   cases on top of the previous 44).
 
 ### Phase 2 — staged delivery
-- **2.1 — merged (#21)** — `LessonProgress` write path. `JourneyFeature.missionComplete` constructs + persists + syncs a `LessonProgress` alongside the `SparksRecord`, lockstep IDs.
-- **2.2 — open PR** — Email/password login UI + anon → authenticated UID data migration. `AuthClient` extended with `signIn` / `signUp` / `signOut`. `FirestoreClient` extended with read methods + `migrateAnonData(anon, authed)`. `AuthFeature` reducer + `AuthView` modal sheet. Parent-only "Already have an account? Sign in" link on Onboarding. 59 tests passing.
-- **2.3** — Google Sign-In, Sign in with Apple (Apple requires SIWA if Google is offered).
+- **2.1 — merged (#21)** — `LessonProgress` write path.
+- **2.2 — merged (#22)** — Email/password login UI + anon → authenticated UID migration.
+- **2.3.a — open PR** — Sign in with Apple. Adds entitlements file, `NonceGenerator` (SHA-256 + random), `AuthClient.signInWithApple`, `SignInWithAppleButton` in `AuthView`, replay-protected nonce round-trip. 68 tests passing.
+- **2.3.b** — Google Sign-In (`GoogleSignIn-iOS` SPM + URL scheme + Info.plist). Order matters: SIWA first means we can ship Google later without violating Apple's social-login policy.
 - **2.4** — Child picker against `users/{authedUid}/students/` (multi-child households).
 - **2.x deferred** — Sign-out UI surface (no current way to log out without app reinstall).
 

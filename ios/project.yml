@@ -30,6 +30,11 @@ targets:
       INFOPLIST_FILE: IEPAndThrive/Resources/Info.plist
       GENERATE_INFOPLIST_FILE: YES
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      # Sign in with Apple capability. Building on the simulator (and in
+      # CI with code signing disabled) works without a Team ID; running
+      # on a real device requires the team's signing identity to allow
+      # the entitlement.
+      CODE_SIGN_ENTITLEMENTS: IEPAndThrive/Resources/IEPAndThrive.entitlements
 
   IEPAndThriveTests:
     type: bundle.unit-test

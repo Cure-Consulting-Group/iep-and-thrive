@@ -166,4 +166,90 @@ final class AuthFeatureTests: XCTestCase {
             $0.errorMessage = "There is no user record corresponding to this email."
         }
     }
+
+    // MARK: - Sign in with Apple
+
+    func test_apple_storesNonceFromOnRequest() async {
+        let store = TestStore(initialState: AuthFeature.State()) {
+            AuthFeature()
+        }
+
+        await store.send(.appleNonceGenerated("nonce-abc")) {
+            $0.pendingAppleNonce = "nonce-abc"
+        }
+    }
+
+    func test_apple_credentialReceived_exchangesForFirebaseUid() async {
+        let captured = Box<(idToken: String, rawNonce: String)?>(nil)
+
+        let store = TestStore(initialState: AuthFeature.State()) {
+            AuthFeature()
+        } withDependencies: {
+            $0.authClient.signInWithApple = { idToken, nonce, _ in
+                captured.setValue((idToken, nonce))
+                return "apple-authed-uid"
+            }
+        }
+
+        await store.send(.appleNonceGenerated("nonce-abc")) {
+            $0.pendingAppleNonce = "nonce-abc"
+        }
+        await store.send(.appleCredentialReceived(idToken: "apple-id-token", fullName: nil)) {
+            $0.isSubmitting = true
+            $0.pendingAppleNonce = nil
+        }
+        await store.receive(\.authSucceeded) {
+            $0.isSubmitting = false
+        }
+        await store.receive(\.delegate.signedIn)
+
+        XCTAssertEqual(captured.value?.idToken, "apple-id-token")
+        XCTAssertEqual(captured.value?.rawNonce, "nonce-abc",
+            "Firebase must receive the RAW nonce, not the SHA-256 hash that went to Apple.")
+    }
+
+    func test_apple_credentialWithoutNonce_surfacesError() async {
+        // Guard against a credential arriving before the nonce — would
+        // mean SignInWithAppleButton skipped onRequest somehow. We must
+        // NOT call authClient.signInWithApple without a nonce because
+        // Firebase would reject the credential anyway.
+        let store = TestStore(initialState: AuthFeature.State()) {
+            AuthFeature()
+        } withDependencies: {
+            $0.authClient.signInWithApple = { _, _, _ in
+                XCTFail("Must not exchange a credential without a stored nonce")
+                return ""
+            }
+        }
+
+        await store.send(.appleCredentialReceived(idToken: "tok", fullName: nil)) {
+            $0.errorMessage = "Sign in with Apple did not start cleanly. Please try again."
+        }
+    }
+
+    func test_apple_failure_clearsPendingNonce() async {
+        struct AppleError: Error, LocalizedError {
+            var errorDescription: String? { "Apple credential rejected by Firebase." }
+        }
+
+        let store = TestStore(initialState: AuthFeature.State()) {
+            AuthFeature()
+        } withDependencies: {
+            $0.authClient.signInWithApple = { _, _, _ in throw AppleError() }
+        }
+
+        await store.send(.appleNonceGenerated("nonce")) {
+            $0.pendingAppleNonce = "nonce"
+        }
+        await store.send(.appleCredentialReceived(idToken: "tok", fullName: nil)) {
+            $0.isSubmitting = true
+            $0.pendingAppleNonce = nil
+        }
+        await store.receive(\.authFailed) {
+            $0.isSubmitting = false
+            $0.errorMessage = "Apple credential rejected by Firebase."
+        }
+        // Both state.pendingAppleNonce and state.errorMessage land
+        // as expected — nothing carrying over to a stale retry.
+    }
 }

@@ -20,6 +20,7 @@
 		2111A06EB5F2C147BFDAF8CF /* MathFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1435D1A0416E422C472227A /* MathFeatureTests.swift */; };
 		21F4E022A547E32B613D93D5 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACCD9AE6FF55C034C8DECB4 /* AuthView.swift */; };
 		2C591572EC20F9C6A5CFBEEB /* LiteracyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016321022F483F8A84357FD2 /* LiteracyView.swift */; };
+		2DE2FD1A139C03BD81BDE1FD /* NonceGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D898FAE7F78F64FDA29D0BA1 /* NonceGenerator.swift */; };
 		2EA4E8A5F01360C64864E568 /* RootFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1517E63F9D4532DD4D131426 /* RootFeature.swift */; };
 		3CE9C708E7758EC18CF9233D /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = F4AC7945CBFE12845799735E /* FirebaseAuth */; };
 		410C56A037A7A120CD9BDDA8 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6054114615EB7B0D510461CC /* Theme.swift */; };
@@ -32,6 +33,7 @@
 		5DB7F1ECA737D5B4EEE2EEFB /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD8190FA86DDDC439DA16B4D /* SwiftData.framework */; };
 		5ECB8FCF4C706BA59628BF7D /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63AB19E977899BBFB9AAC6E4 /* CoreHaptics.framework */; };
 		61454E6BDD96128B963845B2 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2AE62A9C3D3C67EE392272 /* Models.swift */; };
+		6E52338CE0FEDDC7C010EA76 /* NonceGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181A759E2FB582C8F42AE420 /* NonceGeneratorTests.swift */; };
 		72F764B1996C801150BA5AEE /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CF1CA3F022055AABBF9F83 /* TestHelpers.swift */; };
 		76E80E8543E9ECD614AD353F /* CasePaths in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2232830F7CAA550E33F587 /* CasePaths */; };
 		783F0FB7DFDE6C7F0798F9C3 /* LiteracyFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E6E5BC83C0A3DCC3F8EF7C /* LiteracyFeatureTests.swift */; };
@@ -78,6 +80,7 @@
 		0951E0242990B2EBBF92BACD /* JourneyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JourneyView.swift; sourceTree = "<group>"; };
 		0B21B34CA778C5279EAF9F9D /* IEPAndThrive.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IEPAndThrive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1517E63F9D4532DD4D131426 /* RootFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootFeature.swift; sourceTree = "<group>"; };
+		181A759E2FB582C8F42AE420 /* NonceGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonceGeneratorTests.swift; sourceTree = "<group>"; };
 		212AB81B43DEB9B917F4F091 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		22E9C1754652EA74DC454588 /* LetterTracer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterTracer.swift; sourceTree = "<group>"; };
 		2E279D8FA47A579701428C26 /* AuthFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFeatureTests.swift; sourceTree = "<group>"; };
@@ -102,6 +105,7 @@
 		A4AB0D13DA6E1B8754315ACE /* RootFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootFeatureTests.swift; sourceTree = "<group>"; };
 		ACAF25BA0BFB1D42FF99C1BD /* LiteracyFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiteracyFeature.swift; sourceTree = "<group>"; };
 		AD8190FA86DDDC439DA16B4D /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
+		ADE9B1F6E3152A4AD4354D6F /* IEPAndThrive.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IEPAndThrive.entitlements; sourceTree = "<group>"; };
 		B1435D1A0416E422C472227A /* MathFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathFeatureTests.swift; sourceTree = "<group>"; };
 		B309FFB8FF9C45E6E27FF359 /* OnboardingFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFeature.swift; sourceTree = "<group>"; };
 		C3A88B65FA36D1F3723BBBFF /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
@@ -110,6 +114,7 @@
 		C9B9EEBD9F2CD7359D8DDCD5 /* LetterTracerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterTracerTests.swift; sourceTree = "<group>"; };
 		CF9D2734ECEE31FC77C549D8 /* SafeSpaceFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeSpaceFeature.swift; sourceTree = "<group>"; };
 		D612A09A3A7AD9BD212BFC7B /* JourneyFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JourneyFeatureTests.swift; sourceTree = "<group>"; };
+		D898FAE7F78F64FDA29D0BA1 /* NonceGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonceGenerator.swift; sourceTree = "<group>"; };
 		DACCD9AE6FF55C034C8DECB4 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		DDC9F611AB7CA4368F7879B7 /* SnapCubesScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapCubesScene.swift; sourceTree = "<group>"; };
 		E071B1F27BDFAF913966D2FC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -279,6 +284,7 @@
 			isa = PBXGroup;
 			children = (
 				6F11D2F142FCE7303149D411 /* AuthClient.swift */,
+				D898FAE7F78F64FDA29D0BA1 /* NonceGenerator.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -291,6 +297,7 @@
 				C9B9EEBD9F2CD7359D8DDCD5 /* LetterTracerTests.swift */,
 				34E6E5BC83C0A3DCC3F8EF7C /* LiteracyFeatureTests.swift */,
 				B1435D1A0416E422C472227A /* MathFeatureTests.swift */,
+				181A759E2FB582C8F42AE420 /* NonceGeneratorTests.swift */,
 				40FBFBB76FC17207D15F15CA /* OnboardingFeatureTests.swift */,
 				A4AB0D13DA6E1B8754315ACE /* RootFeatureTests.swift */,
 				64CF1CA3F022055AABBF9F83 /* TestHelpers.swift */,
@@ -325,6 +332,7 @@
 			children = (
 				7B6EB7E24CB242E803113D13 /* Assets.xcassets */,
 				C841D049B51F4E70EBD40D83 /* GoogleService-Info.plist */,
+				ADE9B1F6E3152A4AD4354D6F /* IEPAndThrive.entitlements */,
 				F09BDECB1508AF4ED1D5E2EE /* Info.plist */,
 			);
 			path = Resources;
@@ -486,6 +494,7 @@
 				B3C967352E075141A8700A62 /* MathView.swift in Sources */,
 				58C4173190B19C09CF127084 /* MissionCompleteView.swift in Sources */,
 				61454E6BDD96128B963845B2 /* Models.swift in Sources */,
+				2DE2FD1A139C03BD81BDE1FD /* NonceGenerator.swift in Sources */,
 				BD8557FC81324535BFA99E81 /* OnboardingFeature.swift in Sources */,
 				4C885A7BE8C2D00E06790601 /* OnboardingView.swift in Sources */,
 				153BB9AEC862C770399118BB /* PaywallFeature.swift in Sources */,
@@ -511,6 +520,7 @@
 				8533D5960B130424A9186127 /* LetterTracerTests.swift in Sources */,
 				783F0FB7DFDE6C7F0798F9C3 /* LiteracyFeatureTests.swift in Sources */,
 				2111A06EB5F2C147BFDAF8CF /* MathFeatureTests.swift in Sources */,
+				6E52338CE0FEDDC7C010EA76 /* NonceGeneratorTests.swift in Sources */,
 				2005A4F860104AC631C7D6B5 /* OnboardingFeatureTests.swift in Sources */,
 				48EF7B6468992C830F493727 /* RootFeatureTests.swift in Sources */,
 				72F764B1996C801150BA5AEE /* TestHelpers.swift in Sources */,
@@ -532,6 +542,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = IEPAndThrive/Resources/IEPAndThrive.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IEPAndThrive/Resources/Info.plist;
@@ -685,6 +696,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = IEPAndThrive/Resources/IEPAndThrive.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IEPAndThrive/Resources/Info.plist;

@@ -1,6 +1,9 @@
 import ComposableArchitecture
 import FirebaseAuth
 import Foundation
+#if canImport(AuthenticationServices)
+import AuthenticationServices
+#endif
 
 /// Firebase Auth wrapper. Phase 1 exposes anonymous sign-in (every
 /// device gets a stable durable UID). Phase 2.2 adds email/password
@@ -27,6 +30,16 @@ struct AuthClient {
     /// Sign out of the current account. Next launch will fall back to
     /// anonymous sign-in via `signInAnonymously()`.
     var signOut: @Sendable () async throws -> Void
+
+    /// Exchange an Apple ID token (from `SignInWithAppleButton`) for a
+    /// Firebase credential and complete the sign-in. The raw nonce is
+    /// the same one the View hashed before sending to Apple — Firebase
+    /// verifies the hash matches the ID token's claim.
+    var signInWithApple: @Sendable (
+        _ idToken: String,
+        _ rawNonce: String,
+        _ fullName: PersonNameComponents?
+    ) async throws -> String
 }
 
 extension AuthClient: DependencyKey {
@@ -51,6 +64,15 @@ extension AuthClient: DependencyKey {
         },
         signOut: {
             try Auth.auth().signOut()
+        },
+        signInWithApple: { idToken, rawNonce, fullName in
+            let credential = OAuthProvider.appleCredential(
+                withIDToken: idToken,
+                rawNonce: rawNonce,
+                fullName: fullName
+            )
+            let result = try await Auth.auth().signIn(with: credential)
+            return result.user.uid
         }
     )
 
@@ -59,7 +81,8 @@ extension AuthClient: DependencyKey {
         currentUserId: { "test-uid" },
         signIn: { _, _ in "authed-uid" },
         signUp: { _, _ in "authed-uid" },
-        signOut: { }
+        signOut: { },
+        signInWithApple: { _, _, _ in "authed-uid" }
     )
 }
 
