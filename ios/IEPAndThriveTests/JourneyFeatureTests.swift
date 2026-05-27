@@ -58,7 +58,9 @@ final class JourneyFeatureTests: XCTestCase {
 
     func test_missionComplete_advancesIndexAndAwardsSparks() async {
         let sparksAwarded = Box<SparksRecord?>(nil)
-        let firestoreSync = Box<(String, SparksRecordDTO)?>(nil)
+        let progressSaved = Box<LessonProgress?>(nil)
+        let sparksSync = Box<(String, SparksRecordDTO)?>(nil)
+        let lessonSync = Box<(String, LessonProgressDTO)?>(nil)
 
         let store = TestStore(
             initialState: JourneyFeature.State(
@@ -71,9 +73,15 @@ final class JourneyFeatureTests: XCTestCase {
             $0.database.addSparks = { record in
                 sparksAwarded.setValue(record)
             }
+            $0.database.saveProgress = { record in
+                progressSaved.setValue(record)
+            }
             $0.authClient.currentUserId = { "test-uid" }
             $0.firestoreClient.syncSparks = { uid, dto in
-                firestoreSync.setValue((uid, dto))
+                sparksSync.setValue((uid, dto))
+            }
+            $0.firestoreClient.syncLesson = { uid, dto in
+                lessonSync.setValue((uid, dto))
             }
         }
 
@@ -90,10 +98,51 @@ final class JourneyFeatureTests: XCTestCase {
         await store.finish()
         XCTAssertEqual(sparksAwarded.value?.amount, 10)
         XCTAssertEqual(sparksAwarded.value?.reason, "mission_complete")
-        // The same record (same UUID) must reach Firestore.
-        XCTAssertEqual(firestoreSync.value?.0, "test-uid")
-        XCTAssertEqual(firestoreSync.value?.1.id, sparksAwarded.value?.id,
-            "Local + cloud writes must share a UUID so they stay in lockstep.")
+        // Both records reach Firestore with their local UUIDs (lockstep).
+        XCTAssertEqual(sparksSync.value?.0, "test-uid")
+        XCTAssertEqual(sparksSync.value?.1.id, sparksAwarded.value?.id,
+            "Sparks local + cloud writes must share a UUID.")
+        XCTAssertEqual(lessonSync.value?.0, "test-uid")
+        XCTAssertEqual(lessonSync.value?.1.id, progressSaved.value?.id,
+            "Lesson local + cloud writes must share a UUID.")
+    }
+
+    func test_missionComplete_lessonProgressShape() async {
+        // Verify the LessonProgress record carries the right metadata —
+        // levelIndex maps the curriculum position, category names the
+        // discipline ('literacy'/'math'), isCompleted reflects success.
+        let progressSaved = Box<LessonProgress?>(nil)
+
+        let store = TestStore(
+            initialState: JourneyFeature.State(
+                currentLevelIndex: 1,
+                levels: Self.testLevels  // 3 literacy levels
+            )
+        ) {
+            JourneyFeature()
+        } withDependencies: {
+            $0.database.addSparks = { _ in }
+            $0.database.saveProgress = { record in
+                progressSaved.setValue(record)
+            }
+            $0.authClient.currentUserId = { nil }  // skip Firestore branch
+        }
+
+        let level = Self.testLevels[1]  // index 1 in test fixture
+        await store.send(.missionComplete(level)) {
+            $0.sparksCount = 10
+            $0.currentLevelIndex = 2
+            $0.missionComplete = MissionCompleteFeature.State(
+                levelTitle: level.title,
+                sparksAwarded: 10
+            )
+        }
+        await store.finish()
+
+        XCTAssertEqual(progressSaved.value?.levelIndex, 1)
+        XCTAssertEqual(progressSaved.value?.category, "literacy")
+        XCTAssertEqual(progressSaved.value?.isCompleted, true)
+        XCTAssertEqual(progressSaved.value?.score, 10)
     }
 
     func test_missionComplete_doesNotAdvanceIndex_whenReplayingPreviousLevel() async {
