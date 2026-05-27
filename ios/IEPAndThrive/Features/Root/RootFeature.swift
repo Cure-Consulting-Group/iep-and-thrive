@@ -7,6 +7,7 @@ struct RootFeature {
         var journey = JourneyFeature.State()
         var onboarding = OnboardingFeature.State()
         @PresentationState var paywall: PaywallFeature.State?
+        @PresentationState var auth: AuthFeature.State?
         var path = StackState<Path.State>()
 
         var isUserOnboarded: Bool = false
@@ -15,11 +16,12 @@ struct RootFeature {
         /// resolves on launch. Used downstream for Firestore sync addressing.
         var currentUid: String? = nil
     }
-    
+
     enum Action {
         case journey(JourneyFeature.Action)
         case onboarding(OnboardingFeature.Action)
         case paywall(PresentationAction<PaywallFeature.Action>)
+        case auth(PresentationAction<AuthFeature.Action>)
         case path(StackAction<Path.State, Path.Action>)
         case appDelegate(AppDelegateAction)
         case authResolved(String)
@@ -34,6 +36,7 @@ struct RootFeature {
     @Dependency(\.database) var database
     @Dependency(\.storeKit) var storeKit
     @Dependency(\.authClient) var authClient
+    @Dependency(\.firestoreClient) var firestoreClient
     
     var body: some ReducerOf<Self> {
         Scope(state: \.journey, action: \.journey) {
@@ -89,6 +92,22 @@ struct RootFeature {
                     state.paywall = PaywallFeature.State()
                 }
                 return .none
+
+            case .onboarding(.signInTapped):
+                state.auth = AuthFeature.State()
+                return .none
+
+            case let .auth(.presented(.delegate(.signedIn(uid: newUid)))):
+                // Phase 2.2 migration: copy anon UID's Firestore data
+                // under the new authenticated UID's paths. Local
+                // SwiftData stays as-is — it was always device-bound.
+                let oldUid = state.currentUid
+                state.currentUid = newUid
+                return .run { [firestoreClient] _ in
+                    if let oldUid, oldUid != newUid {
+                        try? await firestoreClient.migrateAnonData(oldUid, newUid)
+                    }
+                }
                 
             case let .journey(.levelPreview(.presented(.startButtonTapped(level)))):
                 state.journey.levelPreview = nil
@@ -133,12 +152,15 @@ struct RootFeature {
                 state.path.removeLast()
                 return .none
 
-            case .journey, .onboarding, .path, .paywall:
+            case .journey, .onboarding, .path, .paywall, .auth:
                 return .none
             }
         }
         .ifLet(\.$paywall, action: \.paywall) {
             PaywallFeature()
+        }
+        .ifLet(\.$auth, action: \.auth) {
+            AuthFeature()
         }
         .forEach(\.path, action: \.path) {
             Path()

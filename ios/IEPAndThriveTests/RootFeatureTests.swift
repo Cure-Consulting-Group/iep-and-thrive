@@ -41,6 +41,75 @@ final class RootFeatureTests: XCTestCase {
         await store.finish()
     }
 
+    // MARK: - Auth modal + anon→authenticated migration
+
+    func test_onboardingSignInTapped_presentsAuthSheet() async {
+        let store = TestStore(initialState: RootFeature.State()) {
+            RootFeature()
+        }
+
+        await store.send(.onboarding(.signInTapped)) {
+            $0.auth = AuthFeature.State()
+        }
+    }
+
+    func test_authSignedIn_triggersMigrationAndUpdatesUid() async {
+        // The Phase 2.2 migration: when AuthFeature emits its delegate
+        // .signedIn, RootFeature must call firestoreClient.migrateAnonData
+        // with the OLD anon UID → NEW authed UID, and swap currentUid.
+        let migrateCall = Box<(String, String)?>(nil)
+
+        var initial = RootFeature.State()
+        initial.currentUid = "anon-uid"
+        initial.auth = AuthFeature.State()
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.firestoreClient.migrateAnonData = { anon, authed in
+                migrateCall.setValue((anon, authed))
+            }
+        }
+        // The Auth reducer also dispatches a dismiss effect after the
+        // delegate fires — we don't care about asserting that here.
+        store.exhaustivity = .off
+
+        await store.send(.auth(.presented(.delegate(.signedIn(uid: "new-authed-uid"))))) {
+            $0.currentUid = "new-authed-uid"
+        }
+        await store.finish()
+
+        XCTAssertEqual(migrateCall.value?.0, "anon-uid")
+        XCTAssertEqual(migrateCall.value?.1, "new-authed-uid")
+    }
+
+    func test_authSignedIn_skipsMigration_whenNoAnonUid() async {
+        // If somehow auth resolves before anon (no currentUid), we
+        // must NOT call migrateAnonData with an empty source.
+        let migrateCalled = Box(false)
+
+        var initial = RootFeature.State()
+        initial.currentUid = nil
+        initial.auth = AuthFeature.State()
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.firestoreClient.migrateAnonData = { _, _ in
+                migrateCalled.setValue(true)
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.auth(.presented(.delegate(.signedIn(uid: "authed"))))) {
+            $0.currentUid = "authed"
+        }
+        await store.finish()
+
+        XCTAssertFalse(migrateCalled.value,
+            "Migration must be skipped if there's no anon UID to migrate FROM.")
+    }
+
     // MARK: - Onboarding → Paywall
 
     func test_onboardingComplete_marksOnboardedAndPresentsPaywall() async {

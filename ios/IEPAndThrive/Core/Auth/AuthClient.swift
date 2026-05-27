@@ -2,10 +2,10 @@ import ComposableArchitecture
 import FirebaseAuth
 import Foundation
 
-/// Firebase Auth wrapper. Phase 1 only exposes anonymous sign-in —
-/// every device gets a stable, durable UID with no UI friction. Phase 2
-/// will add email/password + child picker and migrate the anonymous
-/// UID's data to the parent's authenticated account.
+/// Firebase Auth wrapper. Phase 1 exposes anonymous sign-in (every
+/// device gets a stable durable UID). Phase 2.2 adds email/password
+/// sign-in + sign-up + sign-out, and the parent flow migrates the
+/// anonymous UID's Firestore data under the new authenticated UID.
 struct AuthClient {
     /// Returns the current user's UID, signing in anonymously if no
     /// session exists. Idempotent — safe to call multiple times.
@@ -14,6 +14,19 @@ struct AuthClient {
     /// Synchronous access to the currently signed-in UID. Returns nil
     /// before `signInAnonymously` has resolved.
     var currentUserId: @Sendable () -> String?
+
+    /// Email/password sign-in for an existing parent account. Replaces
+    /// any active anonymous session — caller is responsible for
+    /// migrating the anon UID's data before this overwrites it.
+    var signIn: @Sendable (_ email: String, _ password: String) async throws -> String
+
+    /// Email/password sign-up. Creates a new Firebase Auth user and
+    /// returns the new UID. Parent caller migrates anon data to it.
+    var signUp: @Sendable (_ email: String, _ password: String) async throws -> String
+
+    /// Sign out of the current account. Next launch will fall back to
+    /// anonymous sign-in via `signInAnonymously()`.
+    var signOut: @Sendable () async throws -> Void
 }
 
 extension AuthClient: DependencyKey {
@@ -27,12 +40,26 @@ extension AuthClient: DependencyKey {
         },
         currentUserId: {
             Auth.auth().currentUser?.uid
+        },
+        signIn: { email, password in
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            return result.user.uid
+        },
+        signUp: { email, password in
+            let result = try await Auth.auth().createUser(withEmail: email, password: password)
+            return result.user.uid
+        },
+        signOut: {
+            try Auth.auth().signOut()
         }
     )
 
     static let testValue = Self(
         signInAnonymously: { "test-uid" },
-        currentUserId: { "test-uid" }
+        currentUserId: { "test-uid" },
+        signIn: { _, _ in "authed-uid" },
+        signUp: { _, _ in "authed-uid" },
+        signOut: { }
     )
 }
 

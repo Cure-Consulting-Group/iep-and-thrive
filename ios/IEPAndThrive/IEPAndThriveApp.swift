@@ -67,6 +67,14 @@ struct RootView: View {
             ) { store in
                 PaywallView(store: store)
             }
+            .sheet(
+                store: self.store.scope(
+                    state: \.$auth,
+                    action: \.auth
+                )
+            ) { store in
+                AuthView(store: store)
+            }
         }
     }
 }
