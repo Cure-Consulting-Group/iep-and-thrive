@@ -39,11 +39,26 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 - **`LetterTracer`** — CoreText glyph paths → flipped/centered `CGPath` → stroke-inflated for `contains(point)` accuracy + sampled anchors for coverage. Pass requires accuracy ≥ 0.55 AND coverage ≥ 0.45 (forgiving for SPED motor-skill learners).
 - **`SandTrayView`** — `GeometryReader` captures canvas size for the tracer; strokes shift to forestLight on a passing trace; Done button morphs into "✓ Great Job!" capsule; new undo button; amber hint chip on misses. Done remains always-tappable — visual feedback is the carrot, not the stick.
 
+## Sprint 7 — In Flight
+
+### PR (open) — Test harness
+- `IEPAndThriveTests` XCTest target added to `project.yml`.
+- TCA `TestStore` coverage for `OnboardingFeature`, `JourneyFeature`,
+  `MathFeature`, `LiteracyFeature`, and `RootFeature` orchestration —
+  with explicit regression guards on the PR #9 silent-correctness bugs
+  (back chevron / incorrect Math attempts must NOT award completion).
+- `LetterTracer` geometry tests cover empty / single-point / off-canvas
+  / dense-trace cases at the production 0.55 accuracy / 0.45 coverage
+  thresholds.
+- `DatabaseClient` got a `testValue` stub (TCA hygiene — was missing).
+- CI workflow runs `xcodebuild test` after `build` on macos-15 / Xcode
+  16.4. Note: local Xcode 26 build-for-testing trips a transitive-Swift
+  package linker issue (`Dependencies`, `CasePathsCore`); CI is the
+  source of truth.
+
 ## Next Steps
-- **Design assets:** Distinct `BiomeDesert.imageset` and `BiomeMountain.imageset` art (currently empty — only `BiomeForest` has a real image, biomes are differentiated via gradient overlay).
 - **Firebase sync:** Wire `StudentProfile`, `LessonProgress`, and `SparksRecord` to Firestore (SwiftData is local-only today).
-- **CI:** Bump the GitHub Actions Swift toolchain to 6.1 — TCA 1.25.5 requires it; `Build and Check` is currently red on every PR. Restore the GitHub Packages auth token for Playwright `npm ci`.
-- **Test harness:** No XCTest/TestStore target in `project.yml` yet. Adding one unlocks unit tests for the reducers and the `LetterTracer` math.
+- **Design assets:** Distinct `BiomeDesert.imageset` and `BiomeMountain.imageset` art (currently empty — only `BiomeForest` has a real image, biomes are differentiated via gradient overlay).
 - **Threshold tuning:** Sand Tray accuracy/coverage thresholds (0.55/0.45) and Math `targetCount` values are starting points — revisit once we have real session telemetry.
 - **Paywall UX:** Currently auto-presents after onboarding (`RootFeature.swift:56–58, 70–72`) before the child sees any of the journey. Consider deferring until N levels completed.
 - **Per-glyph stroke order:** Sand Tray validates final shape, not stroke sequence. Out of scope for this sprint; future enhancement.

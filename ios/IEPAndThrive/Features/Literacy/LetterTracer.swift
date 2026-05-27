@@ -24,7 +24,10 @@ struct LetterTracer {
     let tolerance: CGFloat
 
     private let inflatedPath: CGPath
-    private let anchors: [CGPoint]
+    // Internal (not private) so unit tests can construct a "passing trace"
+    // by replaying the anchor points the validator samples from the glyph
+    // outline. Production code should not depend on this.
+    let anchors: [CGPoint]
 
     init(target: String, canvasSize: CGSize, fontPointSize: CGFloat = 300, tolerance: CGFloat = 40) {
         self.target = target
