@@ -81,14 +81,14 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 - **2.3.a — merged (#23)** — Sign in with Apple.
 - **2.3.b — merged (#24)** — Google Sign-In.
 - **2.4 — merged (#25)** — Child picker for multi-child households. `FirestoreClient` refactored so every write takes a `studentId` parameter; post-auth flow auto-resolves on 0/1 students or surfaces `ChildPickerView` on 2+.
-- **2.x deferred** — Sign-out UI surface (no current way to log out without app reinstall).
+- **2.x deferred** — Sign-out UI surface (now landing in 3.4).
 
 ## Sprint 8 (Phase 3) — Launch readiness for July 7 cohort
 
 ### Phase 3 — staged delivery
-- **3.3 — open PR** — Crashlytics + observability foundation. `CrashlyticsClient` TCA dependency (log breadcrumbs, recordError with domain, setUserId). All `try?`-swallowed Firestore / SwiftData / Auth errors now record as non-fatals. User ID wired in `authResolved` + `auth.delegate.signedIn`. Breadcrumbs at every key signal point (mission complete, literacy trace pass/fail, math check pass/fail, auth flow). dSYM upload run script added via `postBuildScripts` so production stack traces symbolicate. 84 tests passing.
-- **3.4** — UX polish (defer paywall, sign-out UI, distinct Desert/Mountain biome art).
-- **3.1** — Web portal ↔ iOS data unification (parent dashboard reads iOS Firestore subcollections).
+- **3.3 — merged (#26)** — Crashlytics + observability foundation.
+- **3.4 — open PR (#27)** — UX polish: defer paywall to 30 sparks + sign-out UI.
+- **3.1 — open PR (#28)** — Web portal ↔ iOS data unification. `lib/ios-progress.ts` Firestore reads + Zod schema validation for the iOS-written subcollections. New `IOSSessionTile` on `/portal` per enrolled student showing lessons + sparks totals + last activity. New `/portal/students/[studentId]/sessions` page with a merged lesson/sparks timeline. 8 schema tests passing via `node --test`. Web work — independent of the iOS PR stack.
 - **3.5** — Privacy manifest + FERPA/COPPA compliance review.
 - **3.2** — TestFlight distribution (Fastlane + App Store Connect listing).
 - **3.6 / 3.7** — Manual QA + pilot rollout to 3–5 enrolled families.

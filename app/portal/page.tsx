@@ -12,6 +12,7 @@ import {
   getWeeklyProgressForStudent,
   WeeklyStudentProgress,
 } from '@/lib/portal-progress'
+import { IOSSessionTile } from '@/components/portal/IOSSessionTile'
 import { getUnreadCount } from '@/lib/notification-service'
 import { getUserSubscription } from '@/lib/subscription-service'
 import { sessionsRemaining, type SubscriptionState } from '@/lib/subscription'
@@ -450,6 +451,24 @@ export default function PortalDashboard() {
                     student={s}
                     progress={progress[s.id] || null}
                     loading={progressLoading && !progress[s.id]}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* iPad activity — per enrolled student (Phase 3.1) */}
+          {user && enrolledStudents.length > 0 && (
+            <div className="mb-8">
+              <h2 className="font-display text-sm font-semibold text-text-muted uppercase mb-3">
+                iPad Activity
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {enrolledStudents.map((s) => (
+                  <IOSSessionTile
+                    key={s.id}
+                    parentUid={user.uid}
+                    student={s}
                   />
                 ))}
               </div>
