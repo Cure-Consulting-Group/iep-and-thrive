@@ -74,6 +74,7 @@ struct AuthFeature {
     }
 
     @Dependency(\.authClient) var authClient
+    @Dependency(\.crashlyticsClient) var crashlyticsClient
     @Dependency(\.dismiss) var dismiss
 
     var body: some ReducerOf<Self> {
@@ -126,7 +127,9 @@ struct AuthFeature {
                 state.isSubmitting = false
                 state.errorMessage = message
                 state.pendingAppleNonce = nil
-                return .none
+                return .run { [crashlyticsClient] _ in
+                    crashlyticsClient.log("auth: failed message=\(message)")
+                }
 
             case .dismissTapped:
                 return .run { _ in await dismiss() }

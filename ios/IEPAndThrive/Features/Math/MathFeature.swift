@@ -38,6 +38,8 @@ struct MathFeature {
         case dismissHint
     }
 
+    @Dependency(\.crashlyticsClient) var crashlyticsClient
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -52,11 +54,18 @@ struct MathFeature {
                 return .none
 
             case .checkAnswerTapped:
+                let target = state.targetCount
+                let actual = state.currentCount
+                let pass = state.isCorrect
+                let levelId = state.level.id
                 if !state.isCorrect {
                     state.showIncorrectHint = true
-                    return .none
                 }
-                return .none
+                return .run { [crashlyticsClient] _ in
+                    crashlyticsClient.log(
+                        "math: check level=\(levelId) target=\(target.map(String.init) ?? "nil") actual=\(actual) pass=\(pass)"
+                    )
+                }
 
             case .dismissHint:
                 state.showIncorrectHint = false

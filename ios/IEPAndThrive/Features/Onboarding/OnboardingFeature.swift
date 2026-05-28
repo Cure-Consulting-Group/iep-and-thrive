@@ -46,6 +46,7 @@ struct OnboardingFeature {
     @Dependency(\.database) var database
     @Dependency(\.firestoreClient) var firestoreClient
     @Dependency(\.authClient) var authClient
+    @Dependency(\.crashlyticsClient) var crashlyticsClient
 
     static let ageRange: ClosedRange<Int> = 5...11
 
@@ -73,10 +74,19 @@ struct OnboardingFeature {
                 // real studentId after sign-in (Phase 2.4) and writes
                 // from then on land at that picked path.
                 let studentId = FirestoreSchema.defaultStudentId
-                return .run { [authClient, firestoreClient, database] send in
-                    try? await database.saveProfile(profile)
+                return .run { [authClient, firestoreClient, database, crashlyticsClient] send in
+                    crashlyticsClient.log("onboarding: continueTapped firstName=\(profile.firstName)")
+                    do {
+                        try await database.saveProfile(profile)
+                    } catch {
+                        crashlyticsClient.recordError(error, "swiftdata.saveProfile")
+                    }
                     if let uid = authClient.currentUserId() {
-                        try? await firestoreClient.syncProfile(uid, studentId, profile.dto)
+                        do {
+                            try await firestoreClient.syncProfile(uid, studentId, profile.dto)
+                        } catch {
+                            crashlyticsClient.recordError(error, "firestore.syncProfile")
+                        }
                     }
                     await send(.profileSaved)
                 }

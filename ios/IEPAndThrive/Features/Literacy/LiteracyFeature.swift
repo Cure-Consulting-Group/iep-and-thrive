@@ -24,6 +24,7 @@ struct LiteracyFeature {
     }
 
     @Dependency(SpeechClient.self) var speechClient
+    @Dependency(\.crashlyticsClient) var crashlyticsClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -35,7 +36,12 @@ struct LiteracyFeature {
             case let .tracingEnded(success):
                 state.isTracingComplete = success
                 state.showTraceHint = !success
-                return .none
+                let letter = state.currentLetter
+                return .run { [crashlyticsClient] _ in
+                    crashlyticsClient.log(
+                        "literacy: tracingEnded letter=\(letter) pass=\(success)"
+                    )
+                }
 
             case .speakLetterTapped:
                 let text = state.currentLetter

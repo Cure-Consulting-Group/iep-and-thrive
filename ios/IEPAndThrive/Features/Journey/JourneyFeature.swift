@@ -35,6 +35,7 @@ struct JourneyFeature {
     @Dependency(\.database) var database
     @Dependency(\.firestoreClient) var firestoreClient
     @Dependency(\.authClient) var authClient
+    @Dependency(\.crashlyticsClient) var crashlyticsClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -64,7 +65,7 @@ struct JourneyFeature {
                     sparksAwarded: 10
                 )
                 let studentId = state.studentId
-                return .run { [authClient, firestoreClient, database] _ in
+                return .run { [authClient, firestoreClient, database, crashlyticsClient] _ in
                     // Build both records once with stable UUIDs so the
                     // local SwiftData write and the Firestore sync stay
                     // in lockstep — same id on both sides.
@@ -75,11 +76,30 @@ struct JourneyFeature {
                         isCompleted: true,
                         score: 10
                     )
-                    try? await database.addSparks(sparks)
-                    try? await database.saveProgress(progress)
+                    crashlyticsClient.log(
+                        "mission_complete: level=\(level.id) category=\(level.category.rawValue)"
+                    )
+                    do {
+                        try await database.addSparks(sparks)
+                    } catch {
+                        crashlyticsClient.recordError(error, "swiftdata.addSparks")
+                    }
+                    do {
+                        try await database.saveProgress(progress)
+                    } catch {
+                        crashlyticsClient.recordError(error, "swiftdata.saveProgress")
+                    }
                     if let uid = authClient.currentUserId() {
-                        try? await firestoreClient.syncSparks(uid, studentId, sparks.dto)
-                        try? await firestoreClient.syncLesson(uid, studentId, progress.dto)
+                        do {
+                            try await firestoreClient.syncSparks(uid, studentId, sparks.dto)
+                        } catch {
+                            crashlyticsClient.recordError(error, "firestore.syncSparks")
+                        }
+                        do {
+                            try await firestoreClient.syncLesson(uid, studentId, progress.dto)
+                        } catch {
+                            crashlyticsClient.recordError(error, "firestore.syncLesson")
+                        }
                     }
                 }
 
