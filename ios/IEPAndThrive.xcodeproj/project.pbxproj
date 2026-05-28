@@ -27,6 +27,7 @@
 		3CE9C708E7758EC18CF9233D /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = F4AC7945CBFE12845799735E /* FirebaseAuth */; };
 		410C56A037A7A120CD9BDDA8 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6054114615EB7B0D510461CC /* Theme.swift */; };
 		426A50F8F2C772DE837F739C /* StoreKitClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857FFBDD078E2E25D5349F46 /* StoreKitClient.swift */; };
+		42E03CDE71DBDA966B5EADF6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FC9B5AA7FC3DE4F375AC885E /* PrivacyInfo.xcprivacy */; };
 		4384B612564CAD35A4B7DBF2 /* CrashlyticsClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D0563AEC4458FFB7D1226C /* CrashlyticsClientTests.swift */; };
 		4567834D4682137C4B24E9BF /* MathFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B01DC43CB2605246AB27E97 /* MathFeature.swift */; };
 		45FF0EC1B4D3EA1AB30588B9 /* SpeechClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A114507FB80443206E2FF3 /* SpeechClient.swift */; };
@@ -145,6 +146,7 @@
 		F09BDECB1508AF4ED1D5E2EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F2D218F7A142A1FCCF272ACA /* FirestoreDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreDTOs.swift; sourceTree = "<group>"; };
 		F78598283E84A8525888BED2 /* AudioClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioClient.swift; sourceTree = "<group>"; };
+		FC9B5AA7FC3DE4F375AC885E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -388,6 +390,7 @@
 				C841D049B51F4E70EBD40D83 /* GoogleService-Info.plist */,
 				ADE9B1F6E3152A4AD4354D6F /* IEPAndThrive.entitlements */,
 				F09BDECB1508AF4ED1D5E2EE /* Info.plist */,
+				FC9B5AA7FC3DE4F375AC885E /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -524,6 +527,7 @@
 			files = (
 				DC08E5B51199475F82170487 /* Assets.xcassets in Resources */,
 				A406CE4FF5CF00986424E86B /* GoogleService-Info.plist in Resources */,
+				42E03CDE71DBDA966B5EADF6 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

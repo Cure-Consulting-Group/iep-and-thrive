@@ -87,11 +87,18 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 
 ### Phase 3 — staged delivery
 - **3.3 — merged (#26)** — Crashlytics + observability foundation.
-- **3.4 — open PR (#27)** — UX polish: paywall deferred to 3 missions / 30 sparks (one-shot guard so it doesn't re-present after dismiss); settings cog on `JourneyView` opens a `SettingsFeature` sheet with UID display + Sign Out (resets state, restarts anon sign-in). Biome art still deferred pending Desert/Mountain assets. 95 tests passing.
+- **3.4 — merged (#27)** — UX polish: paywall deferred to 3 missions / 30 sparks + sign-out UI on JourneyView.
 - **3.1 — merged (#28)** — Web portal ↔ iOS data unification.
-- **3.5** — Privacy manifest + FERPA/COPPA compliance review.
-- **3.2** — TestFlight distribution (Fastlane + App Store Connect listing).
+- **3.5 — open PR (#29)** — Privacy manifest + compliance docs. Apple-required `PrivacyInfo.xcprivacy` declares all 6 collected data categories + 4 required-reason APIs. Privacy policy + compliance framework updated for iOS data flows. New `docs/legal/data-deletion-process.md` documents the manual COPPA deletion runbook until Phase 4 ships the automated UI.
+- **3.2 — open PR (#30)** — TestFlight distribution. Fastlane `beta` lane + tag-triggered GitHub Actions workflow + 7-step operator runbook. Engineering complete; operator-side Apple ops outstanding.
 - **3.6 / 3.7** — Manual QA + pilot rollout to 3–5 enrolled families.
+
+### Phase 3 — open legal-review items
+The privacy + compliance work in 3.5 is engineering scaffolding; the published versions need attorney sign-off before pilot. Specific items flagged in the docs:
+- Privacy Policy `[!CAUTION]` — entire scaffold needs attorney review before publishing.
+- Data-deletion SLA (30 days) — confirm with counsel.
+- Auth-account deletion when parent has active web enrollment — confirm policy with counsel.
+- Crashlytics 90-day passive retention vs explicit deletion — confirm with counsel.
 
 ## Next Steps
 - **Design assets:** Distinct `BiomeDesert.imageset` and `BiomeMountain.imageset` art (currently empty — only `BiomeForest` has a real image, biomes are differentiated via gradient overlay).

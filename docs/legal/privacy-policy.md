@@ -54,7 +54,28 @@ This policy is designed to align with the following regulations:
 | **Device Information** | Browser type, OS, screen size | Website optimization |
 | **Cookies** | Session cookies, functional cookies | Website functionality |
 
-### 3.3 Information We Do NOT Collect
+### 3.3 Information Collected by the IEP & Thrive iOS App
+
+The iOS companion app (used by children during the summer intensive program) collects a narrower set of information than the website. The Apple App Store privacy manifest (`PrivacyInfo.xcprivacy`) in the app bundle is the authoritative engineering record; the table below is its plain-language translation.
+
+| Category | Examples | Storage | Purpose |
+|----------|----------|---------|---------|
+| **Child's name + age** | First name and age entered during onboarding | Firebase Firestore (`users/{uid}/students/{id}/profile`); also cached locally on the device via SwiftData | Personalizing the journey UI, addressing the child by name |
+| **Firebase Auth ID** | Anonymous device-bound UID (default), or the parent's authenticated UID after sign-in | Firebase Authentication | Identifying the device/account for syncing progress |
+| **Parent email** | Only when the parent signs in with email/password (Google and Apple sign-in flows expose the parent's email to Firebase Auth as well) | Firebase Authentication | Linking the iPad's data to the parent's portal account |
+| **Learning progress** | Lessons completed, scores, sparks awarded, mission timestamps | Firebase Firestore (`users/{uid}/students/{id}/lessons` and `.../sparks`) | Surfacing progress in the parent portal; in-app journey state |
+| **Crash diagnostics** | Stack traces, breadcrumbs (e.g., "mission_complete: level=lit-1") | Firebase Crashlytics (Google) | Diagnosing and fixing app crashes |
+
+The iOS app does **NOT** collect:
+- Location data (GPS or otherwise)
+- Audio recordings, video, or photos of the child
+- Contacts, calendar, or any other on-device data outside the app's own sandbox
+- Advertising identifiers or any data used for cross-app tracking
+- Health, biometric, or financial information
+
+The Apple App Store listing reflects these declarations on the "App Privacy" card.
+
+### 3.4 Information We Do NOT Collect
 - We do not collect data directly from children online
 - We do not use behavioral advertising or tracking pixels
 - We do not sell, rent, or share personal information with third parties for marketing purposes
@@ -130,6 +151,10 @@ We implement reasonable administrative, technical, and physical safeguards to pr
 | Progress reports | 3 years (copy retained; original provided to parent) | Program improvement, re-enrollment support |
 | Payment records | 7 years | Tax and financial compliance |
 | Website analytics | 24 months | Aggregated, anonymized |
+| iOS app — child profile + learning progress (Firestore) | Retained until parent requests deletion, or 12 months after the family's last enrollment | Allows returning families to resume on iPad without re-onboarding |
+| iOS app — Crashlytics data | 90 days (Crashlytics platform default) | Engineering diagnosis only |
+
+**iOS app deletion:** Parents may request deletion of their child's iOS-stored data at any time by emailing hello@iepandthrive.com. Until an automated deletion UI ships, the request is processed manually within 30 days (see `docs/legal/data-deletion-process.md`).
 
 ---
 
