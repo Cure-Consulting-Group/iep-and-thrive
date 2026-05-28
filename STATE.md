@@ -87,8 +87,8 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 
 ### Phase 3 — staged delivery
 - **3.3 — merged (#26)** — Crashlytics + observability foundation.
-- **3.4 — open PR (#27)** — UX polish: defer paywall to 30 sparks + sign-out UI.
-- **3.1 — open PR (#28)** — Web portal ↔ iOS data unification. `lib/ios-progress.ts` Firestore reads + Zod schema validation for the iOS-written subcollections. New `IOSSessionTile` on `/portal` per enrolled student showing lessons + sparks totals + last activity. New `/portal/students/[studentId]/sessions` page with a merged lesson/sparks timeline. 8 schema tests passing via `node --test`. Web work — independent of the iOS PR stack.
+- **3.4 — open PR (#27)** — UX polish: paywall deferred to 3 missions / 30 sparks (one-shot guard so it doesn't re-present after dismiss); settings cog on `JourneyView` opens a `SettingsFeature` sheet with UID display + Sign Out (resets state, restarts anon sign-in). Biome art still deferred pending Desert/Mountain assets. 95 tests passing.
+- **3.1 — merged (#28)** — Web portal ↔ iOS data unification.
 - **3.5** — Privacy manifest + FERPA/COPPA compliance review.
 - **3.2** — TestFlight distribution (Fastlane + App Store Connect listing).
 - **3.6 / 3.7** — Manual QA + pilot rollout to 3–5 enrolled families.

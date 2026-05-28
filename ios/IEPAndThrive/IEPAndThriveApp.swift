@@ -90,6 +90,14 @@ struct RootView: View {
             ) { store in
                 ChildPickerView(store: store)
             }
+            .sheet(
+                store: self.store.scope(
+                    state: \.$settings,
+                    action: \.settings
+                )
+            ) { store in
+                SettingsView(store: store)
+            }
         }
     }
 }

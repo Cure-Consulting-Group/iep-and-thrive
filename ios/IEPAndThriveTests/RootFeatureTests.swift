@@ -208,31 +208,182 @@ final class RootFeatureTests: XCTestCase {
             "Migration target must be the freshly-minted UUID.")
     }
 
-    // MARK: - Onboarding → Paywall
+    // MARK: - Onboarding → no auto-paywall (Phase 3.4 deferred it)
 
-    func test_onboardingComplete_marksOnboardedAndPresentsPaywall() async {
+    func test_onboardingComplete_marksOnboardedButDoesNotPresentPaywall() async {
+        // Phase 3.4 defers the paywall to after 3 missions. Onboarding
+        // complete just marks the flag — paywall stays nil.
         let store = TestStore(initialState: RootFeature.State()) {
             RootFeature()
         }
 
         await store.send(.onboarding(.onboardingComplete)) {
             $0.isUserOnboarded = true
-            $0.paywall = PaywallFeature.State()
         }
+        XCTAssertNil(store.state.paywall,
+            "Paywall must not auto-present after onboarding — Phase 3.4 deferred this.")
     }
 
-    func test_onboardingComplete_doesNotShowPaywall_whenAlreadyPremium() async {
+    func test_profileLoaded_doesNotPresentPaywall() async {
+        // Same deferral applies to the launch flow when a returning
+        // user's profile loads.
+        let store = TestStore(initialState: RootFeature.State()) {
+            RootFeature()
+        }
+
+        let profile = StudentProfile(firstName: "Aiden", age: 8, primaryFocus: "reading")
+        await store.send(.profileLoaded(profile)) {
+            $0.isUserOnboarded = true
+        }
+        XCTAssertNil(store.state.paywall)
+    }
+
+    // MARK: - Paywall gated on mission count
+
+    func test_paywall_presentsAfterThirdMission() async {
+        // 3 missions × 10 sparks = 30. Below threshold no paywall;
+        // crossing it presents the paywall and flips the one-shot guard.
+        var initial = RootFeature.State()
+        initial.journey.currentLevelIndex = 2  // already completed 2 missions worth
+        initial.journey.sparksCount = 20
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.database.addSparks = { _ in }
+            $0.database.saveProgress = { _ in }
+            $0.authClient.currentUserId = { nil }
+        }
+        // The journey reducer fires its own effects (database/firestore)
+        // — exhaustively asserting all of them isn't the point of this
+        // test, we care about the paywall gate.
+        store.exhaustivity = .off
+
+        let level = LevelDefinition(id: "lit-1", title: "x", category: .literacy,
+                                    targetValue: "a", biome: .forest)
+        await store.send(.journey(.missionComplete(level)))
+        await store.finish()
+
+        XCTAssertEqual(store.state.journey.sparksCount, 30)
+        XCTAssertNotNil(store.state.paywall,
+            "Crossing the 30-spark threshold must present the paywall.")
+        XCTAssertTrue(store.state.hasShownPaywallThisSession)
+    }
+
+    func test_paywall_doesNotPresentBeforeThirdMission() async {
+        var initial = RootFeature.State()
+        initial.journey.sparksCount = 10  // already 1 mission in
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.database.addSparks = { _ in }
+            $0.database.saveProgress = { _ in }
+            $0.authClient.currentUserId = { nil }
+        }
+        store.exhaustivity = .off
+
+        let level = LevelDefinition(id: "lit-1", title: "x", category: .literacy,
+                                    targetValue: "a", biome: .forest)
+        await store.send(.journey(.missionComplete(level)))
+        await store.finish()
+
+        XCTAssertEqual(store.state.journey.sparksCount, 20)
+        XCTAssertNil(store.state.paywall,
+            "Two completed missions must NOT present the paywall yet.")
+    }
+
+    func test_paywall_skipsRePresentOnSubsequentMissions() async {
+        // Once the paywall has shown this session and the parent
+        // dismissed it, hitting 4+ missions must not re-present.
+        var initial = RootFeature.State()
+        initial.journey.sparksCount = 30
+        initial.hasShownPaywallThisSession = true
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.database.addSparks = { _ in }
+            $0.database.saveProgress = { _ in }
+            $0.authClient.currentUserId = { nil }
+        }
+        store.exhaustivity = .off
+
+        let level = LevelDefinition(id: "lit-1", title: "x", category: .literacy,
+                                    targetValue: "a", biome: .forest)
+        await store.send(.journey(.missionComplete(level)))
+        await store.finish()
+
+        XCTAssertNil(store.state.paywall,
+            "Paywall must remain dismissed for the rest of the session after first present.")
+    }
+
+    func test_paywall_skipsWhenPremium() async {
         var initial = RootFeature.State()
         initial.isPremium = true
+        initial.journey.sparksCount = 30
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.database.addSparks = { _ in }
+            $0.database.saveProgress = { _ in }
+            $0.authClient.currentUserId = { nil }
+        }
+        store.exhaustivity = .off
+
+        let level = LevelDefinition(id: "lit-1", title: "x", category: .literacy,
+                                    targetValue: "a", biome: .forest)
+        await store.send(.journey(.missionComplete(level)))
+        await store.finish()
+
+        XCTAssertNil(store.state.paywall,
+            "Premium parents must never see the paywall regardless of spark count.")
+    }
+
+    // MARK: - Settings + sign-out
+
+    func test_journeySettingsTapped_opensSettingsSheet() async {
+        var initial = RootFeature.State()
+        initial.currentUid = "test-uid-123"
 
         let store = TestStore(initialState: initial) {
             RootFeature()
         }
 
-        await store.send(.onboarding(.onboardingComplete)) {
-            $0.isUserOnboarded = true
+        await store.send(.journey(.settingsTapped)) {
+            $0.settings = SettingsFeature.State(uid: "test-uid-123")
         }
-        XCTAssertNil(store.state.paywall)
+    }
+
+    func test_settingsSignedOut_resetsStateAndRestartsAnonAuth() async {
+        // The user tapped Sign Out and SettingsFeature confirmed via
+        // delegate. RootFeature must clear currentUid, reset student
+        // routing to default, and fire a new anonymous sign-in so the
+        // child can keep using the device against a fresh UID.
+        var initial = RootFeature.State()
+        initial.currentUid = "authed-uid"
+        initial.journey.studentId = "kid-A"
+        initial.hasShownPaywallThisSession = true
+        initial.settings = SettingsFeature.State(uid: "authed-uid")
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.authClient.signInAnonymously = { "fresh-anon-uid" }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.settings(.presented(.delegate(.signedOut)))) {
+            $0.currentUid = nil
+            $0.journey.studentId = FirestoreSchema.defaultStudentId
+            $0.pendingMigrationFromUid = nil
+            $0.hasShownPaywallThisSession = false
+        }
+        await store.receive(\.authResolved) {
+            $0.currentUid = "fresh-anon-uid"
+        }
+        await store.finish()
     }
 
     func test_subscriptionStatusChanged_toPremium_dismissesPaywall() async {

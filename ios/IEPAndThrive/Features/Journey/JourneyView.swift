@@ -57,6 +57,19 @@ struct JourneyView: View {
                 // Floating UI Overlays
                 VStack {
                     HStack {
+                        Button {
+                            viewStore.send(.settingsTapped)
+                        } label: {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(Theme.Colors.forestMid)
+                                .padding(10)
+                                .background(Color.white.opacity(0.8))
+                                .clipShape(Circle())
+                                .accessibilityLabel("Parent settings")
+                        }
+                        .padding(.leading, 16)
+                        .padding(.top, 16)
                         Spacer()
                         SparksCounter(count: viewStore.sparksCount)
                             .padding()
