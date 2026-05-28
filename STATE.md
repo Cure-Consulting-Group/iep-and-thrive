@@ -89,7 +89,7 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 - **3.3 — merged (#26)** — Crashlytics + observability foundation.
 - **3.4 — merged (#27)** — UX polish: paywall deferred to 3 missions / 30 sparks + sign-out UI on JourneyView.
 - **3.1 — merged (#28)** — Web portal ↔ iOS data unification.
-- **3.5 — open PR (#29)** — Privacy manifest + compliance docs. Apple-required `PrivacyInfo.xcprivacy` declares all 6 collected data categories + 4 required-reason APIs. Privacy policy + compliance framework updated for iOS data flows. New `docs/legal/data-deletion-process.md` documents the manual COPPA deletion runbook until Phase 4 ships the automated UI.
+- **3.5 — merged (#29)** — Privacy manifest + compliance docs. Apple-required `PrivacyInfo.xcprivacy` declares all 6 collected data categories + 4 required-reason APIs. Privacy policy + compliance framework updated for iOS data flows. New `docs/legal/data-deletion-process.md` documents the manual COPPA deletion runbook until Phase 4 ships the automated UI.
 - **3.2 — open PR (#30)** — TestFlight distribution. Fastlane `beta` lane + tag-triggered GitHub Actions workflow + 7-step operator runbook. Engineering complete; operator-side Apple ops outstanding.
 - **3.6 / 3.7** — Manual QA + pilot rollout to 3–5 enrolled families.
 

@@ -41,6 +41,14 @@ targets:
       # on a real device requires the team's signing identity to allow
       # the entitlement.
       CODE_SIGN_ENTITLEMENTS: IEPAndThrive/Resources/IEPAndThrive.entitlements
+      # Version + build number live in build settings so Fastlane can
+      # bump them via `increment_version_number` / `increment_build_number`
+      # without touching Info.plist. The committed Info.plist still has
+      # CFBundleShortVersionString / CFBundleVersion as literal values,
+      # but with GENERATE_INFOPLIST_FILE=YES Xcode regenerates from
+      # these settings on every build.
+      MARKETING_VERSION: "1.0.0"
+      CURRENT_PROJECT_VERSION: "1"
     postBuildScripts:
       # Crashlytics dSYM upload. No-ops on debug builds without dSYM
       # output; on TestFlight/App Store builds it uploads symbol files

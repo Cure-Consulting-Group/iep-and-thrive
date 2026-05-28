@@ -44,3 +44,13 @@ functions/.next/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# fastlane / ios release artifacts
+ios/Gemfile.lock
+ios/fastlane/report.xml
+ios/fastlane/README.md
+ios/fastlane/test_output
+ios/build/
+ios/*.ipa
+ios/*.dSYM.zip
+ios/AuthKey_*.p8
