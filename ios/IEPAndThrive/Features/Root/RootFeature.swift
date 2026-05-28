@@ -43,6 +43,7 @@ struct RootFeature {
     @Dependency(\.storeKit) var storeKit
     @Dependency(\.authClient) var authClient
     @Dependency(\.firestoreClient) var firestoreClient
+    @Dependency(\.crashlyticsClient) var crashlyticsClient
     
     var body: some ReducerOf<Self> {
         Scope(state: \.journey, action: \.journey) {
@@ -76,7 +77,10 @@ struct RootFeature {
 
             case let .authResolved(uid):
                 state.currentUid = uid
-                return .none
+                return .run { [crashlyticsClient] _ in
+                    crashlyticsClient.setUserId(uid)
+                    crashlyticsClient.log("auth: resolved uid=\(uid)")
+                }
 
             case let .profileLoaded(profile):
                 state.isUserOnboarded = (profile != nil)
@@ -110,14 +114,19 @@ struct RootFeature {
                 // resolution flow knows where to read FROM.
                 state.pendingMigrationFromUid = state.currentUid
                 state.currentUid = newUid
-                return .run { [firestoreClient] send in
+                return .run { [firestoreClient, crashlyticsClient] send in
+                    crashlyticsClient.setUserId(newUid)
+                    crashlyticsClient.log("auth: signed in uid=\(newUid)")
                     do {
                         let students = try await firestoreClient.fetchAllStudents(newUid)
                         await send(.studentsFetched(forUid: newUid, students: students))
                     } catch {
                         // If the read fails (rules, network), fall back
                         // to a default-target migration so we don't
-                        // strand the anon data.
+                        // strand the anon data. Record the failure so
+                        // it surfaces in Crashlytics even though we
+                        // recover gracefully.
+                        crashlyticsClient.recordError(error, "firestore.fetchAllStudents")
                         await send(.studentsFetched(forUid: newUid, students: []))
                     }
                 }
@@ -131,9 +140,11 @@ struct RootFeature {
                     let target = FirestoreSchema.defaultStudentId
                     state.journey.studentId = target
                     state.pendingMigrationFromUid = nil
-                    return .run { [firestoreClient] _ in
+                    return .run { [firestoreClient, crashlyticsClient] _ in
+                        crashlyticsClient.log("migration: resolved 0 students, target=\(target)")
                         if let anonUid, anonUid != forUid {
-                            try? await firestoreClient.migrateAnonData(anonUid, forUid, target)
+                            await Self.migrateOrRecord(firestoreClient, crashlyticsClient,
+                                                        anonUid, forUid, target)
                         }
                     }
                 case 1:
@@ -141,9 +152,11 @@ struct RootFeature {
                     let target = students[0].id
                     state.journey.studentId = target
                     state.pendingMigrationFromUid = nil
-                    return .run { [firestoreClient] _ in
+                    return .run { [firestoreClient, crashlyticsClient] _ in
+                        crashlyticsClient.log("migration: resolved 1 student, target=\(target)")
                         if let anonUid, anonUid != forUid {
-                            try? await firestoreClient.migrateAnonData(anonUid, forUid, target)
+                            await Self.migrateOrRecord(firestoreClient, crashlyticsClient,
+                                                        anonUid, forUid, target)
                         }
                     }
                 default:
@@ -152,7 +165,9 @@ struct RootFeature {
                         uid: forUid,
                         students: students
                     )
-                    return .none
+                    return .run { [crashlyticsClient] _ in
+                        crashlyticsClient.log("migration: presenting picker for \(students.count) students")
+                    }
                 }
 
             case let .childPicker(.presented(.delegate(.studentSelected(id: pickedId)))):
@@ -160,9 +175,11 @@ struct RootFeature {
                 let authedUid = state.currentUid
                 state.journey.studentId = pickedId
                 state.pendingMigrationFromUid = nil
-                return .run { [firestoreClient] _ in
+                return .run { [firestoreClient, crashlyticsClient] _ in
+                    crashlyticsClient.log("picker: studentSelected target=\(pickedId)")
                     if let anonUid, let authedUid, anonUid != authedUid {
-                        try? await firestoreClient.migrateAnonData(anonUid, authedUid, pickedId)
+                        await Self.migrateOrRecord(firestoreClient, crashlyticsClient,
+                                                    anonUid, authedUid, pickedId)
                     }
                 }
 
@@ -175,9 +192,11 @@ struct RootFeature {
                 let newStudentId = UUID().uuidString
                 state.journey.studentId = newStudentId
                 state.pendingMigrationFromUid = nil
-                return .run { [firestoreClient] _ in
+                return .run { [firestoreClient, crashlyticsClient] _ in
+                    crashlyticsClient.log("picker: createNewStudent target=\(newStudentId)")
                     if let anonUid, let authedUid, anonUid != authedUid {
-                        try? await firestoreClient.migrateAnonData(anonUid, authedUid, newStudentId)
+                        await Self.migrateOrRecord(firestoreClient, crashlyticsClient,
+                                                    anonUid, authedUid, newStudentId)
                     }
                 }
                 
@@ -242,6 +261,25 @@ struct RootFeature {
         }
     }
     
+    /// Migration runner that records any error to Crashlytics instead
+    /// of swallowing it via `try?`. Used by every post-auth resolution
+    /// branch (0 / 1 / 2+ students) since they share the same effect
+    /// shape — call this from inside a `.run { }` effect.
+    private static func migrateOrRecord(
+        _ firestoreClient: FirestoreClient,
+        _ crashlyticsClient: CrashlyticsClient,
+        _ anonUid: String,
+        _ authedUid: String,
+        _ targetStudentId: String
+    ) async {
+        do {
+            try await firestoreClient.migrateAnonData(anonUid, authedUid, targetStudentId)
+            crashlyticsClient.log("migration: complete → \(targetStudentId)")
+        } catch {
+            crashlyticsClient.recordError(error, "firestore.migrateAnonData")
+        }
+    }
+
     @Reducer
     struct Path {
         enum State: Equatable {

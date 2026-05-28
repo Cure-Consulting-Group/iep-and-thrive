@@ -26,6 +26,8 @@ targets:
         product: FirebaseAuth
       - package: Firebase
         product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseCrashlytics
       - package: GoogleSignIn
         product: GoogleSignIn
       - package: GoogleSignIn
@@ -39,6 +41,16 @@ targets:
       # on a real device requires the team's signing identity to allow
       # the entitlement.
       CODE_SIGN_ENTITLEMENTS: IEPAndThrive/Resources/IEPAndThrive.entitlements
+    postBuildScripts:
+      # Crashlytics dSYM upload. No-ops on debug builds without dSYM
+      # output; on TestFlight/App Store builds it uploads symbol files
+      # so production crash reports come back symbolicated.
+      - name: "Crashlytics: Upload dSYMs"
+        script: |
+          "${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run"
+        inputFiles:
+          - "$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)"
+          - "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}"
 
   IEPAndThriveTests:
     type: bundle.unit-test
