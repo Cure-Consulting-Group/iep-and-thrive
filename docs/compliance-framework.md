@@ -28,8 +28,37 @@
 |---------------|----------|---------|
 | **Restricted** | IEP/504 Plans, evaluation reports, medical information, diagnoses | Encrypted storage; access limited to authorized instructors; return/destroy within 90 days of program end |
 | **Confidential** | Student name, address, parent contact, behavioral notes | Secure storage; not shared externally; retained per retention schedule |
+| **Confidential — iOS App** | Child first name + age, learning progress (lessons completed, scores, sparks), Firebase Auth UID | Firestore (`users/{uid}/students/{id}/*`) with owner-only security rules; SwiftData on-device. Returned to anon-default or deleted per parent request (see `docs/legal/data-deletion-process.md`) |
 | **Internal** | Enrollment numbers, financial data, staff records | Business-use only; standard security |
 | **Public** | Website content, program descriptions, pricing | Freely shared |
+
+### 2.1 iOS App Data Flows
+
+The iOS companion app uses a strictly bounded data model:
+
+```
+Onboarding (anon Firebase Auth)
+  → SwiftData:    StudentProfile  (id, firstName, age, primaryFocus)
+  → Firestore:    users/{anonUid}/students/default/profile
+
+Mission complete (anon or authed)
+  → SwiftData:    LessonProgress (UUID, levelIndex, category, isCompleted, score)
+  → SwiftData:    SparksRecord   (UUID, amount, reason, earnedAt)
+  → Firestore:    users/{uid}/students/{studentId}/{lessons|sparks}/{uuid}
+
+Parent sign-in (email / Google / Apple)
+  → migrateAnonData(anon, authed, pickedStudentId)
+    copies users/{anonUid}/students/default/* → users/{authedUid}/students/{pickedStudentId}/*
+  → anon docs left in place for retry safety; cleaned up via the data-deletion process
+
+Crash / non-fatal
+  → Firebase Crashlytics: stack trace + breadcrumbs
+  → No child name / IEP content in breadcrumbs (only IDs + state-machine labels)
+```
+
+**Storage region:** Firestore default region is `us-east4` (Northern Virginia). All data stays inside Google Cloud's US data centers per the project config in `STATE.md`.
+
+**iOS app vs web portal:** the iOS app does NOT collect IEP documents, evaluation reports, medical notes, or any of the "Restricted" categories above — those flow through the web portal's intake form into the same Firestore project but a different collection (`progressReports` etc.). The iOS app's data is therefore strictly "Confidential" tier.
 
 ---
 
@@ -37,12 +66,12 @@
 
 | Requirement | Status | Implementation |
 |------------|--------|----------------|
-| Parental consent before collecting child data | ☐ Pending | Enrollment Agreement includes consent section |
-| Collect only data necessary for educational purpose | ☐ Pending | Intake form limited to program-relevant fields |
-| No behavioral advertising using child data | ✅ | No ad tracking on website; no data sold |
-| Parental right to review/delete child data | ☐ Pending | Process documented in Privacy Policy |
-| Data security measures | ☐ Pending | Encrypted storage, access controls |
-| Clear privacy policy | ☐ Pending | Privacy Policy scaffold created; needs attorney review |
+| Parental consent before collecting child data | ☐ Pending | Enrollment Agreement includes consent section; iOS app's anonymous mode does not collect identifying child data until a parent enters the child's name on the Onboarding screen (under parental supervision per the program contract) |
+| Collect only data necessary for educational purpose | ☐ Pending | Intake form limited to program-relevant fields; iOS app's `PrivacyInfo.xcprivacy` declares only first-name, age, learning progress, Firebase Auth UID, crash diagnostics |
+| No behavioral advertising using child data | ✅ | No ad tracking on website; no data sold; iOS app sets `NSPrivacyTracking=false` |
+| Parental right to review/delete child data | ☐ Pending | Process documented in Privacy Policy; manual deletion workflow in `docs/legal/data-deletion-process.md` |
+| Data security measures | ☐ Pending | Encrypted storage, access controls; iOS app uses Firestore owner-only rules + Firebase Auth |
+| Clear privacy policy | ☐ Pending | Privacy Policy scaffold created (includes iOS section); needs attorney review |
 | No conditioning participation on excess data | ✅ | Only program-essential data collected |
 
 ---
@@ -95,6 +124,9 @@
 | **Stripe** | Payment card data (PCI DSS Level 1 certified) | SOC 2, PCI DSS | Low ✅ |
 | **Resend** | Parent email, student first name | Privacy policy reviewed | Low ✅ |
 | **Vercel** | Anonymous web analytics | SOC 2, GDPR | Low ✅ |
+| **Firebase Auth (Google)** | Parent email, Apple/Google OAuth tokens, anon Firebase UIDs | SOC 1/2/3, ISO 27001, FERPA-aligned with Google Cloud terms | Low ✅ |
+| **Firebase Firestore (Google)** | iOS app StudentProfile, LessonProgress, SparksRecord; web portal student records | SOC 1/2/3, ISO 27001; region: us-east4 | Low ✅ |
+| **Firebase Crashlytics (Google)** | Stack traces + breadcrumbs (no PII; only state-machine labels + UIDs) | Same Google Cloud terms; 90-day retention default | Low ✅ |
 | **Google Workspace** | If used for storing student records | FERPA-compliant with BAA | Medium — needs BAA ⚠️ |
 | **Calendly** | Parent name, email, phone | SOC 2 | Low ✅ |
 
