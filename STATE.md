@@ -78,8 +78,8 @@ Audit + four PRs merged 2026-05-26 (#9 → #13 → #14 → #15):
 ### Phase 2 — staged delivery
 - **2.1 — merged (#21)** — `LessonProgress` write path.
 - **2.2 — merged (#22)** — Email/password login UI + anon → authenticated UID migration.
-- **2.3.a — open PR** — Sign in with Apple. Adds entitlements file, `NonceGenerator` (SHA-256 + random), `AuthClient.signInWithApple`, `SignInWithAppleButton` in `AuthView`, replay-protected nonce round-trip. 68 tests passing.
-- **2.3.b** — Google Sign-In (`GoogleSignIn-iOS` SPM + URL scheme + Info.plist). Order matters: SIWA first means we can ship Google later without violating Apple's social-login policy.
+- **2.3.a — open PR** — Sign in with Apple. Adds entitlements file, `NonceGenerator` (SHA-256 + random), `AuthClient.signInWithApple`, `SignInWithAppleButton` in `AuthView`, replay-protected nonce round-trip.
+- **2.3.b — open PR (stacked on 2.3.a)** — Google Sign-In. Adds `GoogleSignIn-iOS` SPM, REVERSED_CLIENT_ID URL scheme in Info.plist, `onOpenURL` handler in `RootView`, `AuthClient.signInWithGoogle`, "Sign in with Google" button. 71 tests passing.
 - **2.4** — Child picker against `users/{authedUid}/students/` (multi-child households).
 - **2.x deferred** — Sign-out UI surface (no current way to log out without app reinstall).
 

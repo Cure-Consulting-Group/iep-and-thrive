@@ -252,4 +252,67 @@ final class AuthFeatureTests: XCTestCase {
         // Both state.pendingAppleNonce and state.errorMessage land
         // as expected — nothing carrying over to a stale retry.
     }
+
+    // MARK: - Sign in with Google
+
+    func test_google_signInTapped_invokesClientAndEmitsDelegate() async {
+        let called = Box(false)
+
+        let store = TestStore(initialState: AuthFeature.State()) {
+            AuthFeature()
+        } withDependencies: {
+            $0.authClient.signInWithGoogle = {
+                called.setValue(true)
+                return "google-authed-uid"
+            }
+        }
+
+        await store.send(.googleSignInTapped) {
+            $0.isSubmitting = true
+        }
+        await store.receive(\.authSucceeded) {
+            $0.isSubmitting = false
+        }
+        await store.receive(\.delegate.signedIn)
+
+        XCTAssertTrue(called.value)
+    }
+
+    func test_google_failure_surfacesErrorMessage() async {
+        struct GoogleError: Error, LocalizedError {
+            var errorDescription: String? { "Network error — try again." }
+        }
+
+        let store = TestStore(initialState: AuthFeature.State()) {
+            AuthFeature()
+        } withDependencies: {
+            $0.authClient.signInWithGoogle = { throw GoogleError() }
+        }
+
+        await store.send(.googleSignInTapped) { $0.isSubmitting = true }
+        await store.receive(\.authFailed) {
+            $0.isSubmitting = false
+            $0.errorMessage = "Network error — try again."
+        }
+    }
+
+    func test_google_clearsExistingErrorOnRetry() async {
+        // Tapping Google again after a failed attempt should clear the
+        // previous error banner immediately so the user sees that a
+        // new attempt is in flight.
+        let store = TestStore(
+            initialState: AuthFeature.State(errorMessage: "stale error")
+        ) {
+            AuthFeature()
+        } withDependencies: {
+            $0.authClient.signInWithGoogle = { "uid" }
+        }
+
+        await store.send(.googleSignInTapped) {
+            $0.isSubmitting = true
+            $0.errorMessage = nil
+        }
+        await store.receive(\.authSucceeded) { $0.isSubmitting = false }
+        await store.receive(\.delegate.signedIn)
+    }
 }

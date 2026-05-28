@@ -32,5 +32,19 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Google Sign-In callback. The URL scheme is the REVERSED_CLIENT_ID
+	     from GoogleService-Info.plist, registered here so the OS can
+	     route Google's OAuth callback back to this app. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.564060847585-qja9of7p712opgo2splebbae8tq2pejm</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
