@@ -1,0 +1,8 @@
+source "https://rubygems.org"
+
+# Fastlane handles iOS release automation (TestFlight uploads, signing
+# via Match, build number management). Pinning to a version range that
+# supports Xcode 16+ and the App Store Connect API key auth flow.
+gem "fastlane", "~> 2.220"
+
+# Cocoapods isn't used (we're SPM-only) — skip the cocoapods gem.

@@ -1,0 +1,70 @@
+name: iOS Release
+
+# Triggered when a release tag is pushed (e.g. `git tag v0.2.0 && git push --tags`).
+# The version portion of the tag is informational only — the build number that
+# lands in TestFlight is auto-incremented by Fastlane against whatever's latest
+# in App Store Connect.
+on:
+  push:
+    tags: ['v*']
+  # Manual trigger for emergency reissues without bumping a tag.
+  workflow_dispatch:
+
+jobs:
+  beta:
+    name: Build + upload to TestFlight
+    runs-on: macos-15
+    # Allow ~30 min for the first build (full SwiftPM resolve + archive
+    # + dSYM upload + TestFlight push). Subsequent builds with cache hit
+    # in under 15.
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16.4 (Swift 6.1)
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+
+      - name: Setup Ruby + Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: cd ios && xcodegen generate
+
+      - name: Run Fastlane beta lane
+        working-directory: ios
+        env:
+          # App Store Connect API key — see docs/runbooks/ios-release.md
+          # for how to generate + paste these as GitHub secrets.
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+
+          # Match — encrypted certs in a private GitHub repo.
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          # Personal access token with read access to the Match certs
+          # repo. Fastlane sets MATCH_GIT_BASIC_AUTHORIZATION from this.
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+
+          # Optional release-notes pass-through. Tag annotations get
+          # picked up automatically as fallback if this is empty.
+          CHANGELOG: ${{ github.event.head_commit.message }}
+        run: bundle exec fastlane beta
+
+      - name: Upload .ipa artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: IEPAndThrive-${{ github.ref_name }}.ipa
+          path: ios/build/IEPAndThrive.ipa
+          if-no-files-found: warn
+          retention-days: 14

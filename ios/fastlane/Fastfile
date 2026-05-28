@@ -1,0 +1,96 @@
+# IEP & Thrive iOS — Fastlane release automation.
+#
+# Lanes:
+#   beta — archive + export + upload to TestFlight
+#
+# Auth: App Store Connect API key (passed via secrets — see
+# `docs/runbooks/ios-release.md` for the one-time setup).
+#
+# Signing: Match (encrypted certs in a private GitHub repo). The
+# bootstrap PR ships this without an actual Match repo configured; the
+# runbook walks through `fastlane match init` to set that up before the
+# first TestFlight push.
+
+default_platform(:ios)
+
+APP_IDENTIFIER = "com.cureconsulting.IEPAndThrive"
+XCODEGEN_PROJECT = "IEPAndThrive.xcodeproj"
+XCODEGEN_SCHEME = "IEPAndThrive"
+
+platform :ios do
+  before_all do
+    # `xcodegen` is the source of truth for project.yml → .xcodeproj.
+    # Regenerate before each lane so committed pbxproj drift doesn't
+    # silently change what gets built. Skip if the binary isn't present
+    # (local dev may not have it installed).
+    if File.exist?("../../node_modules/.bin/xcodegen") ||
+       system("command -v xcodegen >/dev/null 2>&1")
+      sh("cd .. && xcodegen generate", log: false)
+    end
+  end
+
+  desc "Build and upload a new beta to TestFlight"
+  lane :beta do
+    # 1. Bump build number — uses CURRENT_PROJECT_VERSION from project.yml
+    #    via Xcode build settings, NOT Info.plist. The committed value
+    #    in project.yml stays at "1"; CI increments only the build that
+    #    ships, so consecutive tag pushes don't collide on TestFlight.
+    increment_build_number(
+      xcodeproj: XCODEGEN_PROJECT,
+      build_number: latest_testflight_build_number(
+        app_identifier: APP_IDENTIFIER
+      ).to_i + 1
+    )
+
+    # 2. Resolve App Store Connect API key from CI secrets. This token
+    #    handles both Apple ID auth (for upload_to_testflight) and the
+    #    `pilot` build-info reads (e.g. latest_testflight_build_number).
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
+      is_key_content_base64: true,
+      in_house: false
+    )
+
+    # 3. Signing — Match handles cert + provisioning profile resolution.
+    #    Skipped automatically on local dev runs where MATCH_GIT_URL is
+    #    unset, falling back to whatever signing the developer's Xcode
+    #    already has. CI always has MATCH_GIT_URL.
+    if ENV["MATCH_GIT_URL"]
+      match(
+        type: "appstore",
+        app_identifier: APP_IDENTIFIER,
+        git_url: ENV["MATCH_GIT_URL"],
+        readonly: is_ci,
+        api_key: api_key
+      )
+    else
+      UI.important("MATCH_GIT_URL not set — skipping match. " \
+                   "Build will use the local Xcode signing identity.")
+    end
+
+    # 4. Archive + export. `gym` is Fastlane's wrapper around xcodebuild.
+    build_app(
+      project: XCODEGEN_PROJECT,
+      scheme: XCODEGEN_SCHEME,
+      export_method: "app-store",
+      configuration: "Release",
+      clean: true,
+      output_directory: "build",
+      output_name: "IEPAndThrive.ipa",
+      xcargs: "-skipMacroValidation -skipPackagePluginValidation"
+    )
+
+    # 5. Upload to TestFlight. `skip_waiting_for_build_processing: true`
+    #    returns immediately — App Store Connect's processing pipeline
+    #    is slow (15–30 min) and we don't want to hold CI minutes.
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      changelog: ENV["CHANGELOG"] || "Internal beta build"
+    )
+  end
+end
