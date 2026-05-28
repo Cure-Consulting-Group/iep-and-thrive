@@ -59,13 +59,14 @@ final class JourneyFeatureTests: XCTestCase {
     func test_missionComplete_advancesIndexAndAwardsSparks() async {
         let sparksAwarded = Box<SparksRecord?>(nil)
         let progressSaved = Box<LessonProgress?>(nil)
-        let sparksSync = Box<(String, SparksRecordDTO)?>(nil)
-        let lessonSync = Box<(String, LessonProgressDTO)?>(nil)
+        let sparksSync = Box<(String, String, SparksRecordDTO)?>(nil)
+        let lessonSync = Box<(String, String, LessonProgressDTO)?>(nil)
 
         let store = TestStore(
             initialState: JourneyFeature.State(
                 currentLevelIndex: 0,
-                levels: Self.testLevels
+                levels: Self.testLevels,
+                studentId: "picked-student-id"
             )
         ) {
             JourneyFeature()
@@ -77,11 +78,11 @@ final class JourneyFeatureTests: XCTestCase {
                 progressSaved.setValue(record)
             }
             $0.authClient.currentUserId = { "test-uid" }
-            $0.firestoreClient.syncSparks = { uid, dto in
-                sparksSync.setValue((uid, dto))
+            $0.firestoreClient.syncSparks = { uid, studentId, dto in
+                sparksSync.setValue((uid, studentId, dto))
             }
-            $0.firestoreClient.syncLesson = { uid, dto in
-                lessonSync.setValue((uid, dto))
+            $0.firestoreClient.syncLesson = { uid, studentId, dto in
+                lessonSync.setValue((uid, studentId, dto))
             }
         }
 
@@ -98,12 +99,15 @@ final class JourneyFeatureTests: XCTestCase {
         await store.finish()
         XCTAssertEqual(sparksAwarded.value?.amount, 10)
         XCTAssertEqual(sparksAwarded.value?.reason, "mission_complete")
-        // Both records reach Firestore with their local UUIDs (lockstep).
+        // Both records reach Firestore at the state's studentId with
+        // their local UUIDs (lockstep).
         XCTAssertEqual(sparksSync.value?.0, "test-uid")
-        XCTAssertEqual(sparksSync.value?.1.id, sparksAwarded.value?.id,
+        XCTAssertEqual(sparksSync.value?.1, "picked-student-id")
+        XCTAssertEqual(sparksSync.value?.2.id, sparksAwarded.value?.id,
             "Sparks local + cloud writes must share a UUID.")
         XCTAssertEqual(lessonSync.value?.0, "test-uid")
-        XCTAssertEqual(lessonSync.value?.1.id, progressSaved.value?.id,
+        XCTAssertEqual(lessonSync.value?.1, "picked-student-id")
+        XCTAssertEqual(lessonSync.value?.2.id, progressSaved.value?.id,
             "Lesson local + cloud writes must share a UUID.")
     }
 

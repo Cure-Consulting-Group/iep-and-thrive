@@ -82,6 +82,14 @@ struct RootView: View {
             ) { store in
                 AuthView(store: store)
             }
+            .sheet(
+                store: self.store.scope(
+                    state: \.$childPicker,
+                    action: \.childPicker
+                )
+            ) { store in
+                ChildPickerView(store: store)
+            }
         }
     }
 }

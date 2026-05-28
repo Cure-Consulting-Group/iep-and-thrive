@@ -26,6 +26,50 @@ struct StudentProfileDTO: Codable, Equatable, Sendable {
     let createdAt: Date
 }
 
+/// Lightweight projection used by the child picker — just the fields
+/// needed to render a row + identify the student doc. Read out of the
+/// authenticated UID's `users/{uid}/students/` collection.
+struct StudentSummaryDTO: Codable, Equatable, Identifiable, Sendable {
+    let id: String
+    let firstName: String
+    let age: Int?
+    let createdAt: Date?
+
+    enum CodingKeys: String, CodingKey {
+        // Web portal docs use `name`; iOS-written docs use `firstName`.
+        // Decode either so the picker works whether the student was
+        // created from the web sign-up or an iOS device.
+        case firstName, name, age, createdAt
+    }
+
+    init(id: String, firstName: String, age: Int?, createdAt: Date?) {
+        self.id = id
+        self.firstName = firstName
+        self.age = age
+        self.createdAt = createdAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        // `id` is decoded from the Firestore document ID at the call
+        // site, not from the doc body — placeholder so the synthesized
+        // init keeps working but the read path overwrites it.
+        self.id = ""
+        self.firstName = (try? c.decode(String.self, forKey: .firstName))
+            ?? (try? c.decode(String.self, forKey: .name))
+            ?? ""
+        self.age = try? c.decode(Int.self, forKey: .age)
+        self.createdAt = try? c.decode(Date.self, forKey: .createdAt)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(firstName, forKey: .firstName)
+        try c.encodeIfPresent(age, forKey: .age)
+        try c.encodeIfPresent(createdAt, forKey: .createdAt)
+    }
+}
+
 struct LessonProgressDTO: Codable, Equatable, Sendable {
     let id: UUID
     let levelIndex: Int
