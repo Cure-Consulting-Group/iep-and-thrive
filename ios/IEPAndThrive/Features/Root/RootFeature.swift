@@ -9,6 +9,7 @@ struct RootFeature {
         @PresentationState var paywall: PaywallFeature.State?
         @PresentationState var auth: AuthFeature.State?
         @PresentationState var childPicker: ChildPickerFeature.State?
+        @PresentationState var settings: SettingsFeature.State?
         var path = StackState<Path.State>()
 
         var isUserOnboarded: Bool = false
@@ -19,6 +20,14 @@ struct RootFeature {
         /// Anon UID captured at sign-in time so the picker resolution
         /// (which may happen seconds later) knows where to migrate FROM.
         var pendingMigrationFromUid: String? = nil
+        /// One-shot guard so the paywall presents at most once per
+        /// session — after dismiss, the child keeps playing without
+        /// being re-nagged on every subsequent mission.
+        var hasShownPaywallThisSession: Bool = false
+
+        /// Three completed missions × 10 sparks per. Chosen so the
+        /// child sees the loop working before commerce gates them.
+        static let paywallSparksThreshold = 30
     }
 
     enum Action {
@@ -27,6 +36,7 @@ struct RootFeature {
         case paywall(PresentationAction<PaywallFeature.Action>)
         case auth(PresentationAction<AuthFeature.Action>)
         case childPicker(PresentationAction<ChildPickerFeature.Action>)
+        case settings(PresentationAction<SettingsFeature.Action>)
         case path(StackAction<Path.State, Path.Action>)
         case appDelegate(AppDelegateAction)
         case authResolved(String)
@@ -84,22 +94,33 @@ struct RootFeature {
 
             case let .profileLoaded(profile):
                 state.isUserOnboarded = (profile != nil)
-                if state.isUserOnboarded && !state.isPremium {
-                    state.paywall = PaywallFeature.State()
-                }
+                // Phase 3.4: paywall no longer auto-presents on launch
+                // or onboarding complete. It now waits for the child to
+                // experience the loop — see the journey.missionComplete
+                // case below for the gate.
                 return .none
-                
+
             case let .subscriptionStatusChanged(isPremium):
                 state.isPremium = isPremium
                 if isPremium {
                     state.paywall = nil
                 }
                 return .none
-                
+
             case .onboarding(.onboardingComplete):
                 state.isUserOnboarded = true
-                if !state.isPremium {
+                return .none
+
+            case .journey(.missionComplete):
+                // After the journey reducer has incremented sparksCount
+                // (Scope runs before this Reduce block), gate the
+                // paywall on the threshold. One-shot per session via
+                // hasShownPaywallThisSession.
+                if !state.isPremium
+                    && !state.hasShownPaywallThisSession
+                    && state.journey.sparksCount >= State.paywallSparksThreshold {
                     state.paywall = PaywallFeature.State()
+                    state.hasShownPaywallThisSession = true
                 }
                 return .none
 
@@ -214,6 +235,26 @@ struct RootFeature {
                 state.path.append(Path.State.safeSpace(SafeSpaceFeature.State()))
                 return .none
 
+            case .journey(.settingsTapped):
+                state.settings = SettingsFeature.State(uid: state.currentUid)
+                return .none
+
+            case .settings(.presented(.delegate(.signedOut))):
+                // Reset to anon-state. Local SwiftData stays — we're
+                // not wiping the device's progress, just clearing the
+                // Firebase Auth session. The didFinishLaunching effect
+                // re-runs the anon sign-in so a fresh UID lands.
+                state.currentUid = nil
+                state.journey.studentId = FirestoreSchema.defaultStudentId
+                state.pendingMigrationFromUid = nil
+                state.hasShownPaywallThisSession = false
+                return .run { [authClient, crashlyticsClient] send in
+                    crashlyticsClient.log("auth: signed out, restarting anon flow")
+                    if let uid = try? await authClient.signInAnonymously() {
+                        await send(.authResolved(uid))
+                    }
+                }
+
             case let .path(.element(id: _, action: .literacy(.doneTapped))):
                 if case let .literacy(literacyState) = state.path.last {
                     state.path.removeLast()
@@ -243,7 +284,7 @@ struct RootFeature {
                 state.path.removeLast()
                 return .none
 
-            case .journey, .onboarding, .path, .paywall, .auth, .childPicker:
+            case .journey, .onboarding, .path, .paywall, .auth, .childPicker, .settings:
                 return .none
             }
         }
@@ -255,6 +296,9 @@ struct RootFeature {
         }
         .ifLet(\.$childPicker, action: \.childPicker) {
             ChildPickerFeature()
+        }
+        .ifLet(\.$settings, action: \.settings) {
+            SettingsFeature()
         }
         .forEach(\.path, action: \.path) {
             Path()

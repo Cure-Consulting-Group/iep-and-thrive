@@ -26,6 +26,7 @@ struct JourneyFeature {
         case loadLevels([LevelDefinition])
         case nodeTapped(LevelDefinition)
         case safeSpaceTapped
+        case settingsTapped
         case levelPreview(PresentationAction<LevelPreviewFeature.Action>)
         case missionComplete(LevelDefinition)
         case missionCompleteSheet(PresentationAction<MissionCompleteFeature.Action>)
@@ -104,6 +105,11 @@ struct JourneyFeature {
                 }
 
             case .safeSpaceTapped:
+                return .none
+
+            case .settingsTapped:
+                // RootFeature consumes this — the journey reducer just
+                // passes it up so the cog can live on this surface.
                 return .none
 
             case .levelPreview:
