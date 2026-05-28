@@ -8,6 +8,7 @@ struct RootFeature {
         var onboarding = OnboardingFeature.State()
         @PresentationState var paywall: PaywallFeature.State?
         @PresentationState var auth: AuthFeature.State?
+        @PresentationState var childPicker: ChildPickerFeature.State?
         var path = StackState<Path.State>()
 
         var isUserOnboarded: Bool = false
@@ -15,6 +16,9 @@ struct RootFeature {
         /// Anonymous Firebase UID, populated once `authClient.signInAnonymously()`
         /// resolves on launch. Used downstream for Firestore sync addressing.
         var currentUid: String? = nil
+        /// Anon UID captured at sign-in time so the picker resolution
+        /// (which may happen seconds later) knows where to migrate FROM.
+        var pendingMigrationFromUid: String? = nil
     }
 
     enum Action {
@@ -22,11 +26,13 @@ struct RootFeature {
         case onboarding(OnboardingFeature.Action)
         case paywall(PresentationAction<PaywallFeature.Action>)
         case auth(PresentationAction<AuthFeature.Action>)
+        case childPicker(PresentationAction<ChildPickerFeature.Action>)
         case path(StackAction<Path.State, Path.Action>)
         case appDelegate(AppDelegateAction)
         case authResolved(String)
         case profileLoaded(StudentProfile?)
         case subscriptionStatusChanged(Bool)
+        case studentsFetched(forUid: String, students: [StudentSummaryDTO])
     }
 
     enum AppDelegateAction {
@@ -98,14 +104,80 @@ struct RootFeature {
                 return .none
 
             case let .auth(.presented(.delegate(.signedIn(uid: newUid)))):
-                // Phase 2.2 migration: copy anon UID's Firestore data
-                // under the new authenticated UID's paths. Local
-                // SwiftData stays as-is — it was always device-bound.
-                let oldUid = state.currentUid
+                // Phase 2.4: defer migration until the picker resolves
+                // (or we've confirmed only 0/1 students exist and we
+                // can auto-pick). Capture the anon UID now so the
+                // resolution flow knows where to read FROM.
+                state.pendingMigrationFromUid = state.currentUid
                 state.currentUid = newUid
+                return .run { [firestoreClient] send in
+                    do {
+                        let students = try await firestoreClient.fetchAllStudents(newUid)
+                        await send(.studentsFetched(forUid: newUid, students: students))
+                    } catch {
+                        // If the read fails (rules, network), fall back
+                        // to a default-target migration so we don't
+                        // strand the anon data.
+                        await send(.studentsFetched(forUid: newUid, students: []))
+                    }
+                }
+
+            case let .studentsFetched(forUid, students):
+                let anonUid = state.pendingMigrationFromUid
+                switch students.count {
+                case 0:
+                    // No existing students under this account — keep
+                    // the iOS-default ID and migrate anon → authed/default.
+                    let target = FirestoreSchema.defaultStudentId
+                    state.journey.studentId = target
+                    state.pendingMigrationFromUid = nil
+                    return .run { [firestoreClient] _ in
+                        if let anonUid, anonUid != forUid {
+                            try? await firestoreClient.migrateAnonData(anonUid, forUid, target)
+                        }
+                    }
+                case 1:
+                    // Exactly one existing student — auto-select.
+                    let target = students[0].id
+                    state.journey.studentId = target
+                    state.pendingMigrationFromUid = nil
+                    return .run { [firestoreClient] _ in
+                        if let anonUid, anonUid != forUid {
+                            try? await firestoreClient.migrateAnonData(anonUid, forUid, target)
+                        }
+                    }
+                default:
+                    // 2+ students — ask the parent which child this iPad is for.
+                    state.childPicker = ChildPickerFeature.State(
+                        uid: forUid,
+                        students: students
+                    )
+                    return .none
+                }
+
+            case let .childPicker(.presented(.delegate(.studentSelected(id: pickedId)))):
+                let anonUid = state.pendingMigrationFromUid
+                let authedUid = state.currentUid
+                state.journey.studentId = pickedId
+                state.pendingMigrationFromUid = nil
                 return .run { [firestoreClient] _ in
-                    if let oldUid, oldUid != newUid {
-                        try? await firestoreClient.migrateAnonData(oldUid, newUid)
+                    if let anonUid, let authedUid, anonUid != authedUid {
+                        try? await firestoreClient.migrateAnonData(anonUid, authedUid, pickedId)
+                    }
+                }
+
+            case .childPicker(.presented(.delegate(.createNewStudent))):
+                // Mint a fresh UUID for the new student. The iOS-side
+                // profile (if any) stays the same — Firestore just gets
+                // a new doc id at users/{authed}/students/{newId}.
+                let anonUid = state.pendingMigrationFromUid
+                let authedUid = state.currentUid
+                let newStudentId = UUID().uuidString
+                state.journey.studentId = newStudentId
+                state.pendingMigrationFromUid = nil
+                return .run { [firestoreClient] _ in
+                    if let anonUid, let authedUid, anonUid != authedUid {
+                        try? await firestoreClient.migrateAnonData(anonUid, authedUid, newStudentId)
                     }
                 }
                 
@@ -152,7 +224,7 @@ struct RootFeature {
                 state.path.removeLast()
                 return .none
 
-            case .journey, .onboarding, .path, .paywall, .auth:
+            case .journey, .onboarding, .path, .paywall, .auth, .childPicker:
                 return .none
             }
         }
@@ -161,6 +233,9 @@ struct RootFeature {
         }
         .ifLet(\.$auth, action: \.auth) {
             AuthFeature()
+        }
+        .ifLet(\.$childPicker, action: \.childPicker) {
+            ChildPickerFeature()
         }
         .forEach(\.path, action: \.path) {
             Path()

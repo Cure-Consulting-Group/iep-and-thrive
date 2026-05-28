@@ -68,10 +68,15 @@ struct OnboardingFeature {
                     age: state.age,
                     primaryFocus: state.primaryFocus.rawValue
                 )
+                // Anon-only path: the only student under an anonymous
+                // UID is at `students/default`. The picker resolves a
+                // real studentId after sign-in (Phase 2.4) and writes
+                // from then on land at that picked path.
+                let studentId = FirestoreSchema.defaultStudentId
                 return .run { [authClient, firestoreClient, database] send in
                     try? await database.saveProfile(profile)
                     if let uid = authClient.currentUserId() {
-                        try? await firestoreClient.syncProfile(uid, profile.dto)
+                        try? await firestoreClient.syncProfile(uid, studentId, profile.dto)
                     }
                     await send(.profileSaved)
                 }

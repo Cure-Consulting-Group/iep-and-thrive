@@ -53,11 +53,12 @@ final class RootFeatureTests: XCTestCase {
         }
     }
 
-    func test_authSignedIn_triggersMigrationAndUpdatesUid() async {
-        // The Phase 2.2 migration: when AuthFeature emits its delegate
-        // .signedIn, RootFeature must call firestoreClient.migrateAnonData
-        // with the OLD anon UID → NEW authed UID, and swap currentUid.
-        let migrateCall = Box<(String, String)?>(nil)
+    func test_authSignedIn_zeroExistingStudents_autoMigratesToDefault() async {
+        // 2.4 flow: after signedIn, RootFeature fetches the parent's
+        // students. With 0 existing students, we auto-migrate the anon
+        // data to users/{authed}/students/default and proceed — no
+        // picker UI shown.
+        let migrateCall = Box<(String, String, String)?>(nil)
 
         var initial = RootFeature.State()
         initial.currentUid = "anon-uid"
@@ -66,48 +67,145 @@ final class RootFeatureTests: XCTestCase {
         let store = TestStore(initialState: initial) {
             RootFeature()
         } withDependencies: {
-            $0.firestoreClient.migrateAnonData = { anon, authed in
-                migrateCall.setValue((anon, authed))
+            $0.firestoreClient.fetchAllStudents = { _ in [] }
+            $0.firestoreClient.migrateAnonData = { anon, authed, target in
+                migrateCall.setValue((anon, authed, target))
             }
         }
-        // The Auth reducer also dispatches a dismiss effect after the
-        // delegate fires — we don't care about asserting that here.
         store.exhaustivity = .off
 
-        await store.send(.auth(.presented(.delegate(.signedIn(uid: "new-authed-uid"))))) {
-            $0.currentUid = "new-authed-uid"
-        }
+        await store.send(.auth(.presented(.delegate(.signedIn(uid: "new-authed-uid")))))
+        await store.receive(\.studentsFetched)
         await store.finish()
 
+        XCTAssertEqual(store.state.currentUid, "new-authed-uid")
+        XCTAssertEqual(store.state.journey.studentId, FirestoreSchema.defaultStudentId)
+        XCTAssertNil(store.state.childPicker,
+            "0 students must not present the child picker.")
         XCTAssertEqual(migrateCall.value?.0, "anon-uid")
         XCTAssertEqual(migrateCall.value?.1, "new-authed-uid")
+        XCTAssertEqual(migrateCall.value?.2, FirestoreSchema.defaultStudentId)
     }
 
-    func test_authSignedIn_skipsMigration_whenNoAnonUid() async {
-        // If somehow auth resolves before anon (no currentUid), we
-        // must NOT call migrateAnonData with an empty source.
-        let migrateCalled = Box(false)
+    func test_authSignedIn_oneExistingStudent_autoMigratesToThatStudent() async {
+        // 2.4: exactly 1 existing student → auto-select that student,
+        // no picker UI shown.
+        let migrateCall = Box<(String, String, String)?>(nil)
+        let existing = StudentSummaryDTO(id: "kid-A", firstName: "Aiden", age: 8, createdAt: nil)
 
         var initial = RootFeature.State()
-        initial.currentUid = nil
+        initial.currentUid = "anon-uid"
         initial.auth = AuthFeature.State()
 
         let store = TestStore(initialState: initial) {
             RootFeature()
         } withDependencies: {
-            $0.firestoreClient.migrateAnonData = { _, _ in
+            $0.firestoreClient.fetchAllStudents = { _ in [existing] }
+            $0.firestoreClient.migrateAnonData = { anon, authed, target in
+                migrateCall.setValue((anon, authed, target))
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.auth(.presented(.delegate(.signedIn(uid: "new-authed-uid")))))
+        await store.receive(\.studentsFetched)
+        await store.finish()
+
+        XCTAssertEqual(store.state.journey.studentId, "kid-A")
+        XCTAssertNil(store.state.childPicker)
+        XCTAssertEqual(migrateCall.value?.2, "kid-A")
+    }
+
+    func test_authSignedIn_multipleStudents_opensPicker() async {
+        // 2+ students → present the picker, do NOT migrate yet.
+        let migrateCalled = Box(false)
+        let students = [
+            StudentSummaryDTO(id: "kid-A", firstName: "Aiden", age: 8, createdAt: nil),
+            StudentSummaryDTO(id: "kid-B", firstName: "Maya", age: 6, createdAt: nil)
+        ]
+
+        var initial = RootFeature.State()
+        initial.currentUid = "anon-uid"
+        initial.auth = AuthFeature.State()
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.firestoreClient.fetchAllStudents = { _ in students }
+            $0.firestoreClient.migrateAnonData = { _, _, _ in
                 migrateCalled.setValue(true)
             }
         }
         store.exhaustivity = .off
 
-        await store.send(.auth(.presented(.delegate(.signedIn(uid: "authed"))))) {
-            $0.currentUid = "authed"
-        }
+        await store.send(.auth(.presented(.delegate(.signedIn(uid: "new-authed-uid")))))
+        await store.receive(\.studentsFetched)
         await store.finish()
 
+        XCTAssertNotNil(store.state.childPicker,
+            "2+ students must present the child picker.")
+        XCTAssertEqual(store.state.childPicker?.students.count, 2)
+        XCTAssertEqual(store.state.pendingMigrationFromUid, "anon-uid",
+            "Anon UID must be held for the picker delegate to consume.")
         XCTAssertFalse(migrateCalled.value,
-            "Migration must be skipped if there's no anon UID to migrate FROM.")
+            "Migration must wait for picker resolution, not fire on fetch.")
+    }
+
+    func test_childPicker_studentSelected_migratesToPicked() async {
+        let migrateCall = Box<(String, String, String)?>(nil)
+
+        var initial = RootFeature.State()
+        initial.currentUid = "new-authed-uid"
+        initial.pendingMigrationFromUid = "anon-uid"
+        initial.childPicker = ChildPickerFeature.State(
+            uid: "new-authed-uid",
+            students: [StudentSummaryDTO(id: "kid-A", firstName: "Aiden", age: 8, createdAt: nil)]
+        )
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.firestoreClient.migrateAnonData = { anon, authed, target in
+                migrateCall.setValue((anon, authed, target))
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.childPicker(.presented(.delegate(.studentSelected(id: "kid-A")))))
+        await store.finish()
+
+        XCTAssertEqual(store.state.journey.studentId, "kid-A")
+        XCTAssertNil(store.state.pendingMigrationFromUid,
+            "pendingMigrationFromUid must clear after migration runs.")
+        XCTAssertEqual(migrateCall.value?.0, "anon-uid")
+        XCTAssertEqual(migrateCall.value?.1, "new-authed-uid")
+        XCTAssertEqual(migrateCall.value?.2, "kid-A")
+    }
+
+    func test_childPicker_createNewStudent_migratesToFreshUuid() async {
+        let migrateCall = Box<(String, String, String)?>(nil)
+
+        var initial = RootFeature.State()
+        initial.currentUid = "new-authed-uid"
+        initial.pendingMigrationFromUid = "anon-uid"
+        initial.childPicker = ChildPickerFeature.State(uid: "new-authed-uid")
+
+        let store = TestStore(initialState: initial) {
+            RootFeature()
+        } withDependencies: {
+            $0.firestoreClient.migrateAnonData = { anon, authed, target in
+                migrateCall.setValue((anon, authed, target))
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.childPicker(.presented(.delegate(.createNewStudent))))
+        await store.finish()
+
+        XCTAssertNotNil(UUID(uuidString: store.state.journey.studentId),
+            "Create-new path must mint a fresh UUID for journey.studentId.")
+        XCTAssertEqual(migrateCall.value?.2, store.state.journey.studentId,
+            "Migration target must be the freshly-minted UUID.")
     }
 
     // MARK: - Onboarding → Paywall

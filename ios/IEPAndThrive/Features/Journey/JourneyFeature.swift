@@ -7,6 +7,11 @@ struct JourneyFeature {
         var sparksCount: Int = 0
         var currentLevelIndex: Int = 0
         var levels: [LevelDefinition] = []
+        /// Which Firestore student doc all writes target. Anon flows
+        /// (no sign-in) use `FirestoreSchema.defaultStudentId`. After
+        /// the parent signs in + the child picker resolves, RootFeature
+        /// updates this to the picked student's ID.
+        var studentId: String = FirestoreSchema.defaultStudentId
         @PresentationState var levelPreview: LevelPreviewFeature.State?
         @PresentationState var missionComplete: MissionCompleteFeature.State?
 
@@ -58,6 +63,7 @@ struct JourneyFeature {
                     levelTitle: level.title,
                     sparksAwarded: 10
                 )
+                let studentId = state.studentId
                 return .run { [authClient, firestoreClient, database] _ in
                     // Build both records once with stable UUIDs so the
                     // local SwiftData write and the Firestore sync stay
@@ -72,8 +78,8 @@ struct JourneyFeature {
                     try? await database.addSparks(sparks)
                     try? await database.saveProgress(progress)
                     if let uid = authClient.currentUserId() {
-                        try? await firestoreClient.syncSparks(uid, sparks.dto)
-                        try? await firestoreClient.syncLesson(uid, progress.dto)
+                        try? await firestoreClient.syncSparks(uid, studentId, sparks.dto)
+                        try? await firestoreClient.syncLesson(uid, studentId, progress.dto)
                     }
                 }
 
