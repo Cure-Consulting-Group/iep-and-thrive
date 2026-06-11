@@ -1,5 +1,11 @@
 name: iOS CI
 
+# ⏸ PAUSED 2026-06-11: disabled via `gh workflow disable` — the org
+# exhausted its June Actions quota (macOS bills at 10x). Run iOS tests
+# locally in the interim.
+# Re-enable when the billing cycle resets on 2026-07-01:
+#   gh workflow enable "iOS CI" --repo Cure-Consulting-Group/iep-and-thrive
+
 on:
   push:
     branches: [main]
