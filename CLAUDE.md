@@ -829,3 +829,14 @@ Padding: reduce section padding from 5rem to 2rem on mobile
 - [ ] Mobile responsive pass
 - [ ] SEO metadata
 - [ ] Vercel deployment
+
+
+## Cure skill library
+
+This project uses the shared Cure skill library (private plugin from the GitHub org).
+
+- Install once:  `/plugin marketplace add Cure-Consulting-Group/ProductEngineeringSkills`
+                 then `/plugin install cure-product-engineering@cure`
+- Update:        `/plugin marketplace update cure && /plugin update cure-product-engineering`
+- Invoke:        `/cure-product-engineering:<skill>`  (e.g. `:sdlc`, `:project-bootstrap`)
+- Inventory:     run `/agents`, or see the library repo's docs/OVERVIEW.md
