@@ -1,23 +1,31 @@
 name: iOS CI
 
-# ⏸ PAUSED 2026-06-11: disabled via `gh workflow disable` — the org
-# exhausted its June Actions quota (macOS bills at 10x). Run iOS tests
-# locally in the interim.
-# Re-enable when the billing cycle resets on 2026-07-01:
-#   gh workflow enable "iOS CI" --repo Cure-Consulting-Group/iep-and-thrive
+# Cost guard (2026-07-02): macOS bills at 10x and the org exhausted its
+# June Actions quota, so this runs post-merge on main instead of per-PR
+# (the old push+PR double-trigger built every merge twice). For pre-merge
+# signal on a risky PR, add the `ci:mobile` label or trigger manually
+# via workflow_dispatch.
 
 on:
   push:
     branches: [main]
     paths: ['ios/**', '.github/workflows/ios-ci.yml']
   pull_request:
+    types: [labeled]
     branches: [main]
     paths: ['ios/**', '.github/workflows/ios-ci.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: ios-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     name: Build and Check
+    if: github.event_name != 'pull_request' || github.event.label.name == 'ci:mobile'
     runs-on: macos-15
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
