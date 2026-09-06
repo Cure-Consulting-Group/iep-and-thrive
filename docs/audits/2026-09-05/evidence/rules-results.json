@@ -1,0 +1,30 @@
+[
+  {
+    "name": "parent can overwrite server billing fields and role",
+    "result": "ALLOWED"
+  },
+  {
+    "name": "ordinary parent booking slot update",
+    "error": "permission-denied"
+  },
+  {
+    "name": "parent reads instructor-private attendance field",
+    "result": "SYNTHETIC INSTRUCTOR-PRIVATE NOTE"
+  },
+  {
+    "name": "parent obtains other parent signed PDF download URL",
+    "result": "ALLOWED (URL intentionally not recorded)"
+  },
+  {
+    "name": "other student record stays protected despite forged profile role",
+    "error": "permission-denied"
+  },
+  {
+    "name": "new authenticated UID reads old anonymous profile for migration",
+    "error": "permission-denied"
+  },
+  {
+    "name": "parent forges own lesson completion and score",
+    "result": "ALLOWED"
+  }
+]

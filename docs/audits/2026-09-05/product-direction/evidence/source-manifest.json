@@ -1,0 +1,2714 @@
+[
+  {
+    "path": "app/_api-server/contact/route.ts",
+    "bytes": 2979,
+    "lines": 80,
+    "sha256": "f3194886fa6a6bc9065f2b328856087558c8723943cf8497d96fb01059ae70e8",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/_api-server/enroll/route.ts",
+    "bytes": 4954,
+    "lines": 115,
+    "sha256": "ef0abc64d3fcb7176ff3e8152f95b15c750692d28298f30664e2eb9cdbc2d226",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/_api-server/stripe/checkout/route.ts",
+    "bytes": 1739,
+    "lines": 65,
+    "sha256": "bf5dcc04f9dcd1e392840085075bee165f0cd6b19c9de85d4a93ef7c50f82a7c",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/about/page.tsx",
+    "bytes": 4129,
+    "lines": 95,
+    "sha256": "567ca3a1ba0a25c1102a715e4aae8c57b3d74702fdc1e3bf66fbb2a45402a5bd",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/assessments/[studentId]/AssessmentStudentClient.tsx",
+    "bytes": 592,
+    "lines": 20,
+    "sha256": "efb4048eeb0770173081a6649374408f538207c54efdee9f2a22c9e8b1015386",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/assessments/[studentId]/page.tsx",
+    "bytes": 740,
+    "lines": 20,
+    "sha256": "c0c677f01d672cbfdf5c153cc9d1ab2d10407703c26bc88ac2592ada9469046d",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/assessments/page.tsx",
+    "bytes": 3642,
+    "lines": 88,
+    "sha256": "490b921b3ba5974f257d3f81eec4b56023d943eb17af67cde971a2de5aa4b69f",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/assessments/student/page.tsx",
+    "bytes": 689,
+    "lines": 23,
+    "sha256": "fa0d590795eab3c8aab775f645148f757a7b157ca088c455fbe37ef948a58c34",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/attendance/AttendanceView.tsx",
+    "bytes": 17792,
+    "lines": 384,
+    "sha256": "f84c6038082c1c195bfc4986a1a6424f02ddf6f8147c0d355aab103e4d3ef08d",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/attendance/page.tsx",
+    "bytes": 294,
+    "lines": 10,
+    "sha256": "b83ba6733aa910dd12ab316d07c8589c57562ff2061c845c6fad84acd1476faf",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/bookings/page.tsx",
+    "bytes": 5444,
+    "lines": 147,
+    "sha256": "f233e71bca47ef972f2d6cd36cfc939511a53f94209375e16744f3cc70e45653",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/assessments/post/page.tsx",
+    "bytes": 65674,
+    "lines": 1212,
+    "sha256": "9785771de3fc6274fa37d10f7d1f6202d63347f9736949fb0a6e3839856d1e62",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/assessments/pre/page.tsx",
+    "bytes": 74719,
+    "lines": 1497,
+    "sha256": "343c38f354cd3ad1792f822464d8e4e4be14cae1e235a5a5edff14d643d078c6",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/assessments/probes/page.tsx",
+    "bytes": 32462,
+    "lines": 606,
+    "sha256": "4d9634e9e7c6779e313a93d95e4820db9439c715d2ae8239374d66c62a618e13",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/communications/page.tsx",
+    "bytes": 41145,
+    "lines": 684,
+    "sha256": "e9b362d714ffff6b2016ca6bae868f226294046d6522bd75b64301dd6672a396",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/lesson/[date]/LessonDayView.tsx",
+    "bytes": 12640,
+    "lines": 296,
+    "sha256": "050542f97a3c9ec4471e6dda43598e454bb8dbc6a4b902e5fdb3c49374184f9b",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/lesson/[date]/page.tsx",
+    "bytes": 464,
+    "lines": 13,
+    "sha256": "66c9b06a1d92f69869ff281cda43b9e94487c1f9d4ba803c04f6d1ff457cef5e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/page.tsx",
+    "bytes": 6631,
+    "lines": 165,
+    "sha256": "0db82cfc32f7c240bb11a231eedf4e5e2d97ffd841021c28971d5db38c7b46e7",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/portfolio/page.tsx",
+    "bytes": 28979,
+    "lines": 559,
+    "sha256": "d2c50d735a49f0f3a6125409028eed3b2041fc25d2d7bad8f73dd60e27dd1734",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/scope-and-sequence/page.tsx",
+    "bytes": 36215,
+    "lines": 548,
+    "sha256": "ae7909775c256b11fb8ce9924f3bb59118c2eb2b15f0b52e52617d11a3961439",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/today/page.tsx",
+    "bytes": 1098,
+    "lines": 36,
+    "sha256": "4e3b15260951baf34b0f420c8858c3a374c1dcb66452b7f891da5755099ccbe3",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/week/[weekNumber]/WeekDetail.tsx",
+    "bytes": 12821,
+    "lines": 294,
+    "sha256": "daa232e4f6211e453135dc662ebeab0c40f5220a9e60f0f1c95f787489afd835",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/week/[weekNumber]/materials/MaterialsView.tsx",
+    "bytes": 3753,
+    "lines": 106,
+    "sha256": "285cdf6f768691906590755714a810a151aadd3e780e0059e93678d19b66c0ae",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/week/[weekNumber]/materials/page.tsx",
+    "bytes": 781,
+    "lines": 23,
+    "sha256": "f53180472d40585535830fc8cf9413b29f15e250550c1495bca1900efea8eb90",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/curriculum/week/[weekNumber]/page.tsx",
+    "bytes": 214,
+    "lines": 9,
+    "sha256": "a91f128b130a757a513bc5a25a984f350deb0d043fa784735e8da15312166ef8",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/email-log/page.tsx",
+    "bytes": 18316,
+    "lines": 474,
+    "sha256": "c0b7072c5e3c0dbeba3ac6ea2b2ad0ff206e704f4a315eaf90a7dbb4939db5f9",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/layout.tsx",
+    "bytes": 3920,
+    "lines": 94,
+    "sha256": "ed0e6ecdf112d7944ae984896cd18897314c03cbf6933e39423f09916962814f",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/materials/[weekNumber]/page.tsx",
+    "bytes": 920,
+    "lines": 28,
+    "sha256": "665910ad65b0a80f43eb3aed77a1789b27993d31934e320f30aad54519796d32",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/materials/page.tsx",
+    "bytes": 1661,
+    "lines": 42,
+    "sha256": "9627e12cd97e5a9724db95ce06b1b4a360417128a8bac144b1873bc14825700c",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/page.tsx",
+    "bytes": 7058,
+    "lines": 153,
+    "sha256": "158123fd89d05dc26d12d9a3154f7b4cb96ab74b997d6da46d3edf125bea9b6e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/pipeline/page.tsx",
+    "bytes": 8118,
+    "lines": 251,
+    "sha256": "3262be67ccd6030f3b535fef38df01bbb22e34b8dcd60037bb533a1e27c2d49e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/probes/page.tsx",
+    "bytes": 1107,
+    "lines": 30,
+    "sha256": "de85e0b2f7ce896a58502eeb58afb9259fc16f1710229146d4dd4d2e0eccfcf5",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/probes/week/[weekNumber]/page.tsx",
+    "bytes": 737,
+    "lines": 24,
+    "sha256": "333be3f63d6d59bbc8b5b21449ad6f859d862db884f148d15e479254ad4d92c6",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/reports/page.tsx",
+    "bytes": 11827,
+    "lines": 283,
+    "sha256": "28c918bafca127ec87f7a1a5f023738a8a7943026fcfc256c42522e4e96e518e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/reports/template/alignment/page.tsx",
+    "bytes": 17679,
+    "lines": 371,
+    "sha256": "add19f2349c27f2a3bbc2a3ed8926c3213fe6563786e90b30cd7c934a853403a",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/reports/template/final/page.tsx",
+    "bytes": 37813,
+    "lines": 861,
+    "sha256": "009a165e86bda78808e81269b48649fa07e4022b848b0657af9e6aa863ee541e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/reports/template/weekly/page.tsx",
+    "bytes": 23149,
+    "lines": 554,
+    "sha256": "21667e90239956b44d17de4633733b20016f01c94e359961b0ab19fdf008a32c",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/resources/page.tsx",
+    "bytes": 9691,
+    "lines": 239,
+    "sha256": "d615f2bb413e83da39286791fa65e1c3a0c9378e8c463274587d1f4fc09c5bb2",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/slots/page.tsx",
+    "bytes": 14028,
+    "lines": 360,
+    "sha256": "0e5d7e6f606c4504a3c5ac7ddfb73b884ab725c27643a45859906ca0c8978c70",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/students/page.tsx",
+    "bytes": 12072,
+    "lines": 276,
+    "sha256": "fa31baaf3868d0b802b5fd848856b96fde0486f45fd441c7a176f92d91e6149f",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/admin/subscribers/page.tsx",
+    "bytes": 10429,
+    "lines": 297,
+    "sha256": "cd3382214ffea6ed1c5193c51da3b523b7ef4670007dc79f17d387a20e0fab79",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/book/page.tsx",
+    "bytes": 25646,
+    "lines": 692,
+    "sha256": "0a858d26ff6e68c3a1533e2be210dbb0da3ef03099e4e4045fe4dbb38f683d3e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/contact/layout.tsx",
+    "bytes": 913,
+    "lines": 37,
+    "sha256": "e0bb8f7e7103d785e48618a02226f46ce25dd13050c4ba4a43635e341c77d813",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/contact/page.tsx",
+    "bytes": 9694,
+    "lines": 227,
+    "sha256": "2218126b5d3196c8a53c5abb3ace2c8905b4be06fb9976cd5d35607f280a9177",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/enroll/agreement/page.tsx",
+    "bytes": 10101,
+    "lines": 243,
+    "sha256": "d88fbe6855e5c20936fd7bc4ef0edf64fc62708e4354f7d1349d49f1ac8a07f2",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/enroll/page.tsx",
+    "bytes": 2548,
+    "lines": 65,
+    "sha256": "9a0389e61aa62a656f92478f9846a68086aa52537a84342ba6e99334c78bfd13",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/faq/page.tsx",
+    "bytes": 5290,
+    "lines": 134,
+    "sha256": "e9582d593f0856c462682a4c7423209a6ab6ee50291de9fff6bc14b158e59f8d",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/layout.tsx",
+    "bytes": 2469,
+    "lines": 83,
+    "sha256": "155db2bd65aefbb3a36b5cdc979fbf035b612d4f34dfd5b1d7e1601576d79047",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/login/page.tsx",
+    "bytes": 6324,
+    "lines": 156,
+    "sha256": "42ccf4e6339a711b377d8a5f7d7d10c8d09f2927ebfe965b1ea306debec0030b",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/page.tsx",
+    "bytes": 1503,
+    "lines": 51,
+    "sha256": "8dedfc251644e57c08ff4bc10b628ddceb628b133180744c0916583636fe62c9",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/agreements/page.tsx",
+    "bytes": 4125,
+    "lines": 110,
+    "sha256": "ce70b8211dfb6afbf64f74ff08b5b6ff65c55d8e9b3109c346efa4b8f46c1031",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/bookings/page.tsx",
+    "bytes": 7603,
+    "lines": 209,
+    "sha256": "0910ae92eeb6c3147dbff29cc31602a4a9390856db941c655caef724c96b837f",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/intake/page.tsx",
+    "bytes": 46251,
+    "lines": 1205,
+    "sha256": "b18b56eced88bd256f83895288e12fb735edbcd7e509d687f2e6f15f52969ad8",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/layout.tsx",
+    "bytes": 4598,
+    "lines": 116,
+    "sha256": "df0d259a378ed108313e30e5cc5954075363d3d3f5bdb3321e0421c42b628e67",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/notifications/page.tsx",
+    "bytes": 5177,
+    "lines": 143,
+    "sha256": "8f9b0cd72a0a4e141419bafef2d73228a39c874bbfdee0104538e97736fd3bbd",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/page.tsx",
+    "bytes": 25375,
+    "lines": 575,
+    "sha256": "f4b76d37bca0f22d6e09b1979097fff8d3bb35ef2e1a31130649c45b87543df1",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/photo-release/page.tsx",
+    "bytes": 14896,
+    "lines": 333,
+    "sha256": "6c2dc27f96ef093b7a0d495538794fdb9b31ca7387a3c27491a291c475565310",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/profile/page.tsx",
+    "bytes": 15303,
+    "lines": 326,
+    "sha256": "83d91c313715a095e96e5455d96542695f4b4f95d18b571829eb1b72144527dc",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/reports/page.tsx",
+    "bytes": 6868,
+    "lines": 154,
+    "sha256": "8f56726f10ce961d7803e00d6c42172ed1a79e2b2e325ed88ef3647bbbacafa3",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/resources/page.tsx",
+    "bytes": 6000,
+    "lines": 150,
+    "sha256": "cd73d5adba95b888eeac01fbfc7efb3c0795771cc0fb9eb988c8b6829abcac9b",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/students/[studentId]/layout.tsx",
+    "bytes": 555,
+    "lines": 16,
+    "sha256": "276d5ff74fdd5033c034d4ddc421a68e4d63ca3b45d71e867f1fbd9341e7688e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/students/[studentId]/sessions/page.tsx",
+    "bytes": 7464,
+    "lines": 204,
+    "sha256": "76f4a53032250dd88200546e5d596e4adecb2ca32e0ba3b66d496a8caa4e4a50",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/portal/subscription/page.tsx",
+    "bytes": 10787,
+    "lines": 325,
+    "sha256": "7e4a707acb93ee04d5e8f7b2a2fc6a43350d1abec566fbc6f2d7f4c0f71decbd",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/privacy/page.tsx",
+    "bytes": 5357,
+    "lines": 146,
+    "sha256": "bf6d969fb1a35964ef6bdc2784d059722fc18b965c083c4b2b281a18bb1d1b5c",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/program/page.tsx",
+    "bytes": 499,
+    "lines": 16,
+    "sha256": "1a10246db08fcaf77cc18dca84ce7421816014c5e180e71d407edf274ce86068",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/signup/page.tsx",
+    "bytes": 8325,
+    "lines": 200,
+    "sha256": "cd1c438cacee8e3122fba729f76c73e9604dd180b2ed65398a8dbc6b00d8ca57",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/success/page.tsx",
+    "bytes": 2379,
+    "lines": 69,
+    "sha256": "d1698397cb2a2da9385888127f89717169b90db8db0e7a1b43b5b6a87b85508e",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/summer-guide/layout.tsx",
+    "bytes": 755,
+    "lines": 21,
+    "sha256": "da4274c228e10d709bd110367ac1ab7f1991a222764676af46d4696543d764d7",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/summer-guide/page.tsx",
+    "bytes": 19911,
+    "lines": 489,
+    "sha256": "c0e95387cc82b387090113bb45a2307d0faaea577b8c50a2db1c8b9522e39880",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/terms/page.tsx",
+    "bytes": 4566,
+    "lines": 124,
+    "sha256": "4a8447344aa0f9b69a0dc5943b3b106d92de62055f448882ca083df5e53a9434",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/tutoring/page.tsx",
+    "bytes": 4955,
+    "lines": 142,
+    "sha256": "57e26c165f4585db682b760fdb8523f0bd7d7aa17631731885c1639630eb56e7",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "app/unsubscribe/page.tsx",
+    "bytes": 3505,
+    "lines": 94,
+    "sha256": "e06c2900372f9b6c56ef06382ae67622f7d1f258930410adce959cbccd91f8d6",
+    "area": "app",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/admin/AssessmentBatteryView.tsx",
+    "bytes": 12231,
+    "lines": 327,
+    "sha256": "68cdaf189c74bd1c6156e06592918a49b3580778aecf4f6fa2181f55ffa0caaa",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/admin/MarkdownView.tsx",
+    "bytes": 8651,
+    "lines": 266,
+    "sha256": "71ef1d31c64e824faca15faf6242cc03d28e87a5d01059277c1b1dedc9db0a0b",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/admin/MaterialsChecklistView.tsx",
+    "bytes": 7575,
+    "lines": 216,
+    "sha256": "4f7313a46ab3bb6c4e9b6303898e67b6211bf09d91dcb4ee12fe7f9f2fc0e913",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/admin/ProbeBatchView.tsx",
+    "bytes": 8025,
+    "lines": 203,
+    "sha256": "bdb640762cdb5fe49618ddc606f410561fb63f799dd2a6c81ad0b8480c1f2a33",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/admin/ProbeTrendList.tsx",
+    "bytes": 3330,
+    "lines": 89,
+    "sha256": "5a11248ec50f86771d769bfa9ab04794d6d3f9c030a63610156cea0a9e7edc45",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/auth/ProtectedRoute.tsx",
+    "bytes": 1159,
+    "lines": 41,
+    "sha256": "7c6122b624350824446c172c2eeb73b91156755c2b1d4e077cb1af99ad2c2bd9",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/booking/MonthCalendar.tsx",
+    "bytes": 7608,
+    "lines": 220,
+    "sha256": "b122a3c83fe46774d6aa5b38dfe93dd61ccf81726497e6954b1a00c626359ac7",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/layout/Footer.tsx",
+    "bytes": 5571,
+    "lines": 156,
+    "sha256": "a7d7b1f40fcd8746a2d4bae7089af723375143c115613048cf64e4326d6c5fbe",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/layout/GoogleAnalytics.tsx",
+    "bytes": 730,
+    "lines": 28,
+    "sha256": "6ffcf63a81120bba54e9f9f9e5917b1f14de816c43bf5272214539e9704c507c",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/layout/Nav.tsx",
+    "bytes": 5231,
+    "lines": 151,
+    "sha256": "5e9d2e9d3bcafed06d59fecf83981e4044951512b82acb728027108f6f14b78d",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/layout/UrgencyBanner.tsx",
+    "bytes": 1851,
+    "lines": 61,
+    "sha256": "4c49b4108b3c74c8a2f6ca6e7922cb4b8b51d7de63f5a8c96e3f9d2d3d43f360",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/portal/BookingGate.tsx",
+    "bytes": 6597,
+    "lines": 192,
+    "sha256": "6780cd36d4e944614783b73bd6537e0429927df3e62a0253abd9cbb934e6d4dc",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/portal/IOSSessionTile.tsx",
+    "bytes": 4034,
+    "lines": 114,
+    "sha256": "56f18dfd8f05b8e188632af27c43203da1ab5f6177919548bf1afb1504fd3184",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/portal/SessionsCounter.tsx",
+    "bytes": 2156,
+    "lines": 72,
+    "sha256": "88bd7aff1543b68f6c8a04aa85c768931dfa0697937db833b060822178c48df0",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/portal/SessionsTrackerCard.tsx",
+    "bytes": 2928,
+    "lines": 83,
+    "sha256": "8976c6c8810405f258b23f2d3645aa416820b477c96fdab10fec7828c5cfe343",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/portal/SignatureCanvas.tsx",
+    "bytes": 5119,
+    "lines": 174,
+    "sha256": "c10bc728f7f5248d543488c419ff10260fb93fcb45b525664867aa2a8a78e0ee",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/portal/SubscriptionStatusCard.tsx",
+    "bytes": 4288,
+    "lines": 142,
+    "sha256": "b5f35c7be829b8b37186c68950fe46fe139e5dbee209118b95b945a76efc24ce",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/AboutFounder.tsx",
+    "bytes": 3530,
+    "lines": 84,
+    "sha256": "c65aeb72573fec0cf6002272e1ac88d97c83654355e87ef25d052513bf79e20e",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/EnrollmentForm.tsx",
+    "bytes": 15685,
+    "lines": 339,
+    "sha256": "af47962cd6299cd302b46264a7da09922471fa3573fdbadb0150c222947bb8b9",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/FAQ.tsx",
+    "bytes": 5798,
+    "lines": 162,
+    "sha256": "a6c3d0bb525e93ab06683d8da41be62a9cbfae968c3bc6072753e96da63a6c42",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/Hero.tsx",
+    "bytes": 6736,
+    "lines": 166,
+    "sha256": "0223ed17d3a5cec7595ca50a62a806845e0e5cd07c22fa5696aa319b52cf86ce",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/HowItWorks.tsx",
+    "bytes": 6471,
+    "lines": 156,
+    "sha256": "977bdb9611256f2c97d10ded2f0efdda30c174225d498de424e6e1b7bc3fe602",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/ProblemStrip.tsx",
+    "bytes": 1573,
+    "lines": 39,
+    "sha256": "bd8c5c624d1b2eaf884645c54d47092380b65751893e388cf626eed3b5c44e5f",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/ProgramCards.tsx",
+    "bytes": 6803,
+    "lines": 200,
+    "sha256": "56ee431b6272fdfa4ee5f36c3cd96085fe1367e254a97ea830848a7525b602a6",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/SummerGuideCTA.tsx",
+    "bytes": 3725,
+    "lines": 73,
+    "sha256": "8b86b568f32729deed4a49c18d6c57bdba1f031e61914435734758f66287777b",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/Testimonials.tsx",
+    "bytes": 3078,
+    "lines": 82,
+    "sha256": "698d9db9a1c809363833e2cccdff410adb34b087b53bad57a08cd730b6e7d7de",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/TutoringFAQ.tsx",
+    "bytes": 5056,
+    "lines": 151,
+    "sha256": "aafe5e31a58e2e8770cb8e852a6e1205787984b7235e496ea2bfbea41ed18e83",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/TutoringHero.tsx",
+    "bytes": 5732,
+    "lines": 149,
+    "sha256": "db2dae439bb657407310acdd57d093277cf7ea4eb36a7259939d7bf9c918644c",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/TutoringHowItWorks.tsx",
+    "bytes": 3490,
+    "lines": 102,
+    "sha256": "a6328119c64ec384918d72b58d5a6dc9a91b532056b97d0c67ecd73926c89460",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/TutoringPricing.tsx",
+    "bytes": 4712,
+    "lines": 109,
+    "sha256": "c13a239252c04e01a23ef1f132320a082a10856be1b24fb9006de7afc1b34115",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/sections/WhySection.tsx",
+    "bytes": 5412,
+    "lines": 131,
+    "sha256": "8f54c084164755df6cab914bcfdcf9cde73f063e1652c072e49e31e26f69ff58",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/ui/Badge.tsx",
+    "bytes": 660,
+    "lines": 28,
+    "sha256": "4acc3f719c586574cb2a72271699d84e96e80bd47caa359951334dfa213d4a01",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/ui/Button.tsx",
+    "bytes": 1478,
+    "lines": 58,
+    "sha256": "d106e12dd6946e909cf2e20fbd214cea5d59ecc68f440e677cdd9ae5c02d9e7f",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/ui/EnrollmentCountdown.tsx",
+    "bytes": 2941,
+    "lines": 106,
+    "sha256": "9be7cfed104782624013c76f33b0e78bcdf4265717a035b21fc7a00fcb295685",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/ui/IEPReviewBanner.tsx",
+    "bytes": 3323,
+    "lines": 92,
+    "sha256": "ed9b2f6eed701bf44f5d672e727c250fbe5e7e4097b634933d8022e796f52ca0",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/ui/PricingCard.tsx",
+    "bytes": 5626,
+    "lines": 195,
+    "sha256": "f77e8f313764bf34ac92a5e9b6ee76170d4422308766b6cd1fbc817a397907f4",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/ui/SectionHeader.tsx",
+    "bytes": 1156,
+    "lines": 49,
+    "sha256": "8ba7032497b44f65f26b3771a295b13750723d52923cd3df14dfe5b6814bed9a",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "components/ui/SegmentedControl.tsx",
+    "bytes": 3375,
+    "lines": 116,
+    "sha256": "ebbf128a7ce9914999740cc4d3311b2c5b057e5431733c0db2980c1e8835c3b2",
+    "area": "components",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/admin-tasks-service.ts",
+    "bytes": 4544,
+    "lines": 148,
+    "sha256": "253d767f8bf3ed80dd6112fbc5abb9375f71f3ef71219ab0b9304bec113e003e",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/analytics.ts",
+    "bytes": 2029,
+    "lines": 81,
+    "sha256": "0f555cb37e8caacbf15f173f7b2c1159ae7106c6eaa01966858c5f100f10e903",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/assessment-presets.ts",
+    "bytes": 1348,
+    "lines": 57,
+    "sha256": "17748ffbda794c313706909af7ab618c281707a3f337db62c94d229b1dfdcaf3",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/assessment-service.ts",
+    "bytes": 3572,
+    "lines": 112,
+    "sha256": "99ba780139ba2b67fbf0c9f0531aeed1671aed743c3801aa7ec760494ec31281",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/attendance-service.ts",
+    "bytes": 5971,
+    "lines": 163,
+    "sha256": "698c830020df07e740e75f9d0b8ab0d2b2d023f3ebc94815bb4cb1dd499f0432",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/auth-context.tsx",
+    "bytes": 3824,
+    "lines": 131,
+    "sha256": "8c6adaf632994996d6f85364b671203f931df7c27ba7218d5daf904556425537",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/booking-service.ts",
+    "bytes": 5028,
+    "lines": 188,
+    "sha256": "f2272facf0b7c8f0d282c3b5e0bc04a834b98955679ee067a1421de5e8d4f87c",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/curriculum-data.ts",
+    "bytes": 22318,
+    "lines": 249,
+    "sha256": "0bbb2ac0d6d834351a3ab073d9f1e823dadd02d3a8ffebd18477205dfd9c66c7",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/curriculum-lessons-types.ts",
+    "bytes": 3678,
+    "lines": 122,
+    "sha256": "8fea48bdb0bbcebe4091ce5eea4b72b284c12575c7aa560de0a7d23dfe413e34",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/curriculum-lessons.ts",
+    "bytes": 5576,
+    "lines": 157,
+    "sha256": "95b2d2fd7991aec458c6bbf0a9413cc3f2ac3bcb2bcb5a90a3bf5f1163345130",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/dates.ts",
+    "bytes": 1936,
+    "lines": 51,
+    "sha256": "032e00337eb520f2cc480d809e345e0ed987a5e8c801128f30e603112974b225",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/e-signature.ts",
+    "bytes": 8320,
+    "lines": 213,
+    "sha256": "3264d709e310e5233504400ada1d55b2c41bd3b46c1d8ed13410d6d7ef7291d3",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/enrollment-agreement-text.ts",
+    "bytes": 5212,
+    "lines": 101,
+    "sha256": "efce78c8d264e3c6115b4d1f16d686487b42a158fb38a9ddc23b9fc6ecd45de1",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/escapeHtml.ts",
+    "bytes": 333,
+    "lines": 12,
+    "sha256": "6be474efda47cec3ac1500f898aa8bdda0ebc5659d2db44f83780a260e1e858a",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/firebase-admin.ts",
+    "bytes": 996,
+    "lines": 30,
+    "sha256": "829a0320763e5e6915c3324865c69aea38f21c578c385e387d3c3a33088970d1",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/firebase.ts",
+    "bytes": 865,
+    "lines": 21,
+    "sha256": "13929b4115dd76454afe324983317428a18045a2f8ee912babd16134a6d0beae",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/functions-config.ts",
+    "bytes": 1486,
+    "lines": 37,
+    "sha256": "24434b5124a34ae19c3cbfffcded08247803f359dcb9e9192d0cad781f393ed9",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/gmail-service.ts",
+    "bytes": 8686,
+    "lines": 230,
+    "sha256": "9569c33a3ced447e179eff1a146f96dd653563ee3cc4b7cd4b53f51e98b8785c",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/google-calendar.ts",
+    "bytes": 5128,
+    "lines": 166,
+    "sha256": "2a7238f97e34ec3bb61600bbe059c5b83c0ff1173418ca68c064c2b6724b95b1",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/ios-progress.ts",
+    "bytes": 5222,
+    "lines": 180,
+    "sha256": "10a3c35898e8d43d699b7b3bdcab4d5160190783c4e7bf13964b6988002f3076",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/materials-parser.ts",
+    "bytes": 8571,
+    "lines": 268,
+    "sha256": "7206ffde2e0994b368d463f16960a283d51edb0363d51557d877d119d226d524",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/materials-types.ts",
+    "bytes": 1381,
+    "lines": 50,
+    "sha256": "51ed86d82e40728ebe071f3744e35abb4deeb4e0b948da428a0499380a9f5c84",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/notification-service.ts",
+    "bytes": 2774,
+    "lines": 103,
+    "sha256": "ac1efeaa54b32d55587aef97fdfbe117247408a89c8aa7e32bba95a9415d47f1",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/portal-progress.ts",
+    "bytes": 10978,
+    "lines": 341,
+    "sha256": "9aac4af04de7cafe024b0858633828c9eb230acbc512554629ad87e3228f5f5e",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/probe-service.ts",
+    "bytes": 4465,
+    "lines": 143,
+    "sha256": "9fd008f5fce581287c789996b6ca26a4386cb0ea3cdb1617f006d7b26652a382",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/report-service.ts",
+    "bytes": 3582,
+    "lines": 135,
+    "sha256": "8fb1fdb0e32e4727de905fe8736045eb3f7a8fe737714f7ab073ed57077f249a",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/resend.ts",
+    "bytes": 198,
+    "lines": 9,
+    "sha256": "32b0eb375c3a910489787a4df08180b7058fd4a6ae98323bae5c4f4f02bac54b",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/resource-service.ts",
+    "bytes": 3955,
+    "lines": 144,
+    "sha256": "40b7d72ce47d22fc919a76d878e2c01a26dcd3b6b1ed516709f317c75173982b",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/stripe.ts",
+    "bytes": 200,
+    "lines": 9,
+    "sha256": "d7d4145d7cd1c38f0b96ad5230234d5b8a6334f1324912440a2f191fe49d1fc9",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/student-service.ts",
+    "bytes": 3203,
+    "lines": 120,
+    "sha256": "b49360b82571a4fc42e57d999f4034c7d2ed50ab5513665b75d0bf8f478d63a8",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/subscriber-service.ts",
+    "bytes": 3306,
+    "lines": 103,
+    "sha256": "f17529da6e47e19e464b01f498e8e45982d10df98bd9f880ad69154c0c7edd90",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/subscription-service.ts",
+    "bytes": 5788,
+    "lines": 187,
+    "sha256": "86ad250f0c4ea76c1c3bc93316c3eef3fabce0f9cad6056b7d2932f619ea291f",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/subscription.ts",
+    "bytes": 6905,
+    "lines": 173,
+    "sha256": "9913037b427d0d90a44282163fedefc560bb1a764845b03f686899d7294f3d57",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "lib/validations.ts",
+    "bytes": 1956,
+    "lines": 64,
+    "sha256": "363e7dd71eb456e438df04228f81a6b8b9bdfff7161cb46dd92261f6886855c4",
+    "area": "lib",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/attendance-notifications.ts",
+    "bytes": 9827,
+    "lines": 289,
+    "sha256": "66e96ce5c208d574a32ce61feb2e7d6d95da982c122bf30caf43295657d49e46",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/balance-due-reminders.ts",
+    "bytes": 6176,
+    "lines": 203,
+    "sha256": "630b940d6c476db8451723a13da50f8d14fedc977f5cc13117ee793015938147",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/booking-emails.ts",
+    "bytes": 5084,
+    "lines": 188,
+    "sha256": "d97cc44a724c8c653bb0580b6b3e896ecb7d2af75f176b2475028a94993276ae",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/calendar-sync.ts",
+    "bytes": 4489,
+    "lines": 157,
+    "sha256": "92b24edde916bcff03b02c02715c04d65855141cff992c6ddac0fd520618485f",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/contact.ts",
+    "bytes": 2270,
+    "lines": 86,
+    "sha256": "878eccd01fd598edc64113977899d8ef83b7cad02a17f25aba13e8f19e6b60ce",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/customer-portal.ts",
+    "bytes": 3980,
+    "lines": 114,
+    "sha256": "dfc733fedc22eb2c0b09ef20194b9a8721bc338d8af3ae0c977e9eb1f6a0e423",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/e-signature/audit.ts",
+    "bytes": 1031,
+    "lines": 38,
+    "sha256": "7c0479a540361c7ded14cbd0ff8f9d5e38088bc92f0f81782ba769c53c89130d",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/e-signature/index.ts",
+    "bytes": 8410,
+    "lines": 265,
+    "sha256": "d4acdb8fe957c29567c88fabd9dc44c6352ac4fd8fb1d93e07cc18b01a42224b",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/e-signature/pdf-generator.ts",
+    "bytes": 7326,
+    "lines": 229,
+    "sha256": "8ecb96a7cf6d2f3301b55fa7972897bdf08c10d50f14255992bc380cd4bb8737",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/email-service.ts",
+    "bytes": 9686,
+    "lines": 298,
+    "sha256": "67cd946002ef30fa10802abf11647b0894d5b03afe56f47a57de9407236490e7",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/email-templates.ts",
+    "bytes": 39488,
+    "lines": 903,
+    "sha256": "4af6a38ea5fd836e004e778fac56606a2502599b08925cc134e7c425db0ca2b8",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/enroll.ts",
+    "bytes": 2949,
+    "lines": 103,
+    "sha256": "dfed46876e9d952ee9f10fda3943b0cb0fb6d6bd0f3f3965e8747c11a940bf2f",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/index.ts",
+    "bytes": 2396,
+    "lines": 65,
+    "sha256": "46f5dfb218338d3cb6476c45c260a569abaa0c2ca043d302b83513f2c2088db3",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/intake-incomplete-reminder.ts",
+    "bytes": 5387,
+    "lines": 181,
+    "sha256": "cdd2e1068a575e99d823ff2997046f5701348547d3e205c8d5186dce517de719",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/lifecycle-email-templates.ts",
+    "bytes": 37117,
+    "lines": 725,
+    "sha256": "bb8db47e3c3527e1a90c8a22e8dd79db6590b4b0205a525fd51bcb6fd448692b",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/photo-release-reminder.ts",
+    "bytes": 5929,
+    "lines": 198,
+    "sha256": "07d67c0074fe59a37ae3c030899cc63dca22d4a1de018002f5ca5195a2b430a3",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/photo-release.ts",
+    "bytes": 18353,
+    "lines": 438,
+    "sha256": "a433444a54b473216b32dcecc8c5724e58b77dbf4a1b67f7b632249c0c6bdf75",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/pre-program-ramp.ts",
+    "bytes": 8490,
+    "lines": 279,
+    "sha256": "8d931217da3deea3386ef6d255cceb3a5f9957fda88e2798999469997ef75c92",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/preview-email.ts",
+    "bytes": 8445,
+    "lines": 255,
+    "sha256": "8b91a83c99c7f2973d910f103c45163672d7b7fc94373e965abef24f70af89f0",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/stripe-checkout.ts",
+    "bytes": 3712,
+    "lines": 115,
+    "sha256": "3a22b16b55c601fcd4bf93e01c8b1e81ff76bc20d189dafbde01b888010a7435",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/stripe-webhook-emails.ts",
+    "bytes": 9006,
+    "lines": 197,
+    "sha256": "652d2a4569733695f40a31191cf12fcd460f69ac94d905e5bf875fa00c76ba0e",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/stripe-webhook.ts",
+    "bytes": 33057,
+    "lines": 951,
+    "sha256": "ecfa9a95301ecf3e7527e848374d6de9a6f3311df53074f03a96700b6293f58f",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/subscription-checkout.ts",
+    "bytes": 5430,
+    "lines": 165,
+    "sha256": "fd251a17f6a47acc86be117d4344b5a42c44afbaab915214bd8a1a614832ea1f",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/subscription-types.ts",
+    "bytes": 2526,
+    "lines": 72,
+    "sha256": "7ab2a58533f8a566d2a3aeaf296c46a3b2d7216a60f8013ed6ab45b05180b006",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/summer-guide-capture.ts",
+    "bytes": 2516,
+    "lines": 94,
+    "sha256": "062a3d55d697e1376b0a31549c0bac1d45d4314ffaca49b47abd43c0831fd333",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/summer-guide-drip.ts",
+    "bytes": 2949,
+    "lines": 104,
+    "sha256": "d73c3143d2184eb009e6e8b93aa513ffcc0b34a5be7c2c217c49903fdc7b128b",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/summer-guide-emails.ts",
+    "bytes": 10503,
+    "lines": 221,
+    "sha256": "61450846287db0f5e54f6ef054bf4664dbf5371a26a232a6836b6e0ccb7746f2",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/unsubscribe-token.ts",
+    "bytes": 2130,
+    "lines": 65,
+    "sha256": "ac6a698562be6e26249f74d9b7c3a250b274f8f24296d76ba4ce6ae0786c67f2",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/unsubscribe.ts",
+    "bytes": 1791,
+    "lines": 59,
+    "sha256": "b5b4e46311c8c05cc6adcd55a3c1f5e70d8e59b38a26189c04b162d48904bfa8",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/weekly-digest.ts",
+    "bytes": 11174,
+    "lines": 357,
+    "sha256": "9ef5ef9ff937bcb30922b188704a216b6f6ca0e93e1543476dd5761c06212c55",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "functions/src/welcome-sequence.ts",
+    "bytes": 6555,
+    "lines": 206,
+    "sha256": "9292dfa05663ecd8f58021947d56c5c0b985676fabb255efd35f05db0aca57e2",
+    "area": "functions/src",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Audio/AudioClient.swift",
+    "bytes": 2087,
+    "lines": 74,
+    "sha256": "46b29dc0724367a62d56ec32d3a593733e1432ed4ab8a7c6b2b107d1619a0480",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Audio/SpeechClient.swift",
+    "bytes": 976,
+    "lines": 34,
+    "sha256": "7329fccc69030c15f22562a7e495e2fb465a2c870eea57b217d676f0f4b9106f",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Auth/AuthClient.swift",
+    "bytes": 6025,
+    "lines": 152,
+    "sha256": "7ea74c9bdfca273e2825794fe1ddcf9375c014eb980c853cbebeedb72456874d",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Auth/NonceGenerator.swift",
+    "bytes": 1515,
+    "lines": 36,
+    "sha256": "4fa21fcfaa975a34122ba34b8d958f6831acbd47608184ef76880615e32dd034",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Data/CurriculumClient.swift",
+    "bytes": 9758,
+    "lines": 175,
+    "sha256": "32a7ff6ad7f9a659ec611e98dafb2656aacdb562bc50d8692e6dea37db2f9e15",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Data/DatabaseClient.swift",
+    "bytes": 3520,
+    "lines": 96,
+    "sha256": "533b8317504de3ed60b4388613ca3946b2425bc2616ed9ef4fa2d18dc763368a",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Data/FirestoreClient.swift",
+    "bytes": 7003,
+    "lines": 149,
+    "sha256": "507d7347dcafaf5bcfdb2e11685d075876979d45afb005dbfa13d3dbb2a0799e",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Data/FirestoreDTOs.swift",
+    "bytes": 3779,
+    "lines": 115,
+    "sha256": "ecf7b3ae3fe6dfff722d330a2109c84633b78054ff84313c5370539ac2b460c3",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Data/Models.swift",
+    "bytes": 1428,
+    "lines": 53,
+    "sha256": "8d515a9563f4c0b0c9a72bb95f46f58052b790f1de67f41a75da9e43b159acf1",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/DesignSystem/Theme.swift",
+    "bytes": 2430,
+    "lines": 69,
+    "sha256": "9f43a462c6485dd04fb5e6bced46c6803b0c29a4a93abfb48447d0d591baf617",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/Observability/CrashlyticsClient.swift",
+    "bytes": 2686,
+    "lines": 68,
+    "sha256": "dc2750efd4d690e07eb96192cea55c04b9d52698ac6ef4b0c4fbec035497b560",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Core/StoreKit/StoreKitClient.swift",
+    "bytes": 4169,
+    "lines": 122,
+    "sha256": "b970f70f421b9de3f9dce710d91227c5af032a0459994531a6e73c48ab1df48d",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Auth/AuthFeature.swift",
+    "bytes": 7122,
+    "lines": 179,
+    "sha256": "1f18bceac23dc60f22a2220c8351e3a26b0962131d404c03d6588d18f1fbfb0f",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Auth/AuthView.swift",
+    "bytes": 9550,
+    "lines": 238,
+    "sha256": "f53b6d556aa09238662badf3f6e1055d833c2e77036191344ccf263d56a41e07",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/ChildPicker/ChildPickerFeature.swift",
+    "bytes": 2782,
+    "lines": 82,
+    "sha256": "bf0ad89072f5c31079b060f8f9be503cbd4edf4db9a920bcef4678244d2f7124",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/ChildPicker/ChildPickerView.swift",
+    "bytes": 5178,
+    "lines": 130,
+    "sha256": "67d7afc8ce52e30472295aa8cb6fe41c645ecb8f4cac7b78c2b4cf63a248ebd6",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Journey/JourneyFeature.swift",
+    "bytes": 6054,
+    "lines": 172,
+    "sha256": "0dc47b74cb9904cf88102e1321040da61c36720fc2e439bd5b4e942551719c14",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Journey/JourneyView.swift",
+    "bytes": 10126,
+    "lines": 287,
+    "sha256": "b61d2b4dae0edb369d1baa32e29d6d75d722a4442ec4e5c6c31628a953cafd6d",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Journey/LevelPreviewView.swift",
+    "bytes": 3012,
+    "lines": 81,
+    "sha256": "702940c9e0fb92885f757a751b94791f6ad5c698725f5c0d4d4a67c9c19ee81b",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Journey/MissionCompleteView.swift",
+    "bytes": 2938,
+    "lines": 77,
+    "sha256": "b11e54e75f440bd9fa2c244897dc122bc6d7e8e97a9eb6ec2b30bb02a6cb2ae9",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Literacy/LetterTracer.swift",
+    "bytes": 6160,
+    "lines": 156,
+    "sha256": "c7dfdb470183c71f5e3b8a66a9dc965d08e4c52c90589cc271215e161174ddb7",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Literacy/LiteracyFeature.swift",
+    "bytes": 1631,
+    "lines": 58,
+    "sha256": "0a49f3b08df5635fa59ba04d6eef122062e6fd67cdf0b523d8d9e68e0d7276b0",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Literacy/LiteracyView.swift",
+    "bytes": 1872,
+    "lines": 50,
+    "sha256": "64a4e93a0b3d1255e17cf4e73adc59a16c732c9e8d476a3dcee0a0727fe34630",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Literacy/SandTrayView.swift",
+    "bytes": 8276,
+    "lines": 200,
+    "sha256": "74f17f3004a68e892526f1b8efc98131cb8c534762b444cddc0c2149390df249",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Math/MathFeature.swift",
+    "bytes": 2256,
+    "lines": 76,
+    "sha256": "3f57de4db5acc0ffb8df7762478a9b0a204e420220a3a73e9c70b50c6eba8776",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Math/MathView.swift",
+    "bytes": 4702,
+    "lines": 117,
+    "sha256": "ef9d89a6c5fd1b187589e50ee323dadddc54554599bad1e047b5844f9865a805",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Math/SnapCubesScene.swift",
+    "bytes": 4225,
+    "lines": 129,
+    "sha256": "92b64a111f6ca340a261ba31a0479d1d10a9f7b8752f6305716982ead29539b1",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Math/SnapCubesView.swift",
+    "bytes": 2327,
+    "lines": 62,
+    "sha256": "2758ed44644dbb7b2613e5c9a041aa9075de698da957f5f5d0c8bbf07986afb1",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Onboarding/OnboardingFeature.swift",
+    "bytes": 3775,
+    "lines": 104,
+    "sha256": "db340dad2a3f13fa32cbe8c2348a4071e9b914316ee4e8106050f105e396ddaa",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Onboarding/OnboardingView.swift",
+    "bytes": 5133,
+    "lines": 123,
+    "sha256": "5cab556f9adb8ef831f1fda999bd7384b9e6bdd96594eb0d27af98f8d880f719",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Paywall/PaywallFeature.swift",
+    "bytes": 4087,
+    "lines": 115,
+    "sha256": "1669b58cf72eccc7e26b25df507aa13d6bdb76dd59110cadfb885968cefd9559",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Paywall/PaywallView.swift",
+    "bytes": 4584,
+    "lines": 98,
+    "sha256": "9d938ebe437920b29a8f687e8c34ec8eeee14df5cd0c67ce39b209d32d0e47b4",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Root/RootFeature.swift",
+    "bytes": 16045,
+    "lines": 353,
+    "sha256": "f3ea1e794c411c7a05f3bdbe2ddbe2e50bb0643ab598944430a4254e14810922",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/SafeSpace/SafeSpaceFeature.swift",
+    "bytes": 1442,
+    "lines": 54,
+    "sha256": "29d0f2f6e40f68dc82aec9b420c4ad14b12bb11dd4e4469a0a5f7c65b4bb26ea",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/SafeSpace/SafeSpaceView.swift",
+    "bytes": 4533,
+    "lines": 129,
+    "sha256": "8bd468dbb278c24c925402ba5205e41f6fef8461b981ca87fd7f012b41847da7",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Settings/SettingsFeature.swift",
+    "bytes": 2482,
+    "lines": 77,
+    "sha256": "c4f269455b29e2d2e336785e81f8206abd94920149d31ff18d777f9f43118866",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Features/Settings/SettingsView.swift",
+    "bytes": 3425,
+    "lines": 95,
+    "sha256": "478914f31773e640eb09a5d9220d183a3ae6453aacd1b93836e749bae9c974c1",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/IEPAndThriveApp.swift",
+    "bytes": 3414,
+    "lines": 103,
+    "sha256": "5e071528b322311c9107349a5e24ccf87626fb4d588cf24ada224253c0e8d7c4",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json",
+    "bytes": 177,
+    "lines": 13,
+    "sha256": "554c06afb2bf81e3af423161e55281ea25575759a2d2d8c63229d4981d89bd0b",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/BiomeForest.imageset/Contents.json",
+    "bytes": 156,
+    "lines": 12,
+    "sha256": "1147e5f291dd6924eaf7317a3d98e89391029d53328890a9a49426b97aea7733",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/BiomeForest.imageset/forest.png",
+    "bytes": 23582,
+    "lines": null,
+    "sha256": "e0e7237e06be2e3d36c1d41b89a5bb30c62046a2a24f1410a25b7fe9b28f0807",
+    "area": "ios/IEPAndThrive",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/Contents.json",
+    "bytes": 63,
+    "lines": 6,
+    "sha256": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/SafeSpaceBg.imageset/Contents.json",
+    "bytes": 159,
+    "lines": 12,
+    "sha256": "897d1121454c85fd0c2a913058bd4e5b3742448854b055802f80d2f4ac8baee7",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/SafeSpaceBg.imageset/safespace.png",
+    "bytes": 61137,
+    "lines": null,
+    "sha256": "5b4bcbe03da3f57eca6d1b7c41faaa65321123ca0e7d5488e50070024b12476c",
+    "area": "ios/IEPAndThrive",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/SandTexture.imageset/Contents.json",
+    "bytes": 154,
+    "lines": 12,
+    "sha256": "9ca5d78d36a9e06e75c7fe3f95a5a4fdfc5e1e7f8f5f27453f2c09aeac85da41",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Assets.xcassets/SandTexture.imageset/sand.png",
+    "bytes": 27919,
+    "lines": null,
+    "sha256": "8738a15eb3c0cabc909438f7707fcfcfbe6fcfcdad4af741ace5cb1758230b80",
+    "area": "ios/IEPAndThrive",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/GoogleService-Info.plist",
+    "bytes": 1126,
+    "lines": 34,
+    "sha256": "e486b87c5fcdb38d41e77e3ab5674761926798a70341ff8df5d2380da89d1118",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/IEPAndThrive.entitlements",
+    "bytes": 278,
+    "lines": 10,
+    "sha256": "b2cff52cf90d8cc5be5a2803c78f759d1dffcf00f0f54615b5330c53fea46d29",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/Info.plist",
+    "bytes": 1571,
+    "lines": 50,
+    "sha256": "91b2976b917afb1ee6a25f4a9e8596b8de11576f30bc6628eba64bdcf05de98f",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThrive/Resources/PrivacyInfo.xcprivacy",
+    "bytes": 5343,
+    "lines": 165,
+    "sha256": "7d6e8c6bba79dcbb3111e40e46cd1bb1ceb82e4efde4401a82333ec24c5498a8",
+    "area": "ios/IEPAndThrive",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/AuthFeatureTests.swift",
+    "bytes": 10843,
+    "lines": 318,
+    "sha256": "136abd12b9f16a29fbde8f4178a23426b28b87c39ee8e4e392862c11be74c5c0",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/ChildPickerFeatureTests.swift",
+    "bytes": 2668,
+    "lines": 81,
+    "sha256": "7950e5a0de89ab0db34870d1432fc97cf4042d4365005904e728dd4ec8c5523c",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/CrashlyticsClientTests.swift",
+    "bytes": 6883,
+    "lines": 185,
+    "sha256": "7dcd8700459efcbd1d4bc3082d1fefa94db0cea06e35edd1a2c5abbf38418afa",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/JourneyFeatureTests.swift",
+    "bytes": 7186,
+    "lines": 190,
+    "sha256": "281cbcebaf50ec451477ab113193979e13863bab83477eb98735f22de9c734b8",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/LetterTracerTests.swift",
+    "bytes": 3558,
+    "lines": 90,
+    "sha256": "4fe802d30ce37587ca044cad48ad5cc8017bfe25a11cfc55dadda62ed36bacec",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/LiteracyFeatureTests.swift",
+    "bytes": 2999,
+    "lines": 99,
+    "sha256": "db272d4c9b7576bef8840e2e1590aa38216cb94400184c4f54271d2aaa8af76e",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/MathFeatureTests.swift",
+    "bytes": 4735,
+    "lines": 138,
+    "sha256": "012c4b030f317c48bbf7f6d6a3966170ac54c42dd9564bde0fce9254a42f98f7",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/NonceGeneratorTests.swift",
+    "bytes": 1564,
+    "lines": 41,
+    "sha256": "666f68560c3713ccff291409e4150c31817c66e3b8567a3c362d22ad07d11d0d",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/OnboardingFeatureTests.swift",
+    "bytes": 4954,
+    "lines": 136,
+    "sha256": "06e06a61e28f5bf251b3baa5ef7e3ee4dd3a19ada211a79b4e27119265cf0428",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/RootFeatureTests.swift",
+    "bytes": 23806,
+    "lines": 605,
+    "sha256": "2aea6a8291804a07dc9f036136e30086d8b42e18da121455eb0628a6e944e2ae",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/SettingsFeatureTests.swift",
+    "bytes": 2073,
+    "lines": 65,
+    "sha256": "b571e411ba140d1dea294acb6d3bb5441b22fca4acc0a278bb39fb5d503b9d6a",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "ios/IEPAndThriveTests/TestHelpers.swift",
+    "bytes": 898,
+    "lines": 28,
+    "sha256": "8c483f0fc2cbae80f6418e38130b80a06aca971450066b4b2834baadf2d4d872",
+    "area": "ios/IEPAndThriveTests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/assessments/post-assessment.md",
+    "bytes": 21700,
+    "lines": 688,
+    "sha256": "a547389cafec962cafb226da5f62e68cbfdca6c60413defbab11e86160d0859d",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/assessments/pre-assessment.md",
+    "bytes": 23985,
+    "lines": 769,
+    "sha256": "e2e7605ec8d4d374d3689bf273a8f9665242355ca0ea86ddbb9bfe34258efa7f",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/assessments/progress-monitoring/weekly-probe-template.md",
+    "bytes": 16711,
+    "lines": 404,
+    "sha256": "a6e11410e5efb7a74c557980a8c325f025b7a92daeacba04db4346f58eb4c498",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/parent-communications/weekly-update-templates.md",
+    "bytes": 23160,
+    "lines": 590,
+    "sha256": "5ba22d3c214056476f002f46f2507a7a2cb52ae189792b59b6c851eedbbf9349",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/portfolio/portfolio-guide.md",
+    "bytes": 12947,
+    "lines": 383,
+    "sha256": "83a8fb0151c185095a4478600a3d0c8c2a7d616a09d922cf51f22d9207625a95",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/scope-and-sequence.md",
+    "bytes": 21694,
+    "lines": 297,
+    "sha256": "d652530ba8816104eb17eee2fdae0cf4a14f1262788703a584f02335422c664b",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-1/friday.md",
+    "bytes": 24648,
+    "lines": 465,
+    "sha256": "f5232f61d210caff2e56a774325610bce286f9ece13a6654eeec6eff86e1041b",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-1/monday.md",
+    "bytes": 18936,
+    "lines": 337,
+    "sha256": "db4c7564535cdf855d7e082e1969d1c0742f287557377a8299d9d15ccba6ee59",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-1/overview.md",
+    "bytes": 6036,
+    "lines": 150,
+    "sha256": "2eca24bbb5ac1525503069e03f814a227a152704c1f70c3cc2bb52535a83dbbc",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-1/thursday.md",
+    "bytes": 26016,
+    "lines": 445,
+    "sha256": "64d6832818dd13b736651d312211d6e9ec616429e4a6d2b57ee2b18a7bfc160b",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-1/tuesday.md",
+    "bytes": 19315,
+    "lines": 353,
+    "sha256": "a0af093dbd95bc70419f5a10aad1b5a49cc7b61e543692eff21e0ef9b1720b44",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-1/wednesday.md",
+    "bytes": 22076,
+    "lines": 370,
+    "sha256": "628ccc8a7e6d26360c9c986cca085a78c3b5009fac4688f8f26cc6ef4c85118f",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-2/friday.md",
+    "bytes": 28951,
+    "lines": 557,
+    "sha256": "61e000fe40680a13c5e3c8b6d49c84956bc54ea3c884c256b4e6fad90929b5f2",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-2/monday.md",
+    "bytes": 26143,
+    "lines": 427,
+    "sha256": "be8fb3ed8206d560afe604c29773cd67a09b5c741ffc1172b9fadd7aa9cbb3a1",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-2/overview.md",
+    "bytes": 8730,
+    "lines": 151,
+    "sha256": "db892156bcda1d2d50f5e13692ba94f53128dfbd4a1aa3a9a254cd2a39fed89f",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-2/thursday.md",
+    "bytes": 28279,
+    "lines": 486,
+    "sha256": "a6e3fff93e727683a6ba94bfc17c5e746de67e834daadffc4f724a24d48c783c",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-2/tuesday.md",
+    "bytes": 23484,
+    "lines": 400,
+    "sha256": "7084da23c4ca7e95a863d576c8cd7f11e3b2b837a1a2bee09731b23851a6d102",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-2/wednesday.md",
+    "bytes": 27914,
+    "lines": 463,
+    "sha256": "d57093104d0ab52ff6a970790ccf5f14d97dc670c5253a4e52c23f850b55729f",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-3/friday.md",
+    "bytes": 27877,
+    "lines": 469,
+    "sha256": "0a02bea3134f47162d022ee59d337036e0f5f1eafb3a26dfa5e67e0b56bc71f2",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-3/monday.md",
+    "bytes": 23258,
+    "lines": 384,
+    "sha256": "263411ebf112e80c95abc02f378c624b564bc31779863a5fa1341d413e31ddd0",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-3/overview.md",
+    "bytes": 11561,
+    "lines": 181,
+    "sha256": "3961132dc1a06f1a35d9478c05a513f70b28a8bfc6f9c36e7b2db95a8dbb81ff",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-3/thursday.md",
+    "bytes": 26746,
+    "lines": 447,
+    "sha256": "fd05e94c17f7a758d01cd2d8294d5b955dc830e9334304b816e3f4d60860941a",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-3/tuesday.md",
+    "bytes": 22266,
+    "lines": 378,
+    "sha256": "a38dc7723a0adb18ad539bc86f6c54c16891d04366ca5ef18a98e10e30b93e80",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-3/wednesday.md",
+    "bytes": 25296,
+    "lines": 425,
+    "sha256": "1199767a5f6408105d2fd52436f966931e96b97ab21623fb62f2c35190946bb3",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-4/friday.md",
+    "bytes": 25069,
+    "lines": 429,
+    "sha256": "95537e0183a2020f7201640947d4a01969b889506c8b3b61c026d73c63d43201",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-4/monday.md",
+    "bytes": 25324,
+    "lines": 393,
+    "sha256": "574e1ab1b54b9b287015140d63d47f030a4ba7d45abba80d4bb709d0447f8621",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-4/overview.md",
+    "bytes": 13477,
+    "lines": 185,
+    "sha256": "ba5e5e6baef31e4c9565ba4ee8ae2e5969f17b1e6eed34af465e47de48633826",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-4/thursday.md",
+    "bytes": 28652,
+    "lines": 407,
+    "sha256": "7c1a47208f8d1dfa67eee35eaaa59d08c7680fa9090cb40fb355aa324768b684",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-4/tuesday.md",
+    "bytes": 23619,
+    "lines": 365,
+    "sha256": "f3a83a456f17f4a9c8da88d931d5ff16e69ff05f00e689ccd6b2e9391abdd7e2",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-4/wednesday.md",
+    "bytes": 24932,
+    "lines": 401,
+    "sha256": "2d1e203d9f90bf08e099490937adc98b66d1ff626788f8ad229567611dfe002c",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-5/friday.md",
+    "bytes": 18694,
+    "lines": 356,
+    "sha256": "f68baedbb94efee4348a58ad3a2724ff81b987cd907a7d8b5a9af06139b52da3",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-5/monday.md",
+    "bytes": 21441,
+    "lines": 334,
+    "sha256": "d2a4a8d6af96257e7fb8794e94286d2aa46e15ffe3c8a8351191539c584c45d7",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-5/overview.md",
+    "bytes": 12309,
+    "lines": 168,
+    "sha256": "c46dd9d250f8198e47f241d9450b4d4f3e41a4ea53c2339496ad1d273c0b1814",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-5/thursday.md",
+    "bytes": 23428,
+    "lines": 392,
+    "sha256": "0a4930a15ae92a44e74c546adf7c4c884fb558987bf39d54a977c3baf18624be",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-5/tuesday.md",
+    "bytes": 23026,
+    "lines": 384,
+    "sha256": "9ecfe823ded6f17f07d4323105cbf847b718c646e8c432a7125b7cfac2a9651d",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-5/wednesday.md",
+    "bytes": 23338,
+    "lines": 400,
+    "sha256": "6feeb465ec888464ec6fa24239851d8d352fa3bd0a4e7e52015617708da8501e",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-6/friday.md",
+    "bytes": 24408,
+    "lines": 408,
+    "sha256": "e09e72139d8c334fdc7d758c5de8c43f5a2b49bd5c57190803b63094c69e03b3",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-6/monday.md",
+    "bytes": 22212,
+    "lines": 367,
+    "sha256": "1df144857b8a91b8e13103e780593d218363a89a72653a3c481d089db5100821",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-6/overview.md",
+    "bytes": 16490,
+    "lines": 244,
+    "sha256": "b9621802291679893c07693314e971baeb79a22c986f2038c9b9f0f8e48b37c9",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-6/thursday.md",
+    "bytes": 23670,
+    "lines": 411,
+    "sha256": "d2eff1b82b1a8f83496e1570998491e2b858abd3ab06154a30ec8f7ce2a9f6f6",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-6/tuesday.md",
+    "bytes": 20200,
+    "lines": 355,
+    "sha256": "a285bfd5a09d099b2246b656405329e1d791306db0e30a856c342b67b37d4884",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "curriculum/week-6/wednesday.md",
+    "bytes": 20036,
+    "lines": 345,
+    "sha256": "d6dbcdfaf11fe178b73ff296f4ee82e578afc3687ec8c768ccc5351464c59cac",
+    "area": "curriculum",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": ".github/workflows/deploy.yml",
+    "bytes": 1851,
+    "lines": 57,
+    "sha256": "0fa498d8d64f86723c12663c82b2a2ae931b41897d19e2ec11b085aedda37207",
+    "area": ".github/workflows",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": ".github/workflows/e2e.yml",
+    "bytes": 2186,
+    "lines": 73,
+    "sha256": "a4ca5dfd16bfaddbf75e27feb2c576c1a71139e399ec094e517ac61024deab6a",
+    "area": ".github/workflows",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": ".github/workflows/ios-ci.yml",
+    "bytes": 2582,
+    "lines": 76,
+    "sha256": "f35b99a8fa4e2bde17d0397a939905337767a299a390f41ccd90f7b2e3682c6d",
+    "area": ".github/workflows",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": ".github/workflows/ios-release.yml",
+    "bytes": 2580,
+    "lines": 70,
+    "sha256": "33a9cf5f7c397c1a22dd7928f094506efca13db1efa1f0a6217d736fb15e3fac",
+    "area": ".github/workflows",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/backlog.yml",
+    "bytes": 78346,
+    "lines": 2045,
+    "sha256": "27fe5d7e4781fc756681e8ad966f941369b3abd127cae0bef45aa3d646b370f7",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/create-stripe-tutoring-products.sh",
+    "bytes": 5329,
+    "lines": 121,
+    "sha256": "324b153c7a5fe56f0b24047727fbef840dc8b71a57aee916ce829ed32fd82ed2",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/reset-test-accounts.mjs",
+    "bytes": 2563,
+    "lines": 79,
+    "sha256": "9a4eb7b385dbb016e23cc9fbd10333d1844a7207ac319e11e711c2c6b4c07bb5",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/seed-github-project.sh",
+    "bytes": 11625,
+    "lines": 311,
+    "sha256": "e321a3a51fe0c45ecdc5a414a220162f75681550698ffc5bcd4cfe08e04c5fd3",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/seed-test-accounts.mjs",
+    "bytes": 9423,
+    "lines": 283,
+    "sha256": "6a7d5bb56624e8f8c5cf4c65537407551c324396a016cda1de8a42797967ad48",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/seed-tutoring-slots.mjs",
+    "bytes": 15954,
+    "lines": 474,
+    "sha256": "f9b96c1864ba0d838d654f6712399b14ef33e75536f8ae9a335b9939c08c1bb4",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/setup-firestore-backups.sh",
+    "bytes": 5502,
+    "lines": 82,
+    "sha256": "069d7ea3f68e1524599bfc4a1ff719814b6623ce2b74b2543f7560fef3e91608",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/test-accounts.md",
+    "bytes": 4493,
+    "lines": 88,
+    "sha256": "023100298787d6664805303d110fabd3dedcdcf17ba6cb8bc6e4610e46fc2d98",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/tutoring-slot-template.json",
+    "bytes": 448,
+    "lines": 10,
+    "sha256": "a94f4e5ff0c3ac9c804c63f5364423fad4fe95471dad33353ac55a949f76f757",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/verify-firebase.mjs",
+    "bytes": 6504,
+    "lines": 183,
+    "sha256": "e6fab302e698851e31828dfea84c645b69668ff00910af6036c909a78dd29de2",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/verify-firestore-backup.sh",
+    "bytes": 2433,
+    "lines": 68,
+    "sha256": "b91e8a624337340a0f4bc04760d03b81c50a0afd9c8195fcee9deea563a2812b",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "scripts/verify-test-accounts.mjs",
+    "bytes": 1144,
+    "lines": 28,
+    "sha256": "0e5fa48c61f8ce5118bfcaeac89deca0444a9d03bce3b0a087141b3baef0ee75",
+    "area": "scripts",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/admin-curriculum.spec.ts",
+    "bytes": 4145,
+    "lines": 93,
+    "sha256": "c572b0eb7e2d7a90d90ecdcbc1bba93497e06b1c8d53d64b47eceb89f7fe2fab",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/auth-personas.spec.ts",
+    "bytes": 1243,
+    "lines": 35,
+    "sha256": "e16e40c11e27e1034206a9caa4474245d396380b08469105c7b171ce2eb23988",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/email-lifecycle.spec.ts",
+    "bytes": 2215,
+    "lines": 41,
+    "sha256": "546a900df227508e45c2c6b05ee89296ccb9912b0730d49a145781b3d90812dd",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/enrollment-agreement.spec.ts",
+    "bytes": 2908,
+    "lines": 65,
+    "sha256": "0d2e95f0979846888a154c3669862ac595de7e99186040fd0512a4e19cbd846e",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/fixtures.ts",
+    "bytes": 2755,
+    "lines": 67,
+    "sha256": "d57a88f26fa19addddc2bee886d88a919c1063a7dbbe726a6056a3f8a0af8926",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/marketing.spec.ts",
+    "bytes": 4608,
+    "lines": 110,
+    "sha256": "c7d73edaa496b5164c48a5489dc0a5af75e99c3d2f20774bd619f4cbc9fffc26",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/photo-release.spec.ts",
+    "bytes": 3190,
+    "lines": 75,
+    "sha256": "350027dc4908a94eecb68c689d526ee433e33484d7ce19d38a9ed81ba9697cef",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/portal-state.spec.ts",
+    "bytes": 1407,
+    "lines": 30,
+    "sha256": "58d833ac3b138f6c46949740f7cf7d8b11995f5b7d882d426feb63645c83fe09",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/e2e/tutoring.spec.ts",
+    "bytes": 6303,
+    "lines": 125,
+    "sha256": "f0df767484c784af200e52ce558cc682969f6d18ed55a64bb2d70e7fe823b6e3",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/security/README.md",
+    "bytes": 1280,
+    "lines": 13,
+    "sha256": "8ab236a944a3c390147978aaf96949f68fb6e40b66d0105df5e51c2fc94c1339",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/security/family-access.test.cjs",
+    "bytes": 4386,
+    "lines": 61,
+    "sha256": "66233b8d85a656c0e49913ae9cd7cbe859595d57583a12f014aed9d6ed883dff",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/JourneyFeatureTests.swift",
+    "bytes": 553,
+    "lines": 17,
+    "sha256": "c57a7e318c1317740879f2f6d354c1d1ba3a3562281804735dea862e112d6db5",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/MathFeatureTests.swift",
+    "bytes": 511,
+    "lines": 17,
+    "sha256": "d0067c033c7fac651dcc49b5f1d85ca51444f50006e87cb2a604b5a87195878c",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/MathGateTests.swift",
+    "bytes": 221,
+    "lines": 10,
+    "sha256": "ca499ac9a369c38c06f496ae86beeefa19cbbfdff3d79d564aec1fe3a793c5e0",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/MonetizationTests.swift",
+    "bytes": 588,
+    "lines": 22,
+    "sha256": "b7c1019cd0f29bc6a2171d57dcc1023511bd516684092a09f9ae874e28cc87d0",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/SafeSpaceTests.swift",
+    "bytes": 1307,
+    "lines": 48,
+    "sha256": "12a8b89c70eed021cc5490f54a92e0f13950547219ea1e67344a9382d20eac78",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/auth-context.test.mjs",
+    "bytes": 2734,
+    "lines": 65,
+    "sha256": "1668c88b3bdad2c2c7992e270bc75397b4f6489824f772a5f87e8eebc0fbf68f",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/dates.test.mjs",
+    "bytes": 4559,
+    "lines": 118,
+    "sha256": "2761d445a08489dc2952469a47ce605bc4adca4178b970b7e969e79d5eaa6ee3",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/ios-progress.test.mjs",
+    "bytes": 3942,
+    "lines": 139,
+    "sha256": "990c7512d3729feafc17ccf3daa9840d37ee927fbcfc0b11cc982d377bc0ab1b",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/seed-tutoring-slots.test.mjs",
+    "bytes": 6045,
+    "lines": 164,
+    "sha256": "b3b9b61368ca433c8a3ba42246dadf4c9aa96aa09adcfc16e9b4871df2299b6a",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "tests/unit/subscription.test.mjs",
+    "bytes": 5531,
+    "lines": 165,
+    "sha256": "9ad8f0f8fba0ab150e35c05563e7ac8da37f3e919fd26ce71511061850c932ec",
+    "area": "tests",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "styles/globals.css",
+    "bytes": 3525,
+    "lines": 170,
+    "sha256": "13bec76ddcae2b01fae4c88ed5c355ea9e4d702a10e91aa41b157a6dc1d9e098",
+    "area": "styles",
+    "review_method": "inventory and pattern scan; principal paths additionally traced in findings"
+  },
+  {
+    "path": "public/images/child-reading.jpg",
+    "bytes": 27623,
+    "lines": null,
+    "sha256": "04d5bb58115267da2c05b3c7357fca12825665a1859e904e8f7631e18d81904e",
+    "area": "public",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "public/images/child-writing-desk.jpg",
+    "bytes": 50242,
+    "lines": null,
+    "sha256": "fa4a2826b8a04204e12bb1b323421ef303a3361080eb30b145a769112da27e9f",
+    "area": "public",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "public/images/founder-teaching.jpg",
+    "bytes": 77784,
+    "lines": null,
+    "sha256": "94f3723a9abcd2ead05ed1216c770a4845f8f734a62a9a9a7c1555d2b4969080",
+    "area": "public",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "public/images/hero-kids-learning.jpg",
+    "bytes": 122444,
+    "lines": null,
+    "sha256": "1ca4dc268c3c4a1f78354a3c010564d0dfcb1689e1c8a67abdd47d2ec4d37057",
+    "area": "public",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "public/images/kids-collaborating.jpg",
+    "bytes": 50242,
+    "lines": null,
+    "sha256": "fa4a2826b8a04204e12bb1b323421ef303a3361080eb30b145a769112da27e9f",
+    "area": "public",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "public/images/parent-child-study.jpg",
+    "bytes": 130658,
+    "lines": null,
+    "sha256": "87e105695b59091463ba41b3f5f9af22550dcc9dd78bee6d73307398b5e3ea94",
+    "area": "public",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "public/og-image.png",
+    "bytes": 24981,
+    "lines": null,
+    "sha256": "cb5109f34b91e3d650ce79f3a0e7dc90603992ac304dc0dc6f5693c9096ece9e",
+    "area": "public",
+    "review_method": "asset inventory; no assertion of full visual or rights review"
+  },
+  {
+    "path": "firestore.rules",
+    "bytes": 8111,
+    "lines": 196,
+    "sha256": "3981800b0bbdc59a2fb7642114e23be80343acf3549958be14ca10eba36d42ad",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "storage.rules",
+    "bytes": 2214,
+    "lines": 53,
+    "sha256": "f40e9e6fcdb216b3163f22b1ef644f5cc289041b925261b63fbf167bdcb7cd1a",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "firestore.indexes.json",
+    "bytes": 4994,
+    "lines": 175,
+    "sha256": "d2e2c97344f6b529e8275f200510105b49a626bb1a2cdb11c6f14618f778eb4a",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "firebase.json",
+    "bytes": 892,
+    "lines": 55,
+    "sha256": "6b9ba4fb29d0fc709829369ee6b137aab7f30a9c851ab4c9c00c42c907401086",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "firebase.security.json",
+    "bytes": 364,
+    "lines": 11,
+    "sha256": "25d1b9ed1073d8fe502f4c8b98a9d8934e1d2e9a243b65fbe15333983063a2b3",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": ".firebaserc",
+    "bytes": 88,
+    "lines": 7,
+    "sha256": "99438a6a20b9976b94265babd106512b8af007354b478f5b68c4b6de6b2e9ff9",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "next.config.js",
+    "bytes": 153,
+    "lines": 9,
+    "sha256": "3e4f212c5bdfe6b18e1db34ffb63b4481f58ca7001a1976ffa7f2067adf05062",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "package.json",
+    "bytes": 1710,
+    "lines": 56,
+    "sha256": "19d6a424c50cae26862924c5071a37f898a07eb0c4b66e030bcfe47b2a02dd46",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "package-lock.json",
+    "bytes": 151630,
+    "lines": 4158,
+    "sha256": "373b0cfdd89e31fbf8e8f5d192e88db8daa0f65deb42db3489532df82e013fe4",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "functions/package.json",
+    "bytes": 750,
+    "lines": 29,
+    "sha256": "d8e6882c6895b2d987f29b7dbd41f020337d540775d86fda6a200b80154778d7",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "functions/package-lock.json",
+    "bytes": 117712,
+    "lines": 3173,
+    "sha256": "a0ddd8d0d69cf3cacc99285eadb3dad53bca263079de486e4b60954169a7c900",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "ios/project.yml",
+    "bytes": 3664,
+    "lines": 92,
+    "sha256": "52d445315f8be451ea22c93e3f70d077c3c7e0deb0177b808efe835cecde0619",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "ios/fastlane/Fastfile",
+    "bytes": 3589,
+    "lines": 96,
+    "sha256": "e8ba7fd2f5b46a6ed7ae06389dfce6778ec10c5ae921e51352899b33f9be9008",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "ios/Gemfile",
+    "bytes": 335,
+    "lines": 8,
+    "sha256": "314124309559bc408fd7b9cbbf519165aa314aed6fbfca2414b06d9c8e73ad43",
+    "area": "configuration",
+    "review_method": "configuration review"
+  },
+  {
+    "path": "ios/IEPAndThrive.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+    "bytes": 8549,
+    "lines": 276,
+    "sha256": "a164be6980a0c4dfe22ae5c150684c9904ad4a8fead7db380078f5520c31a777",
+    "area": "configuration",
+    "review_method": "configuration review"
+  }
+]

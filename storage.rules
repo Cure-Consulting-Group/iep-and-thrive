@@ -36,13 +36,11 @@ service firebase.storage {
       allow write: if false;
     }
 
-    // E3 — Signed enrollment agreements (server-written; client read-only)
+    // Signed PDFs are available only through getSignedAgreementPdf, which
+    // checks owner/admin access before issuing a short-lived signed URL.
+    // Admin SDK writes bypass these rules; no client may read or write directly.
     match /signedAgreements/{enrollmentId} {
-      allow read: if request.auth != null;
-      // Authorization (own vs admin) is enforced server-side via
-      // getSignedAgreementPdf; client direct reads work only if firestore
-      // metadata permits, but we keep this gate auth-required to fail safe.
-      allow write: if false;
+      allow read, write: if false;
     }
 
     // E3 — Per-uid raw signature images (audit-only; admin + owner read)

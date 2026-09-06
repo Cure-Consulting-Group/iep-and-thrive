@@ -1,0 +1,9 @@
+Verification record transcribed from the completed tool result on 2026-09-05.
+Command: npm run build
+Working directory: functions/
+
+> build
+> tsc
+
+Exit code: 0
+This is a compilation result, not a deployed-runtime or integration check.

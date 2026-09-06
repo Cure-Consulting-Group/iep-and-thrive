@@ -1,0 +1,45 @@
+{
+  "baseline": "c60cc3b6d1599a6c5e39f89e999b111a0cc25b2a",
+  "date": "2026-09-05 America/New_York",
+  "unit": {
+    "passed": 37,
+    "failed": 0
+  },
+  "ios": {
+    "passed": 95,
+    "failed": 0,
+    "xcode": "26.5",
+    "simulator": "iPhone 17 Pro iOS 26.5"
+  },
+  "webBuild": "pass with public Firebase environment from deploy workflow; missing-env run failed auth/invalid-api-key",
+  "functionsBuild": "pass",
+  "localNode": "25.9.0",
+  "functionsDeclaredNode": "22",
+  "marketingBrowserTests": {
+    "passed": 7,
+    "failed": 2,
+    "reason": "stale May 30 deadline assertions"
+  },
+  "npmRoot": {
+    "info": 0,
+    "low": 1,
+    "moderate": 12,
+    "high": 8,
+    "critical": 2,
+    "total": 23
+  },
+  "npmFunctions": {
+    "info": 0,
+    "low": 2,
+    "moderate": 13,
+    "high": 5,
+    "critical": 2,
+    "total": 22
+  },
+  "productionChecks": {
+    "https://iep-and-thrive.web.app": 200,
+    "iepandthrive.com": "NXDOMAIN via Cloudflare 1.1.1.1 and local resolver"
+  },
+  "latestGitHubE2E": "https://github.com/Cure-Consulting-Group/iep-and-thrive/actions/runs/32671917063",
+  "productionWrites": "No production family records or billing operations used for security probes; all probes used demo project emulators."
+}

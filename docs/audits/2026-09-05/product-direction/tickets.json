@@ -1,0 +1,1475 @@
+[
+  {
+    "id": "TASK-LP-001",
+    "title": "Approve the independent reading-product brief and explicit non-goals",
+    "epic": "EPIC-LP-01",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Product lead + educator",
+    "points": 5,
+    "findings": [
+      "F01",
+      "F34",
+      "F40"
+    ],
+    "dependencies": [],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-001.md"
+  },
+  {
+    "id": "TASK-LP-002",
+    "title": "Establish educator ownership, content rights, and instructional review",
+    "epic": "EPIC-LP-01",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Educator lead + product",
+    "points": 5,
+    "findings": [
+      "F01",
+      "F33",
+      "F37"
+    ],
+    "dependencies": [
+      "TASK-LP-001"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-002.md"
+  },
+  {
+    "id": "TASK-LP-003",
+    "title": "Design a consented feasibility pilot and external demand study",
+    "epic": "EPIC-LP-01",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Product researcher + educator",
+    "points": 8,
+    "findings": [
+      "F01",
+      "F36",
+      "F40"
+    ],
+    "dependencies": [
+      "TASK-LP-001"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-003.md"
+  },
+  {
+    "id": "TASK-LP-004",
+    "title": "Qualify NYC channels and classroom policy requirements",
+    "epic": "EPIC-LP-01",
+    "priority": "P1",
+    "gate": "G4: institutional use",
+    "owner": "Product + school partnerships + privacy lead",
+    "points": 5,
+    "findings": [
+      "F40"
+    ],
+    "dependencies": [
+      "TASK-LP-001"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-004.md"
+  },
+  {
+    "id": "TASK-LP-005",
+    "title": "Define separate digital and tutoring offers with testable economics",
+    "epic": "EPIC-LP-01",
+    "priority": "P1",
+    "gate": "G3: paid digital release",
+    "owner": "Product + business owner",
+    "points": 5,
+    "findings": [
+      "F01",
+      "F32",
+      "F40"
+    ],
+    "dependencies": [
+      "TASK-LP-001",
+      "TASK-LP-003"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-005.md"
+  },
+  {
+    "id": "TASK-LP-006",
+    "title": "Review and release the existing billing and signed-PDF security repairs",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Security + backend + release owner",
+    "points": 5,
+    "findings": [
+      "F07",
+      "F08"
+    ],
+    "dependencies": [],
+    "status": "Implemented locally \u2014 deployment and historical verification outstanding",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-006.md"
+  },
+  {
+    "id": "TASK-LP-007",
+    "title": "Separate all instructor-private notes from parent-readable records",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web + privacy",
+    "points": 8,
+    "findings": [
+      "F09"
+    ],
+    "dependencies": [
+      "TASK-LP-076"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-007.md"
+  },
+  {
+    "id": "TASK-LP-008",
+    "title": "Make student identity and enrollment authority server-controlled",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + data",
+    "points": 8,
+    "findings": [
+      "F10"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-076"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-008.md"
+  },
+  {
+    "id": "TASK-LP-009",
+    "title": "Constrain notification edits and enforce resource visibility",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web",
+    "points": 5,
+    "findings": [
+      "F12"
+    ],
+    "dependencies": [
+      "TASK-LP-008"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-009.md"
+  },
+  {
+    "id": "TASK-LP-010",
+    "title": "Add bounded validation and abuse protection to public endpoints",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + security",
+    "points": 8,
+    "findings": [
+      "F22"
+    ],
+    "dependencies": [
+      "TASK-LP-054",
+      "TASK-LP-058"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-010.md"
+  },
+  {
+    "id": "TASK-LP-011",
+    "title": "Remove production test-account credential defaults and isolate test access",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Security + QA + operations",
+    "points": 5,
+    "findings": [
+      "F23",
+      "F38"
+    ],
+    "dependencies": [
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-011.md"
+  },
+  {
+    "id": "TASK-LP-012",
+    "title": "Bind signed agreements to canonical terms and owned enrollment records",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web + legal reviewer",
+    "points": 8,
+    "findings": [
+      "F17"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-076"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-012.md"
+  },
+  {
+    "id": "TASK-LP-013",
+    "title": "Align IEP and report storage paths with ownership and safe delivery",
+    "epic": "EPIC-LP-02",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web + privacy",
+    "points": 8,
+    "findings": [
+      "F16"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-076"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-013.md"
+  },
+  {
+    "id": "TASK-LP-014",
+    "title": "Define the canonical account, learner, enrollment, and program data contract",
+    "epic": "EPIC-LP-03",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Data architect + backend + client leads",
+    "points": 8,
+    "findings": [
+      "F10",
+      "F20",
+      "F33",
+      "F35",
+      "F43"
+    ],
+    "dependencies": [
+      "TASK-LP-001"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-014.md"
+  },
+  {
+    "id": "TASK-LP-015",
+    "title": "Implement adult consent and child-data minimization before cloud collection",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "Privacy lead + backend + iOS + web",
+    "points": 8,
+    "findings": [
+      "F06",
+      "F39"
+    ],
+    "dependencies": [
+      "TASK-LP-014"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-015.md"
+  },
+  {
+    "id": "TASK-LP-016",
+    "title": "Build an accessible adult gate and parent control center",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS + product design",
+    "points": 5,
+    "findings": [
+      "F06",
+      "F32"
+    ],
+    "dependencies": [
+      "TASK-LP-015"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-016.md"
+  },
+  {
+    "id": "TASK-LP-017",
+    "title": "Scope SwiftData records to accounts and learners with a safe legacy migration",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS data engineer",
+    "points": 8,
+    "findings": [
+      "F04",
+      "F10",
+      "F43"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-073",
+      "TASK-LP-076"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-017.md"
+  },
+  {
+    "id": "TASK-LP-018",
+    "title": "Restore progress and active learner before enabling the journey",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS",
+    "points": 8,
+    "findings": [
+      "F04",
+      "F05"
+    ],
+    "dependencies": [
+      "TASK-LP-017",
+      "TASK-LP-019",
+      "TASK-LP-020"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-018.md"
+  },
+  {
+    "id": "TASK-LP-019",
+    "title": "Replace anonymous migration with a proven identity-linking flow",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS + backend + security",
+    "points": 8,
+    "findings": [
+      "F05"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-015",
+      "TASK-LP-017"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-019.md"
+  },
+  {
+    "id": "TASK-LP-020",
+    "title": "Implement durable attempt and reward synchronization with acknowledgments",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS + backend",
+    "points": 8,
+    "findings": [
+      "F04",
+      "F43"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-017",
+      "TASK-LP-025"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-020.md"
+  },
+  {
+    "id": "TASK-LP-021",
+    "title": "Deliver account/learner export, deletion, consent withdrawal, and retention",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "Backend + privacy + iOS + web",
+    "points": 8,
+    "findings": [
+      "F39"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-015",
+      "TASK-LP-020",
+      "TASK-LP-059"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-021.md"
+  },
+  {
+    "id": "TASK-LP-022",
+    "title": "Implement least-privilege practitioner invitations and learner sharing",
+    "epic": "EPIC-LP-03",
+    "priority": "P1",
+    "gate": "G4: institutional use",
+    "owner": "Backend + web + privacy",
+    "points": 8,
+    "findings": [
+      "F35"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-015",
+      "TASK-LP-021"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-022.md"
+  },
+  {
+    "id": "TASK-LP-023",
+    "title": "Separate attempts, assistance, completion, skips, and Sparks",
+    "epic": "EPIC-LP-04",
+    "priority": "P0",
+    "gate": "G1: internal prototype",
+    "owner": "iOS + learning engineer + educator",
+    "points": 8,
+    "findings": [
+      "F02",
+      "F03"
+    ],
+    "dependencies": [
+      "TASK-LP-025"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-023.md"
+  },
+  {
+    "id": "TASK-LP-024",
+    "title": "Restrict the catalog to supported activity types and accurate claims",
+    "epic": "EPIC-LP-04",
+    "priority": "P0",
+    "gate": "G1: internal prototype",
+    "owner": "Educator + iOS",
+    "points": 5,
+    "findings": [
+      "F02",
+      "F33"
+    ],
+    "dependencies": [
+      "TASK-LP-001",
+      "TASK-LP-025"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-024.md"
+  },
+  {
+    "id": "TASK-LP-025",
+    "title": "Specify versioned learning-event, rubric, and evidence contracts",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Learning engineer + backend + educator",
+    "points": 8,
+    "findings": [
+      "F02",
+      "F03",
+      "F36"
+    ],
+    "dependencies": [
+      "TASK-LP-001",
+      "TASK-LP-014"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-025.md"
+  },
+  {
+    "id": "TASK-LP-026",
+    "title": "Build a reviewed content publication and rollback pipeline",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Content engineering + educator",
+    "points": 8,
+    "findings": [
+      "F33"
+    ],
+    "dependencies": [
+      "TASK-LP-002",
+      "TASK-LP-025"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-026.md"
+  },
+  {
+    "id": "TASK-LP-027",
+    "title": "Author one complete reading quest and equivalent independent tasks",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Educator lead + content designer",
+    "points": 8,
+    "findings": [
+      "F02",
+      "F33",
+      "F36"
+    ],
+    "dependencies": [
+      "TASK-LP-002",
+      "TASK-LP-025",
+      "TASK-LP-026"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-027.md"
+  },
+  {
+    "id": "TASK-LP-028",
+    "title": "Implement the native passage-based reading quest",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "iOS + design",
+    "points": 8,
+    "findings": [
+      "F02",
+      "F34"
+    ],
+    "dependencies": [
+      "TASK-LP-025",
+      "TASK-LP-027"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-028.md"
+  },
+  {
+    "id": "TASK-LP-029",
+    "title": "Implement explicit help, accommodations, and educational feedback",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Educator + iOS + learning engineer",
+    "points": 5,
+    "findings": [
+      "F02",
+      "F03",
+      "F30"
+    ],
+    "dependencies": [
+      "TASK-LP-027",
+      "TASK-LP-028"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-029.md"
+  },
+  {
+    "id": "TASK-LP-030",
+    "title": "Implement independent checks and educator verification",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Learning engineer + backend + web + educator",
+    "points": 8,
+    "findings": [
+      "F36"
+    ],
+    "dependencies": [
+      "TASK-LP-025",
+      "TASK-LP-027",
+      "TASK-LP-046"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-030.md"
+  },
+  {
+    "id": "TASK-LP-031",
+    "title": "Replace linear unlocks with reviewed skill-based assignments",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Learning engineer + educator + iOS",
+    "points": 8,
+    "findings": [
+      "F02",
+      "F04",
+      "F33"
+    ],
+    "dependencies": [
+      "TASK-LP-018",
+      "TASK-LP-024",
+      "TASK-LP-025",
+      "TASK-LP-029",
+      "TASK-LP-030"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-031.md"
+  },
+  {
+    "id": "TASK-LP-032",
+    "title": "Build the adult evidence dashboard and honest progress exports",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Web + backend + educator",
+    "points": 8,
+    "findings": [
+      "F03",
+      "F14",
+      "F34",
+      "F36"
+    ],
+    "dependencies": [
+      "TASK-LP-025",
+      "TASK-LP-030",
+      "TASK-LP-037"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-032.md"
+  },
+  {
+    "id": "TASK-LP-033",
+    "title": "Build a minimal practitioner assignment and review workflow",
+    "epic": "EPIC-LP-04",
+    "priority": "P1",
+    "gate": "G4: institutional use",
+    "owner": "Web + backend + educator",
+    "points": 8,
+    "findings": [
+      "F34",
+      "F35"
+    ],
+    "dependencies": [
+      "TASK-LP-022",
+      "TASK-LP-026",
+      "TASK-LP-031",
+      "TASK-LP-032"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-033.md"
+  },
+  {
+    "id": "TASK-LP-034",
+    "title": "Separate marketing, family learning, practitioner, and service navigation",
+    "epic": "EPIC-LP-05",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Web + product design",
+    "points": 5,
+    "findings": [
+      "F01",
+      "F34"
+    ],
+    "dependencies": [
+      "TASK-LP-001"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-034.md"
+  },
+  {
+    "id": "TASK-LP-035",
+    "title": "Repair static-export deep links, return URLs, and not-found behavior",
+    "epic": "EPIC-LP-05",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Web + hosting",
+    "points": 5,
+    "findings": [
+      "F34",
+      "F42"
+    ],
+    "dependencies": [
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-035.md"
+  },
+  {
+    "id": "TASK-LP-036",
+    "title": "Make intake learner-specific, resumable, and truthful about saving",
+    "epic": "EPIC-LP-05",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Web + data",
+    "points": 8,
+    "findings": [
+      "F15",
+      "F39"
+    ],
+    "dependencies": [
+      "TASK-LP-014"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-036.md"
+  },
+  {
+    "id": "TASK-LP-037",
+    "title": "Repair parent query authorization, read models, and data-state errors",
+    "epic": "EPIC-LP-05",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Web + backend",
+    "points": 8,
+    "findings": [
+      "F14"
+    ],
+    "dependencies": [
+      "TASK-LP-014"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-037.md"
+  },
+  {
+    "id": "TASK-LP-038",
+    "title": "Wire tutoring purchase buttons to authenticated supported checkout operations",
+    "epic": "EPIC-LP-05",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Web + backend",
+    "points": 5,
+    "findings": [
+      "F18"
+    ],
+    "dependencies": [
+      "TASK-LP-050",
+      "TASK-LP-075"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-038.md"
+  },
+  {
+    "id": "TASK-LP-039",
+    "title": "Create accurate product discovery pages and reconcile public claims",
+    "epic": "EPIC-LP-05",
+    "priority": "P1",
+    "gate": "G3: paid digital release",
+    "owner": "Product marketing + educator + web",
+    "points": 5,
+    "findings": [
+      "F01",
+      "F37",
+      "F40"
+    ],
+    "dependencies": [
+      "TASK-LP-001",
+      "TASK-LP-002",
+      "TASK-LP-005"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-039.md"
+  },
+  {
+    "id": "TASK-LP-040",
+    "title": "Complete web accessibility remediation across adult and public workflows",
+    "epic": "EPIC-LP-05",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Web + accessibility specialist",
+    "points": 8,
+    "findings": [
+      "F31"
+    ],
+    "dependencies": [
+      "TASK-LP-034",
+      "TASK-LP-035",
+      "TASK-LP-036",
+      "TASK-LP-037"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-040.md"
+  },
+  {
+    "id": "TASK-LP-041",
+    "title": "Validate browser learner access before funding a second runtime",
+    "epic": "EPIC-LP-05",
+    "priority": "P2",
+    "gate": "G4: institutional use",
+    "owner": "Product + web + educator",
+    "points": 5,
+    "findings": [
+      "F34",
+      "F40"
+    ],
+    "dependencies": [
+      "TASK-LP-001",
+      "TASK-LP-003",
+      "TASK-LP-027"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-041.md"
+  },
+  {
+    "id": "TASK-LP-042",
+    "title": "Move booking reservation and entitlement consumption into a server transaction",
+    "epic": "EPIC-LP-06",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web",
+    "points": 8,
+    "findings": [
+      "F11"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-050",
+      "TASK-LP-067"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-042.md"
+  },
+  {
+    "id": "TASK-LP-043",
+    "title": "Implement idempotent cancellation, rescheduling, and timezone policy",
+    "epic": "EPIC-LP-06",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web + operations",
+    "points": 8,
+    "findings": [
+      "F11"
+    ],
+    "dependencies": [
+      "TASK-LP-042"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-043.md"
+  },
+  {
+    "id": "TASK-LP-044",
+    "title": "Make booking email and calendar delivery durable and idempotent",
+    "epic": "EPIC-LP-06",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + operations",
+    "points": 8,
+    "findings": [
+      "F11",
+      "F21"
+    ],
+    "dependencies": [
+      "TASK-LP-042",
+      "TASK-LP-043",
+      "TASK-LP-063"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-044.md"
+  },
+  {
+    "id": "TASK-LP-045",
+    "title": "Repair inquiry pipeline access and unify enrollment/payment transitions",
+    "epic": "EPIC-LP-06",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web + operations",
+    "points": 8,
+    "findings": [
+      "F13",
+      "F20"
+    ],
+    "dependencies": [
+      "TASK-LP-012",
+      "TASK-LP-014",
+      "TASK-LP-050"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-045.md"
+  },
+  {
+    "id": "TASK-LP-046",
+    "title": "Version educator assessments and preserve longitudinal history",
+    "epic": "EPIC-LP-06",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Backend + web + educator",
+    "points": 8,
+    "findings": [
+      "F09",
+      "F10",
+      "F36"
+    ],
+    "dependencies": [
+      "TASK-LP-007",
+      "TASK-LP-014",
+      "TASK-LP-025"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-046.md"
+  },
+  {
+    "id": "TASK-LP-047",
+    "title": "Complete governed resource and portfolio publishing",
+    "epic": "EPIC-LP-06",
+    "priority": "P1",
+    "gate": "G4: institutional use",
+    "owner": "Web + backend + privacy",
+    "points": 8,
+    "findings": [
+      "F12",
+      "F14",
+      "F33"
+    ],
+    "dependencies": [
+      "TASK-LP-009",
+      "TASK-LP-013",
+      "TASK-LP-015",
+      "TASK-LP-022"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-047.md"
+  },
+  {
+    "id": "TASK-LP-048",
+    "title": "Repair webhook claim, retry, replay, and processing state",
+    "epic": "EPIC-LP-07",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + payments",
+    "points": 8,
+    "findings": [
+      "F19"
+    ],
+    "dependencies": [
+      "TASK-LP-067"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-048.md"
+  },
+  {
+    "id": "TASK-LP-049",
+    "title": "Align Stripe invoice schemas and cycle accounting with event ordering",
+    "epic": "EPIC-LP-07",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + payments",
+    "points": 8,
+    "findings": [
+      "F20"
+    ],
+    "dependencies": [
+      "TASK-LP-048",
+      "TASK-LP-050"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-049.md"
+  },
+  {
+    "id": "TASK-LP-050",
+    "title": "Make checkout identity, supported SKUs, and duplicate prevention authoritative",
+    "epic": "EPIC-LP-07",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + payments",
+    "points": 8,
+    "findings": [
+      "F07",
+      "F18",
+      "F20"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-067"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-050.md"
+  },
+  {
+    "id": "TASK-LP-051",
+    "title": "Define digital entitlement authority and cross-platform access policy",
+    "epic": "EPIC-LP-07",
+    "priority": "P1",
+    "gate": "G3: paid digital release",
+    "owner": "Product + backend + iOS",
+    "points": 8,
+    "findings": [
+      "F32"
+    ],
+    "dependencies": [
+      "TASK-LP-005",
+      "TASK-LP-014"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-051.md"
+  },
+  {
+    "id": "TASK-LP-052",
+    "title": "Complete native purchase, restoration, pending, and revocation handling",
+    "epic": "EPIC-LP-07",
+    "priority": "P1",
+    "gate": "G3: paid digital release",
+    "owner": "iOS + payments QA",
+    "points": 8,
+    "findings": [
+      "F32"
+    ],
+    "dependencies": [
+      "TASK-LP-016",
+      "TASK-LP-051",
+      "TASK-LP-056"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-052.md"
+  },
+  {
+    "id": "TASK-LP-053",
+    "title": "Add payment reconciliation, refund handling, and finance/support views",
+    "epic": "EPIC-LP-07",
+    "priority": "P1",
+    "gate": "G3: paid digital release",
+    "owner": "Backend + operations + business owner",
+    "points": 8,
+    "findings": [
+      "F19",
+      "F20",
+      "F32"
+    ],
+    "dependencies": [
+      "TASK-LP-048",
+      "TASK-LP-049",
+      "TASK-LP-050",
+      "TASK-LP-051"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-053.md"
+  },
+  {
+    "id": "TASK-LP-054",
+    "title": "Isolate local, staging, and production configuration and data",
+    "epic": "EPIC-LP-08",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Infrastructure + client leads",
+    "points": 8,
+    "findings": [
+      "F23"
+    ],
+    "dependencies": [],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-054.md"
+  },
+  {
+    "id": "TASK-LP-055",
+    "title": "Gate releases on verification and deploy every Firebase surface",
+    "epic": "EPIC-LP-08",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Infrastructure + QA",
+    "points": 8,
+    "findings": [
+      "F24"
+    ],
+    "dependencies": [
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-055.md"
+  },
+  {
+    "id": "TASK-LP-056",
+    "title": "Make iOS archives reproducible and validate the TestFlight pipeline",
+    "epic": "EPIC-LP-08",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "iOS release engineer",
+    "points": 8,
+    "findings": [
+      "F25",
+      "F44"
+    ],
+    "dependencies": [
+      "TASK-LP-054",
+      "TASK-LP-055"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-056.md"
+  },
+  {
+    "id": "TASK-LP-057",
+    "title": "Triage dependency advisories and remove unnecessary runtime dependencies",
+    "epic": "EPIC-LP-08",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Security + web + backend",
+    "points": 8,
+    "findings": [
+      "F26"
+    ],
+    "dependencies": [
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-057.md"
+  },
+  {
+    "id": "TASK-LP-058",
+    "title": "Inventory deployed IAM, secrets, regions, and service configuration",
+    "epic": "EPIC-LP-08",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Infrastructure + security",
+    "points": 8,
+    "findings": [
+      "F27"
+    ],
+    "dependencies": [
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-058.md"
+  },
+  {
+    "id": "TASK-LP-059",
+    "title": "Validate backups and rehearse whole-system recovery",
+    "epic": "EPIC-LP-08",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Infrastructure + data + privacy",
+    "points": 8,
+    "findings": [
+      "F28",
+      "F39"
+    ],
+    "dependencies": [
+      "TASK-LP-054",
+      "TASK-LP-058"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-059.md"
+  },
+  {
+    "id": "TASK-LP-060",
+    "title": "Implement privacy-safe observability and actionable service alerts",
+    "epic": "EPIC-LP-08",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Backend + iOS + operations",
+    "points": 8,
+    "findings": [
+      "F06",
+      "F29",
+      "F41"
+    ],
+    "dependencies": [
+      "TASK-LP-054",
+      "TASK-LP-058",
+      "TASK-LP-064"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-060.md"
+  },
+  {
+    "id": "TASK-LP-061",
+    "title": "Bound query, storage, compute, and client performance costs",
+    "epic": "EPIC-LP-08",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Infrastructure + backend + clients",
+    "points": 8,
+    "findings": [
+      "F29"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-054",
+      "TASK-LP-060"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-061.md"
+  },
+  {
+    "id": "TASK-LP-062",
+    "title": "Add server-enforced release flags and client/content compatibility",
+    "epic": "EPIC-LP-08",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Backend + iOS + web",
+    "points": 5,
+    "findings": [
+      "F24",
+      "F29",
+      "F33"
+    ],
+    "dependencies": [
+      "TASK-LP-025",
+      "TASK-LP-026",
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-062.md"
+  },
+  {
+    "id": "TASK-LP-063",
+    "title": "Repair lifecycle email consent, delivery state, and retry semantics",
+    "epic": "EPIC-LP-09",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + operations + privacy",
+    "points": 8,
+    "findings": [
+      "F21"
+    ],
+    "dependencies": [
+      "TASK-LP-054",
+      "TASK-LP-058"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-063.md"
+  },
+  {
+    "id": "TASK-LP-064",
+    "title": "Remove sensitive diagnostics and gate analytics collection by context",
+    "epic": "EPIC-LP-09",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "iOS + web + privacy",
+    "points": 5,
+    "findings": [
+      "F06",
+      "F39"
+    ],
+    "dependencies": [],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-064.md"
+  },
+  {
+    "id": "TASK-LP-065",
+    "title": "Define privacy-preserving product metrics and pilot dashboards",
+    "epic": "EPIC-LP-09",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Product analytics + backend + privacy",
+    "points": 5,
+    "findings": [
+      "F03",
+      "F29",
+      "F40"
+    ],
+    "dependencies": [
+      "TASK-LP-003",
+      "TASK-LP-025",
+      "TASK-LP-064"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-065.md"
+  },
+  {
+    "id": "TASK-LP-066",
+    "title": "Replace hardcoded seasonal schedules with versioned program configuration",
+    "epic": "EPIC-LP-09",
+    "priority": "P1",
+    "gate": "G0: protect existing users",
+    "owner": "Backend + web + operations",
+    "points": 5,
+    "findings": [
+      "F21",
+      "F33",
+      "F37"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-063"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-066.md"
+  },
+  {
+    "id": "TASK-LP-067",
+    "title": "Build real backend and rules integration coverage",
+    "epic": "EPIC-LP-10",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "QA + backend",
+    "points": 8,
+    "findings": [
+      "F38"
+    ],
+    "dependencies": [
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-067.md"
+  },
+  {
+    "id": "TASK-LP-068",
+    "title": "Test native persistence, identity, and sync using real stores",
+    "epic": "EPIC-LP-10",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS + QA",
+    "points": 8,
+    "findings": [
+      "F04",
+      "F05",
+      "F38",
+      "F43"
+    ],
+    "dependencies": [
+      "TASK-LP-017",
+      "TASK-LP-018",
+      "TASK-LP-019",
+      "TASK-LP-020",
+      "TASK-LP-073"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-068.md"
+  },
+  {
+    "id": "TASK-LP-069",
+    "title": "Move browser E2E to staging and verify actual user outcomes",
+    "epic": "EPIC-LP-10",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "QA + web + infrastructure",
+    "points": 8,
+    "findings": [
+      "F18",
+      "F24",
+      "F38"
+    ],
+    "dependencies": [
+      "TASK-LP-011",
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-069.md"
+  },
+  {
+    "id": "TASK-LP-070",
+    "title": "Complete native accessibility, sensory controls, and audio lifecycle",
+    "epic": "EPIC-LP-10",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS + accessibility specialist + educator",
+    "points": 8,
+    "findings": [
+      "F30"
+    ],
+    "dependencies": [
+      "TASK-LP-016",
+      "TASK-LP-028"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-070.md"
+  },
+  {
+    "id": "TASK-LP-071",
+    "title": "Run a release-gate review and consented pilot acceptance cycle",
+    "epic": "EPIC-LP-10",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "QA lead + educator + product + privacy",
+    "points": 8,
+    "findings": [
+      "F38",
+      "F40",
+      "F41"
+    ],
+    "dependencies": [
+      "TASK-LP-003",
+      "TASK-LP-006",
+      "TASK-LP-007",
+      "TASK-LP-008",
+      "TASK-LP-012",
+      "TASK-LP-013",
+      "TASK-LP-015",
+      "TASK-LP-016",
+      "TASK-LP-018",
+      "TASK-LP-019",
+      "TASK-LP-020",
+      "TASK-LP-021",
+      "TASK-LP-023",
+      "TASK-LP-024",
+      "TASK-LP-028",
+      "TASK-LP-029",
+      "TASK-LP-030",
+      "TASK-LP-032",
+      "TASK-LP-036",
+      "TASK-LP-037",
+      "TASK-LP-040",
+      "TASK-LP-055",
+      "TASK-LP-056",
+      "TASK-LP-060",
+      "TASK-LP-062",
+      "TASK-LP-064",
+      "TASK-LP-065",
+      "TASK-LP-068",
+      "TASK-LP-070",
+      "TASK-LP-074",
+      "TASK-LP-075"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-071.md"
+  },
+  {
+    "id": "TASK-LP-072",
+    "title": "Consolidate backlog ownership, operating runbooks, and support",
+    "epic": "EPIC-LP-10",
+    "priority": "P1",
+    "gate": "G1: internal prototype",
+    "owner": "Product + engineering lead + operations",
+    "points": 5,
+    "findings": [
+      "F01",
+      "F41"
+    ],
+    "dependencies": [
+      "TASK-LP-001"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-072.md"
+  },
+  {
+    "id": "TASK-LP-073",
+    "title": "Correct SwiftData actor isolation and data-adapter failure contracts",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G2: consented pilot",
+    "owner": "iOS data engineer",
+    "points": 8,
+    "findings": [
+      "F43"
+    ],
+    "dependencies": [
+      "TASK-LP-014"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-073.md"
+  },
+  {
+    "id": "TASK-LP-074",
+    "title": "Complete essential assets and align the child/adult design system",
+    "epic": "EPIC-LP-10",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Product design + iOS + web",
+    "points": 5,
+    "findings": [
+      "F30",
+      "F44"
+    ],
+    "dependencies": [
+      "TASK-LP-001",
+      "TASK-LP-002",
+      "TASK-LP-028"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-074.md"
+  },
+  {
+    "id": "TASK-LP-075",
+    "title": "Complete adult authentication recovery and account continuity",
+    "epic": "EPIC-LP-05",
+    "priority": "P1",
+    "gate": "G2: consented pilot",
+    "owner": "Web + iOS + backend",
+    "points": 8,
+    "findings": [
+      "F05",
+      "F42"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-075.md"
+  },
+  {
+    "id": "TASK-LP-076",
+    "title": "Create a repeatable schema migration and compatibility framework",
+    "epic": "EPIC-LP-03",
+    "priority": "P0",
+    "gate": "G0: protect existing users",
+    "owner": "Data + infrastructure + client leads",
+    "points": 8,
+    "findings": [
+      "F10",
+      "F28",
+      "F43"
+    ],
+    "dependencies": [
+      "TASK-LP-014",
+      "TASK-LP-054"
+    ],
+    "status": "Proposed \u2014 review required",
+    "path": "../../../../docs/tasks/learning-product/TASK-LP-076.md"
+  }
+]
