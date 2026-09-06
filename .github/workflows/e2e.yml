@@ -92,7 +92,6 @@ jobs:
         run: |
           npx playwright test \
             tests/e2e/marketing.spec.ts \
-            tests/e2e/tutoring.spec.ts \
             tests/e2e/auth-personas.spec.ts \
             tests/e2e/portal-state.spec.ts \
             tests/e2e/email-lifecycle.spec.ts
@@ -161,7 +160,6 @@ jobs:
           npx playwright test \
             --ignore-snapshots \
             tests/e2e/marketing.spec.ts \
-            tests/e2e/tutoring.spec.ts \
             tests/e2e/auth-personas.spec.ts \
             tests/e2e/portal-state.spec.ts \
             tests/e2e/email-lifecycle.spec.ts

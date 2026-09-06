@@ -5,9 +5,8 @@ import { useRef, KeyboardEvent } from 'react'
 /**
  * SegmentedControl — radiogroup pattern with arrow-key navigation.
  *
- * Used on /book to switch between booking types (Discovery call, Tutoring,
- * Drop-in). Default selection is whichever option matches `value`; consumer
- * controls state.
+ * Default selection is whichever option matches `value`; consumer controls
+ * state.
  *
  * A11y: implements WAI-ARIA radiogroup pattern.
  *   - role="radiogroup" on the wrapper

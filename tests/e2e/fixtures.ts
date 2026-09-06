@@ -4,7 +4,6 @@ const PASSWORD_ENV_VARS = {
   inquiry: 'E2E_INQUIRY_PASSWORD',
   deposited: 'E2E_DEPOSITED_PASSWORD',
   enrolled: 'E2E_ENROLLED_PASSWORD',
-  subscriber: 'E2E_SUBSCRIBER_PASSWORD',
   admin: 'E2E_ADMIN_PASSWORD',
 } as const
 
@@ -40,15 +39,6 @@ export const ACCOUNTS = {
       return resolvePassword('enrolled')
     },
     stage: 'Enrolled',
-  },
-  // Epic H — used by tests/e2e/tutoring.spec.ts. Requires
-  // scripts/seed-test-accounts.mjs to run with the subscriber persona.
-  subscriber: {
-    email: 'parent-test-subscriber@iepandthrive.com',
-    get password() {
-      return resolvePassword('subscriber')
-    },
-    stage: 'Subscriber',
   },
 } as const
 

@@ -13,12 +13,12 @@ const faqs = [
   {
     question: "What happens if my child can't make a session?",
     answer:
-      'Cancel at least 24 hours in advance and we credit the session within the same billing cycle. Same-day cancellations and no-shows forfeit the session — that policy keeps the calendar honest for everyone.',
+      'Contact us as soon as you know. Scheduling and cancellation expectations are confirmed directly with each family before tutoring begins.',
   },
   {
-    question: 'Can sessions roll over to next month?',
+    question: 'How do we get started?',
     answer:
-      "No. Sessions reset on each billing cycle and don't accumulate. This keeps capacity predictable for the founder and prevents the stockpile-and-cancel cycle that erodes consistency.",
+      "Send a tutoring inquiry through the contact page. We'll learn about your child's goals, confirm fit, and discuss current availability directly.",
   },
   {
     question: 'How is this different from your summer cohort?',
@@ -28,12 +28,12 @@ const faqs = [
   {
     question: 'Do you handle CSE meeting prep?',
     answer:
-      "Yes — book the IEP Review add-on for a dedicated 75-minute session plus a written summary, or fold CSE prep into your subscription as one of your weekly slots. Either way, you walk into the meeting with documented data.",
+      'Yes. Share what support you need in your inquiry, and we can discuss whether CSE preparation belongs in the tutoring plan or requires a separate service conversation.',
   },
   {
-    question: 'What if I need to pause my subscription?',
+    question: 'Can I purchase or schedule tutoring online?',
     answer:
-      "You can pause or cancel anytime through Stripe's customer portal — no calls, no friction. While paused, you keep your slot in the system but aren't billed and don't get sessions.",
+      'No. Tutoring fit, availability, scheduling, and billing are coordinated directly. The parent portal is reserved for the learning program and its records.',
   },
 ]
 
@@ -117,7 +117,7 @@ export default function TutoringFAQ() {
     >
       <SectionHeader
         eyebrow="Common Questions"
-        title="What parents ask before they book."
+        title="What parents ask about tutoring."
       />
 
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 md:grid-cols-2">
