@@ -6,48 +6,50 @@
 
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { z } from "zod";
 import { sendEmail, logEmail, escapeHtml } from "./email-service";
 import { summerGuideDeliveryTemplate } from "./summer-guide-emails";
+import {
+  PUBLIC_CORS_ORIGINS,
+  assertBodySize,
+  assertContentType,
+  assertMethod,
+  assertQuota,
+  errorEnvelope,
+} from "./http-guard";
+
+const summerGuideCaptureSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(320),
+}).strict();
+
+const MAX_BODY_BYTES = 8 * 1024;
 
 export const summerGuideCapture = onRequest(
   {
-    cors: [
-      "https://iep-and-thrive.web.app",
-      "https://iepandthrive.com",
-      /localhost/,
-    ],
+    cors: PUBLIC_CORS_ORIGINS,
     region: "us-east1",
   },
   async (req, res) => {
-    if (req.method !== "POST") {
-      res.status(405).json({ success: false, error: "Method not allowed" });
-      return;
-    }
+    if (!assertMethod(req, res, ["POST"])) return;
+    if (!assertContentType(req, res)) return;
+    if (!assertBodySize(req, res, MAX_BODY_BYTES)) return;
+    if (
+      !(await assertQuota(req, res, "summer-guide-capture", {
+        limit: 3,
+        windowSeconds: 60 * 60,
+      }))
+    ) return;
 
     try {
-      const { name, email } = req.body;
-
-      // Validate required fields
-      if (!name || typeof name !== "string" || name.trim().length < 2) {
-        res
-          .status(400)
-          .json({ success: false, error: "Name is required (min 2 characters)." });
+      const parsed = summerGuideCaptureSchema.safeParse(req.body);
+      if (!parsed.success) {
+        errorEnvelope(res, 400, "invalid_request", "Invalid guide request.");
         return;
       }
 
-      if (
-        !email ||
-        typeof email !== "string" ||
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-      ) {
-        res
-          .status(400)
-          .json({ success: false, error: "A valid email address is required." });
-        return;
-      }
-
-      const cleanName = name.trim();
-      const cleanEmail = email.trim().toLowerCase();
+      const cleanName = parsed.data.name;
+      const cleanEmail = parsed.data.email.toLowerCase();
 
       // Store the lead in Firestore
       await admin.firestore().collection("guideLeads").add({
@@ -83,12 +85,12 @@ export const summerGuideCapture = onRequest(
       });
     } catch (error) {
       console.error("Summer guide capture error:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          error: "Something went wrong. Please try again.",
-        });
+      errorEnvelope(
+        res,
+        500,
+        "internal_error",
+        "Something went wrong. Please try again."
+      );
     }
   }
 );

@@ -11,36 +11,64 @@ import {
   enrollmentNotificationTemplate,
   enrollmentConfirmationTemplate,
 } from "./email-templates";
+import {
+  PUBLIC_CORS_ORIGINS,
+  assertBodySize,
+  assertContentType,
+  assertMethod,
+  assertQuota,
+  errorEnvelope,
+} from "./http-guard";
 
 const enrollmentSchema = z.object({
-  parentName: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().min(10),
-  childGrade: z.string().min(1),
-  programInterest: z.string().min(1),
-  learningChallenge: z.string().min(1),
-  notes: z.string().optional(),
-});
+  parentName: z.string().min(2).max(120),
+  email: z.string().email().max(320),
+  phone: z.string().min(10).max(32),
+  childGrade: z.string().min(1).max(80),
+  programInterest: z.string().min(1).max(160),
+  learningChallenge: z.string().min(1).max(160),
+  notes: z.string().max(4000).optional(),
+}).strict();
+
+const MAX_BODY_BYTES = 32 * 1024;
 
 export const enroll = onRequest(
   {
-    cors: [
-      "https://iep-and-thrive.web.app",
-      "https://iepandthrive.com",
-      /localhost/,
-    ],
+    cors: PUBLIC_CORS_ORIGINS,
     region: "us-east1",
   },
   async (req, res) => {
-    if (req.method !== "POST") {
-      res.status(405).json({ success: false, error: "Method not allowed" });
-      return;
-    }
+    if (!assertMethod(req, res, ["POST"])) return;
+    if (!assertContentType(req, res)) return;
+    if (!assertBodySize(req, res, MAX_BODY_BYTES)) return;
+    if (
+      !(await assertQuota(req, res, "enroll", {
+        limit: 3,
+        windowSeconds: 60 * 60,
+      }))
+    ) return;
 
     try {
-      const data = enrollmentSchema.parse(req.body);
+      const parsed = enrollmentSchema.safeParse(req.body);
+      if (!parsed.success) {
+        errorEnvelope(res, 400, "invalid_request", "Invalid enrollment data.");
+        return;
+      }
+      const data = parsed.data;
       const operatorEmail =
         process.env.OPERATOR_EMAIL || "hello@iepandthrive.com";
+
+      // Persist before either email is attempted so a provider failure cannot
+      // lose the enrollment inquiry.
+      const inquiryRef = await admin
+        .firestore()
+        .collection("enrollmentInquiries")
+        .add({
+          ...data,
+          notificationSent: false,
+          confirmationSent: false,
+          submittedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
       // 1. Send notification to operator
       const notifTemplate = enrollmentNotificationTemplate(data);
@@ -55,6 +83,14 @@ export const enroll = onRequest(
         "enrollment_notification",
         notifSent
       );
+      try {
+        await inquiryRef.update({
+          notificationSent: notifSent,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Enrollment notification status update failed:", error);
+      }
 
       // 2. Send confirmation to parent
       const confirmTemplate = enrollmentConfirmationTemplate({
@@ -72,32 +108,24 @@ export const enroll = onRequest(
         "enrollment_confirmation",
         confirmSent
       );
-
-      // 3. Save enrollment inquiry to Firestore (return id so /enroll/agreement
-      //    can correlate the signed agreement back to this inquiry).
-      const inquiryRef = await admin
-        .firestore()
-        .collection("enrollmentInquiries")
-        .add({
-          ...data,
-          notificationSent: notifSent,
+      try {
+        await inquiryRef.update({
           confirmationSent: confirmSent,
-          submittedAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
+      } catch (error) {
+        console.error("Enrollment confirmation status update failed:", error);
+      }
 
       res.status(200).json({ success: true, inquiryId: inquiryRef.id });
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ success: false, error: "Invalid form data" });
-        return;
-      }
       console.error("Enrollment form error:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          error: "Something went wrong. Please try again.",
-        });
+      errorEnvelope(
+        res,
+        500,
+        "internal_error",
+        "Something went wrong. Please try again."
+      );
     }
   }
 );
