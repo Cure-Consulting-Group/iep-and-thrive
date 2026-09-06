@@ -72,6 +72,15 @@ jobs:
       - name: Install Functions dependencies
         run: npm --prefix functions ci
 
+      # The Firestore and Storage emulators are Java processes, and
+      # firebase-tools requires JDK 21+. Both the Functions integration suite
+      # and the security rules suite start emulators, so neither runs without
+      # this — the runner's default JDK is older.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - name: Project lock check
         run: node scripts/verify-firebase.mjs
 
