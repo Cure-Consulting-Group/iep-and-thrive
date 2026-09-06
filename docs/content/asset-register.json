@@ -1,0 +1,398 @@
+[
+ {
+  "path": "curriculum/scope-and-sequence.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [
+   "Orton-Gillingham"
+  ],
+  "words": 3163
+ },
+ {
+  "path": "curriculum/week-4/friday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4033
+ },
+ {
+  "path": "curriculum/week-4/monday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4136
+ },
+ {
+  "path": "curriculum/week-4/overview.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 2056
+ },
+ {
+  "path": "curriculum/week-4/thursday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4504
+ },
+ {
+  "path": "curriculum/week-4/tuesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3772
+ },
+ {
+  "path": "curriculum/week-4/wednesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3951
+ },
+ {
+  "path": "curriculum/week-3/friday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4508
+ },
+ {
+  "path": "curriculum/week-3/monday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3882
+ },
+ {
+  "path": "curriculum/week-3/overview.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 1777
+ },
+ {
+  "path": "curriculum/week-3/thursday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4432
+ },
+ {
+  "path": "curriculum/week-3/tuesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3675
+ },
+ {
+  "path": "curriculum/week-3/wednesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4197
+ },
+ {
+  "path": "curriculum/assessments/post-assessment.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4148
+ },
+ {
+  "path": "curriculum/assessments/pre-assessment.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4457
+ },
+ {
+  "path": "curriculum/assessments/progress-monitoring/weekly-probe-template.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3469
+ },
+ {
+  "path": "curriculum/week-2/friday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4876
+ },
+ {
+  "path": "curriculum/week-2/monday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4375
+ },
+ {
+  "path": "curriculum/week-2/overview.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 1338
+ },
+ {
+  "path": "curriculum/week-2/thursday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4821
+ },
+ {
+  "path": "curriculum/week-2/tuesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3935
+ },
+ {
+  "path": "curriculum/week-2/wednesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4701
+ },
+ {
+  "path": "curriculum/week-5/friday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3016
+ },
+ {
+  "path": "curriculum/week-5/monday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3492
+ },
+ {
+  "path": "curriculum/week-5/overview.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 1879
+ },
+ {
+  "path": "curriculum/week-5/thursday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3805
+ },
+ {
+  "path": "curriculum/week-5/tuesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3689
+ },
+ {
+  "path": "curriculum/week-5/wednesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3706
+ },
+ {
+  "path": "curriculum/week-6/friday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3855
+ },
+ {
+  "path": "curriculum/week-6/monday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3616
+ },
+ {
+  "path": "curriculum/week-6/overview.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 2494
+ },
+ {
+  "path": "curriculum/week-6/thursday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3747
+ },
+ {
+  "path": "curriculum/week-6/tuesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3157
+ },
+ {
+  "path": "curriculum/week-6/wednesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3055
+ },
+ {
+  "path": "curriculum/week-1/friday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4022
+ },
+ {
+  "path": "curriculum/week-1/monday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3100
+ },
+ {
+  "path": "curriculum/week-1/overview.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 947
+ },
+ {
+  "path": "curriculum/week-1/thursday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 4234
+ },
+ {
+  "path": "curriculum/week-1/tuesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3205
+ },
+ {
+  "path": "curriculum/week-1/wednesday.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 3605
+ },
+ {
+  "path": "curriculum/portfolio/portfolio-guide.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 2086
+ },
+ {
+  "path": "curriculum/parent-communications/weekly-update-templates.md",
+  "kind": "lesson/plan",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [
+   "Orton-Gillingham"
+  ],
+  "words": 3753
+ },
+ {
+  "path": "public/og-image.png",
+  "kind": "media",
+  "author": "Your Name",
+  "added": "2026-03-21",
+  "instruments": [],
+  "words": 0
+ },
+ {
+  "path": "public/images/child-reading.jpg",
+  "kind": "media",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 0
+ },
+ {
+  "path": "public/images/child-writing-desk.jpg",
+  "kind": "media",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 0
+ },
+ {
+  "path": "public/images/founder-teaching.jpg",
+  "kind": "media",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 0
+ },
+ {
+  "path": "public/images/hero-kids-learning.jpg",
+  "kind": "media",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 0
+ },
+ {
+  "path": "public/images/kids-collaborating.jpg",
+  "kind": "media",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 0
+ },
+ {
+  "path": "public/images/parent-child-study.jpg",
+  "kind": "media",
+  "author": "Your Name",
+  "added": "2026-03-22",
+  "instruments": [],
+  "words": 0
+ }
+]
