@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "npm run build && node --test lib/**/*.test.js",
+    "test": "npm run build && firebase emulators:exec --config ../firebase.test.json --project demo-iep-and-thrive --only firestore,auth,storage \"node --test --test-concurrency=1 --test-reporter=spec --test-reporter=tap --test-reporter-destination=stdout --test-reporter-destination=integration-test-results.tap lib/http-guard.test.js lib/__tests__/*.test.js\"",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
