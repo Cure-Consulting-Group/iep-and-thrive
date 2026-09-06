@@ -11,8 +11,7 @@
  * to a service account JSON, OR `gcloud auth application-default login`
  * to be run before this script.
  *
- * Project guard: aborts if GCLOUD_PROJECT or GOOGLE_CLOUD_PROJECT is set
- * to anything other than `iep-and-thrive`.
+ * Project guard: requires E2E_SYNTHETIC_PROJECT_ID and refuses production.
  *
  * Usage:
  *   node scripts/seed-test-accounts.mjs
@@ -26,22 +25,38 @@
  * attendance-notifications functions filter on this flag so test
  * accounts never receive production emails.
  *
- * Passwords follow the formula `TestPass123!{persona}`. Founder stores
- * the credentials in 1Password.
  */
 
 import { initializeApp, applicationDefault, getApps } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 
-const PROJECT_ID = 'iep-and-thrive'
+const PRODUCTION_PROJECT_ID = 'iep-and-thrive'
+const SYNTHETIC_PROJECT_ENV = 'E2E_SYNTHETIC_PROJECT_ID'
 
 function assertEnvironment() {
-  const project = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || ''
-  if (project && project !== PROJECT_ID) {
-    console.error(`ABORT: GCLOUD_PROJECT="${project}", expected "${PROJECT_ID}"`)
+  const syntheticProject = process.env[SYNTHETIC_PROJECT_ENV]?.trim() || ''
+  const resolvedProject =
+    process.env.GCLOUD_PROJECT?.trim() ||
+    process.env.GOOGLE_CLOUD_PROJECT?.trim() ||
+    syntheticProject
+
+  if (!syntheticProject) {
+    console.error(`ABORT: Set ${SYNTHETIC_PROJECT_ENV} to the intended synthetic Firebase project.`)
     process.exit(1)
   }
+  if (resolvedProject === PRODUCTION_PROJECT_ID) {
+    console.error(`ABORT: Refusing to seed production project "${PRODUCTION_PROJECT_ID}".`)
+    process.exit(1)
+  }
+  if (resolvedProject !== syntheticProject) {
+    console.error(
+      `ABORT: Resolved Firebase project "${resolvedProject}" does not match ${SYNTHETIC_PROJECT_ENV}.`,
+    )
+    process.exit(1)
+  }
+
+  return syntheticProject
 }
 
 const PERSONAS = [
@@ -244,15 +259,15 @@ async function seedAdmin(auth, db) {
 }
 
 async function main() {
-  assertEnvironment()
+  const projectId = assertEnvironment()
 
   if (!getApps().length) {
-    initializeApp({ credential: applicationDefault(), projectId: PROJECT_ID })
+    initializeApp({ credential: applicationDefault(), projectId })
   }
   const auth = getAuth()
   const db = getFirestore()
 
-  console.log(`\nSeeding test cohort accounts in project: ${PROJECT_ID}`)
+  console.log(`\nSeeding test cohort accounts in project: ${projectId}`)
   console.log('═'.repeat(60))
 
   const results = []
