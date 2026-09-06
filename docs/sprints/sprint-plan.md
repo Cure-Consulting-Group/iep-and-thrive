@@ -1,110 +1,101 @@
 # Sprint plan — audit backlog execution
 
-**Generated September 6, 2026** from `docs/audits/2026-09-05/product-direction/tickets.json`.
-Ordering is computed from the ticket dependency graph. Regenerate rather than hand-edit.
+**Regenerated September 6, 2026** after the full-session audit (Codex `gpt-5.6-sol @ high`
+correctness + Antigravity system review). Ordering is computed from the ticket dependency
+graph. Regenerate rather than hand-edit.
 
-**Decisions encoded:** containment first, then reassess; 24 points per sprint.
+## Shipped — sprints 1–6 · COMPLETE
 
-## Phase A — containment · COMPLETE
+15 tickets merged across PRs #39–#44. Tests 43 → 73 unit, 5 → 25 functions, 17 → 24 security.
 
-Merged to `main` in [PR #40](https://github.com/Cure-Consulting-Group/iep-and-thrive/pull/40) (`7eba0e1`). Test count 43 → 67.
+| | Tickets |
+| --- | --- |
+| Phase A containment | 006, 010, 011, 035, 054, 057, 058, 064 |
+| Sprints 4–6 | 048, 055, 059, 063, 067, 069, 076 |
+| Drafts awaiting approval | 001, 002, 014 |
 
-| Ticket | Gate | P | Pts | Title |
-| --- | --- | --- | --- | --- |
-| [TASK-LP-006](../tasks/learning-product/TASK-LP-006.md) | G0 | P0 | 5 | Review and release the existing billing and signed-PDF security repairs |
-| [TASK-LP-054](../tasks/learning-product/TASK-LP-054.md) | G0 | P0 | 8 | Isolate local, staging, and production configuration and data |
-| [TASK-LP-064](../tasks/learning-product/TASK-LP-064.md) | G0 | P0 | 5 | Remove sensitive diagnostics and gate analytics collection by context |
-| [TASK-LP-011](../tasks/learning-product/TASK-LP-011.md) | G0 | P0 | 5 | Remove production test-account credential defaults and isolate test access |
-| [TASK-LP-057](../tasks/learning-product/TASK-LP-057.md) | G0 | P0 | 8 | Triage dependency advisories and remove unnecessary runtime dependencies |
-| [TASK-LP-058](../tasks/learning-product/TASK-LP-058.md) | G0 | P0 | 8 | Inventory deployed IAM, secrets, regions, and service configuration |
-| [TASK-LP-010](../tasks/learning-product/TASK-LP-010.md) | G0 | P0 | 8 | Add bounded validation and abuse protection to public endpoints |
-| [TASK-LP-035](../tasks/learning-product/TASK-LP-035.md) | G0 | P0 | 5 | Repair static-export deep links, return URLs, and not-found behavior |
+## The finding that reorders everything
 
-### Carried over from Phase A
+**Paying parents cannot book tutoring sessions.** `lib/booking-service.ts:143` updates
+`availableSlots` from the client; `firestore.rules:97` allows that write only for admins, so
+every parent booking fails with PERMISSION_DENIED. `/book` is linked from the parent portal in
+four places, and `subscription-checkout.ts` bills monthly regardless.
 
-These shipped code but are not finished. They are prerequisites for later work, so they
-are listed here rather than buried in a ticket status field.
+This is **pre-existing** — not a regression from this session — and the audit already knew:
+[TASK-LP-042](../tasks/learning-product/TASK-LP-042.md)'s first line reads *"Normal parent booking cannot update admin-only slots."* It was
+filed as a correctness improvement rather than an outage, which is why it sat at wave 3.
 
-- **[TASK-LP-006](../tasks/learning-product/TASK-LP-006.md)** — Scripts and runbook exist; the release itself needs production credentials.
-- **[TASK-LP-058](../tasks/learning-product/TASK-LP-058.md)** — Inventory script exists; running it needs production credentials.
-- **[TASK-LP-054](../tasks/learning-product/TASK-LP-054.md)** — Resolver and guards shipped; the staging project does not exist yet.
-- **[TASK-LP-035](../tasks/learning-product/TASK-LP-035.md)** — 404 and open-redirect guard shipped; deep links verified still broken.
+**It is blocked.** [TASK-LP-042](../tasks/learning-product/TASK-LP-042.md) depends on [TASK-LP-050](../tasks/learning-product/TASK-LP-050.md) and [TASK-LP-014](../tasks/learning-product/TASK-LP-014.md); both need [TASK-LP-001](../tasks/learning-product/TASK-LP-001.md), the
+product brief. So the highest-severity live defect in the system sits behind a decision only
+the owner can make.
 
-**Also outstanding, discovered during Phase A:** the repository has only three E2E
-secrets. `E2E_SUBSCRIBER_PASSWORD` and `E2E_ADMIN_PASSWORD` have never existed, so until
-PR #40 every CI run signed into two real production accounts — one of them admin — with
-passwords derivable from a formula in the public repo. Rotate both and add the secrets.
+I do not think that dependency is real for the *outage*. Restoring booking needs the slot write
+moved server-side under the identity model that exists today. The canonical identity contract is
+required for the rest of [TASK-LP-042](../tasks/learning-product/TASK-LP-042.md) — entitlement ledgers, cross-platform learner references —
+not for stopping the bleeding. Sprint 7 therefore proposes a narrow repair.
 
-## Phase B — the rest of G0, plus the contracts
-
-**68 tickets, 493 points remaining** across the whole backlog.
-The three sprints below are the next 69 points. Beyond Sprint 6 the shape depends on
-decisions that have not been made, so they are deliberately not enumerated.
-
-### The product brief is needed by Sprint 6, not before
-
-[TASK-LP-001](../tasks/learning-product/TASK-LP-001.md) gates [TASK-LP-014](../tasks/learning-product/TASK-LP-014.md), which gates 22 downstream tickets. But Sprints 4 and 5 are
-entirely independent of it — that is roughly **four to six weeks of runway** to make the
-call before it blocks anything.
-
-It is still the single highest-leverage item on this page, and it is not engineering work.
-
-### Sprint 4 — 24 pts
-
-*Make the pipeline tell the truth.*
-
-Phase A left three loops open on purpose. `test:security` runs in no workflow, E2E runs against production rather than the diff, and there is no staging to point either at. This closes all three and is the prerequisite for trusting any later sprint's evidence.
+## Sprint 7 — 24 pts · restore service, close the exposure
 
 | Ticket | Gate | P | Pts | Title |
 | --- | --- | --- | --- | --- |
-| [TASK-LP-055](../tasks/learning-product/TASK-LP-055.md) | G0 | P0 | 8 | Gate releases on verification and deploy every Firebase surface |
-| [TASK-LP-067](../tasks/learning-product/TASK-LP-067.md) | G0 | P0 | 8 | Build real backend and rules integration coverage |
-| [TASK-LP-069](../tasks/learning-product/TASK-LP-069.md) | G0 | P0 | 8 | Move browser E2E to staging and verify actual user outcomes |
+| [TASK-LP-007](../tasks/learning-product/TASK-LP-007.md) | G0 | P0 | 8 | Separate all instructor-private notes from parent-readable records |
+| **TASK-LP-042a** (new, carve-out) | G0 | P0 | 8 | Restore parent booking via a server-side reservation |
+| [TASK-LP-060](../tasks/learning-product/TASK-LP-060.md) | G2 | P1 | 8 | Implement privacy-safe observability and actionable service alerts |
 
-**Exit:** A versioned release graph that deploys rules, indexes and Functions together — not Hosting alone. Rules and backend integration coverage that runs in CI. E2E moved off production onto staging.
+**[TASK-LP-007](../tasks/learning-product/TASK-LP-007.md)** is the highest-value security item left and is startable today. It was blocked
+behind [TASK-LP-076](../tasks/learning-product/TASK-LP-076.md), which shipped in sprint 6 — the migration runner was built
+contract-agnostic, so it did not need the identity RFC after all. Parents can currently read
+instructor-private notes on attendance and probe records; field hiding is UI-only and does not
+protect a whole-document read.
 
-### Sprint 5 — 24 pts
+**TASK-LP-042a** is the carve-out: move the slot claim into a Cloud Function with an atomic
+availability check, using today's identity model. Explicitly *not* the entitlement ledger or the
 
-*Recovery, and the money/email correctness chain.*
+**[TASK-LP-060](../tasks/learning-product/TASK-LP-060.md)** last, because nothing currently reports that booking is failing. A parent hits
+PERMISSION_DENIED and no alert fires anywhere.
 
-The first two protect people who already paid. Backups have never been restored, so 'we have backups' is currently unverified. Webhook replay and email delivery state are where duplicate charges and lost confirmations come from.
+**Exit:** a parent with an active subscription can book and cancel; instructor-private notes are
+unreadable by parents with a negative test proving it; a failed booking raises an alert.
 
-| Ticket | Gate | P | Pts | Title |
-| --- | --- | --- | --- | --- |
-| [TASK-LP-059](../tasks/learning-product/TASK-LP-059.md) | G0 | P0 | 8 | Validate backups and rehearse whole-system recovery |
-| [TASK-LP-063](../tasks/learning-product/TASK-LP-063.md) | G0 | P0 | 8 | Repair lifecycle email consent, delivery state, and retry semantics |
-| [TASK-LP-048](../tasks/learning-product/TASK-LP-048.md) | G0 | P0 | 8 | Repair webhook claim, retry, replay, and processing state |
-
-**Exit:** A rehearsed restore with recorded timings. Idempotent webhook claim/retry/replay. Lifecycle email with real delivery state and consent.
-
-### Sprint 6 — 21 pts · REQUIRES TASK-LP-001
-
-*The canonical contracts.*
-
-This is where the product brief becomes load-bearing. 014 defines the account/learner/enrollment contract and unlocks 22 downstream tickets; 076 gives you a migration framework so changing live data shape stops being freehand.
+## Sprint 8 — 21 pts · the decision, then what it unblocks
 
 | Ticket | Gate | P | Pts | Title |
 | --- | --- | --- | --- | --- |
+| [TASK-LP-001](../tasks/learning-product/TASK-LP-001.md) | G1 | P1 | 5 | Approve the independent reading-product brief and explicit non-goals |
 | [TASK-LP-014](../tasks/learning-product/TASK-LP-014.md) | G1 | P1 | 8 | Define the canonical account, learner, enrollment, and program data contract |
-| [TASK-LP-076](../tasks/learning-product/TASK-LP-076.md) | G0 | P0 | 8 | Create a repeatable schema migration and compatibility framework |
 | [TASK-LP-002](../tasks/learning-product/TASK-LP-002.md) | G1 | P1 | 5 | Establish educator ownership, content rights, and instructional review |
 
-**Exit:** An agreed data contract, a repeatable migration path, and named educator ownership of instructional scope.
+Approving these three moves **14 additional tickets** into immediate reach — the single largest
+unlock left in the backlog. The drafts are written and waiting; what is missing is an educator
+conversation and four decisions, including which of `programTrack` or `enrollmentStatus` is
+authoritative. A wrong answer there silently mis-migrates every enrolled family.
 
-## Beyond Sprint 6
+If the brief slips, Sprint 8 becomes 056 + 060 spillover and the backlog stops widening.
 
-Wave analysis puts the remainder at six further waves. Re-plan after Sprint 5, when the
-deployed-config inventory and the restore rehearsal will have told you things about
-production that nobody currently knows. Committing to that order now would be planning
-against facts not yet in evidence.
+## Sprint 9 — 24 pts · identity-dependent G0, once 014 lands
 
-The known large blocks: the data-exposure repairs (007, 008, 012, 013) behind 076; the
-booking and payment chain (042–045, 049, 050); the G1 prototype (023–028); and the G2
-pilot, which should be cut against what the prototype actually shows.
+| Ticket | Gate | P | Pts | Title |
+| --- | --- | --- | --- | --- |
+| [TASK-LP-008](../tasks/learning-product/TASK-LP-008.md) | G0 | P0 | 8 | Make student identity and enrollment authority server-controlled |
+| [TASK-LP-050](../tasks/learning-product/TASK-LP-050.md) | G0 | P0 | 8 | Make checkout identity, supported SKUs, and duplicate prevention authoritative |
+| [TASK-LP-012](../tasks/learning-product/TASK-LP-012.md) | G0 | P0 | 8 | Bind signed agreements to canonical terms and owned enrollment records |
+
+Not scheduled beyond this. Sprint 7 will change what the rest costs, and the deployed-config
+inventory has still never been run against production.
+
+## Known defects not yet ticketed
+
+| Defect | Evidence | Disposition |
+| --- | --- | --- |
+| One-time deposits create user docs with random ids the owner can never read | `stripe-webhook.ts:561` `usersRef.doc()`; rules require `uid == userId` | Pre-existing; fold into 008 |
+| `webhookOutbox` has no consumer — a transient Gmail failure loses a receipt permanently | Audit upgraded severity: duplicates short-circuit, replay skips succeeded claims | Needs its own ticket |
+| Deep links still broken | verified against production; homepage served for real student URLs | 035 criterion unmet |
+| Auth has no export | `verify-recovery-readiness.sh` | Blocks any restore |
+| No deletion manifest | a faithful restore resurrects deleted records | Privacy obligation |
 
 ## Standing rules
 
 - A ticket is done when its Given/When/Then criteria pass, not when the code merges.
-- Implementation, local verification, staging verification and deployment are tracked
-  separately in `STATE.md`. **Merging is not releasing** — TASK-LP-006 is the live example.
+- **Merging is not releasing.** Nothing from sprints 1–6 is deployed; the deploy job is
+  `workflow_dispatch`-only until admin claims are provisioned.
 - G0 protects people already using the product. It outranks everything in G1–G4.
