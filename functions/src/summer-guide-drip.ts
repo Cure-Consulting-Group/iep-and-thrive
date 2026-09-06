@@ -11,8 +11,10 @@
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { sendEmail, logEmail, escapeHtml } from "./email-service";
+import { logEmail, escapeHtml } from "./email-service";
+import { deliverEmail } from "./email-ledger";
 import {
+  summerGuideDeliveryTemplate,
   summerGuideDripEmail2Template,
   summerGuideDripEmail3Template,
 } from "./summer-guide-emails";
@@ -26,11 +28,13 @@ export const summerGuideDrip = onSchedule(
   async () => {
     const now = new Date();
 
-    // Query all active guide leads
+    // Process at most 200 leads per run. The next scheduled run continues the
+    // queue, keeping Firestore cost, provider fan-out, and function latency bounded.
     const snapshot = await admin
       .firestore()
       .collection("guideLeads")
       .where("status", "==", "active")
+      .limit(200)
       .get();
 
     console.log(
@@ -49,28 +53,70 @@ export const summerGuideDrip = onSchedule(
       const daysSinceCapture = Math.floor(
         (now.getTime() - capturedAt.getTime()) / (1000 * 60 * 60 * 24)
       );
-      const emailsSent = lead.emailsSent || 1;
+      // Older leads predate the durable counter and were already delivered at
+      // capture time; new leads start at zero so a failed immediate send can retry.
+      const emailsSent = typeof lead.emailsSent === "number" ? lead.emailsSent : 1;
       const safeName = escapeHtml(lead.name || "there");
+
+      // Recover a failed immediate guide delivery before moving to later phases.
+      if (emailsSent < 1) {
+        const template = summerGuideDeliveryTemplate({ name: safeName });
+        const result = await deliverEmail({
+          key: {
+            template: "guide_delivery",
+            recipient: lead.email,
+            program: "summer-guide",
+            phase: "immediate",
+          },
+          options: {
+            to: lead.email,
+            subject: template.subject,
+            htmlBody: template.html,
+            classification: template.classification,
+          },
+        });
+
+        await logEmail(lead.email, template.subject, "guide_delivery", result.ok, {
+          messageId: result.messageId,
+          error: result.error,
+          skipped: result.status === "skipped",
+        });
+
+        if (result.ok) {
+          await doc.ref.update({ emailsSent: 1 });
+        }
+        return;
+      }
 
       // Email #2 — send on day 2+ if not yet sent
       if (daysSinceCapture >= 2 && emailsSent < 2) {
         const template = summerGuideDripEmail2Template({ name: safeName });
 
-        const sent = await sendEmail({
-          to: lead.email,
-          subject: template.subject,
-          htmlBody: template.html,
+        const result = await deliverEmail({
+          key: {
+            template: "guide_drip_2",
+            recipient: lead.email,
+            program: "summer-guide",
+            phase: "day-2",
+          },
+          options: {
+            to: lead.email,
+            subject: template.subject,
+            htmlBody: template.html,
+            classification: template.classification,
+          },
         });
 
-        await logEmail(
-          lead.email,
-          template.subject,
-          "guide_drip_2",
-          sent
-        );
+        await logEmail(lead.email, template.subject, "guide_drip_2", result.ok, {
+          messageId: result.messageId,
+          error: result.error,
+          skipped: result.status === "skipped",
+        });
 
-        await doc.ref.update({ emailsSent: 2 });
-        console.log(`[SummerGuideDrip] Sent Email #2 to ${lead.email}`);
+        if (result.ok) {
+          await doc.ref.update({ emailsSent: 2 });
+          console.log("[SummerGuideDrip] Email #2 delivered");
+        }
         return;
       }
 
@@ -78,23 +124,31 @@ export const summerGuideDrip = onSchedule(
       if (daysSinceCapture >= 5 && emailsSent < 3) {
         const template = summerGuideDripEmail3Template({ name: safeName });
 
-        const sent = await sendEmail({
-          to: lead.email,
-          subject: template.subject,
-          htmlBody: template.html,
+        const result = await deliverEmail({
+          key: {
+            template: "guide_drip_3",
+            recipient: lead.email,
+            program: "summer-guide",
+            phase: "day-5",
+          },
+          options: {
+            to: lead.email,
+            subject: template.subject,
+            htmlBody: template.html,
+            classification: template.classification,
+          },
         });
 
-        await logEmail(
-          lead.email,
-          template.subject,
-          "guide_drip_3",
-          sent
-        );
+        await logEmail(lead.email, template.subject, "guide_drip_3", result.ok, {
+          messageId: result.messageId,
+          error: result.error,
+          skipped: result.status === "skipped",
+        });
 
-        await doc.ref.update({ emailsSent: 3, status: "completed" });
-        console.log(
-          `[SummerGuideDrip] Sent Email #3 to ${lead.email} — sequence completed`
-        );
+        if (result.ok) {
+          await doc.ref.update({ emailsSent: 3, status: "completed" });
+          console.log("[SummerGuideDrip] Email #3 delivered; sequence completed");
+        }
       }
     });
 

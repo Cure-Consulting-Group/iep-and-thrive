@@ -19,7 +19,8 @@
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { sendEmailWithResult, logEmail } from "./email-service";
+import { sendEmailWithResult, logEmail, recipientFingerprint } from "./email-service";
+import { deliverEmail } from "./email-ledger";
 import { renderEmail, EmailVariables } from "./email-templates";
 import {
   WelcomePhase,
@@ -66,12 +67,17 @@ export interface WelcomeRecipient {
 
 export async function loadWelcomeRecipients(): Promise<WelcomeRecipient[]> {
   const db = admin.firestore();
-  const usersSnap = await db.collection("users").get();
+  // Process at most 200 enrolled users per run. The daily schedule naturally
+  // continues the queue, avoiding an unbounded scan and fan-out.
+  const usersSnap = await db
+    .collection("users")
+    .where("depositPaid", "==", true)
+    .limit(200)
+    .get();
   const out: WelcomeRecipient[] = [];
 
   for (const userDoc of usersSnap.docs) {
     const u = userDoc.data() ?? {};
-    if (u.depositPaid !== true) continue;
     const email = (u.email as string) || "";
     if (!email) continue;
 
@@ -121,9 +127,6 @@ export async function sendWelcomeToRecipient(
   overrideTo?: string,
   bypassIsTest?: boolean
 ): Promise<{ ok: boolean; messageId: string | null; error?: string }> {
-  if (r.unsubscribed) return { ok: false, messageId: null, error: "unsubscribed" };
-  if (r.isTest && !bypassIsTest) return { ok: false, messageId: null, error: "isTest" };
-
   const tpl = welcomeSequenceTemplate(phase, buildVariables(r));
   const rendered = renderEmail({
     subject: tpl.subject,
@@ -131,14 +134,33 @@ export async function sendWelcomeToRecipient(
     recipientUid: r.parentUid,
   });
 
-  const result = await sendEmailWithResult({
-    to: overrideTo || r.parentEmail,
-    subject: rendered.subject,
-    htmlBody: rendered.html,
-    textBody: rendered.text,
-    kind: "lifecycle",
-    recipientUid: r.parentUid,
-  });
+  const result = overrideTo
+    ? await sendEmailWithResult({
+        to: overrideTo,
+        subject: rendered.subject,
+        htmlBody: rendered.html,
+        textBody: rendered.text,
+        // Preview sends intentionally retain the existing explicit
+        // transactional bypass for founder QA test accounts.
+        kind: "transactional",
+        recipientUid: r.parentUid,
+      })
+    : await deliverEmail({
+        key: {
+          template: "welcome_sequence",
+          recipient: r.parentUid,
+          program: "summer-2026",
+          phase,
+        },
+        options: {
+          to: r.parentEmail,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          classification: tpl.layout.classification,
+          recipientUid: r.parentUid,
+        },
+      });
 
   await logEmail(
     overrideTo || r.parentEmail,
@@ -151,20 +173,19 @@ export async function sendWelcomeToRecipient(
         phase,
         parentUid: r.parentUid,
         studentName: r.studentName,
-        previewSendTo: overrideTo || null,
+        previewSendToFingerprint: overrideTo ? recipientFingerprint(overrideTo) : null,
       },
       messageId: result.messageId ?? undefined,
       error: result.error,
-      bodyHtmlPreview: rendered.html.slice(0, 500),
+      skipped: result.status === "skipped",
     }
   );
 
-  // Dedupe: increment only when the send actually went out (or was an isTest
-  // production skip that has already been logged). Preview sends pass overrideTo
-  // and are not counted toward the parent recipient counter.
+  // Dedupe: increment only after the provider result and ledger delivery state
+  // both confirm success. Preview sends pass overrideTo and are not counted.
   if (!overrideTo) {
     const idx = phase === "day-0" ? 1 : phase === "day-2" ? 2 : 3;
-    if (idx > r.welcomeEmailsSent) {
+    if (result.ok && idx > r.welcomeEmailsSent) {
       try {
         await admin.firestore().collection("users").doc(r.parentUid).update({
           welcomeEmailsSent: idx,
