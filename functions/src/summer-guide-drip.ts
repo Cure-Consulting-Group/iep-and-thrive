@@ -19,6 +19,10 @@ import {
   summerGuideDripEmail3Template,
 } from "./summer-guide-emails";
 
+const DRIP_PAGE_SIZE = 200;
+const DRIP_CURSOR_DOC = "summerGuideDrip";
+const SCHEDULER_CURSOR_COLLECTION = "_schedulerCursors";
+
 export const summerGuideDrip = onSchedule(
   {
     schedule: "0 9 * * *",
@@ -28,14 +32,34 @@ export const summerGuideDrip = onSchedule(
   async () => {
     const now = new Date();
 
-    // Process at most 200 leads per run. The next scheduled run continues the
-    // queue, keeping Firestore cost, provider fan-out, and function latency bounded.
-    const snapshot = await admin
-      .firestore()
+    // Bounded AND advancing, the same correction already applied to
+    // welcome-sequence.ts. `.limit(200)` with no order and no cursor returns the
+    // same first 200 documents by id on every run: leads that stay "active"
+    // because they are unsubscribed, flagged as test, or permanently skipped
+    // never leave that page, so every lead behind them stops receiving the
+    // sequence entirely. Counters only advance on a successful send, so those
+    // records genuinely do persist.
+    const db = admin.firestore();
+    const cursorRef = db.collection(SCHEDULER_CURSOR_COLLECTION).doc(DRIP_CURSOR_DOC);
+    const cursorSnap = await cursorRef.get();
+    const cursor = cursorSnap.exists ? (cursorSnap.get("lastLeadId") as string | null) : null;
+
+    let query = db
       .collection("guideLeads")
       .where("status", "==", "active")
-      .limit(200)
-      .get();
+      .orderBy(admin.firestore.FieldPath.documentId())
+      .limit(DRIP_PAGE_SIZE);
+    if (cursor) query = query.startAfter(cursor);
+
+    const snapshot = await query.get();
+
+    // A short page means the end was reached; reset so the next run starts over.
+    const nextCursor =
+      snapshot.size === DRIP_PAGE_SIZE ? snapshot.docs[snapshot.docs.length - 1].id : null;
+    await cursorRef.set(
+      { lastLeadId: nextCursor, updatedAt: admin.firestore.FieldValue.serverTimestamp() },
+      { merge: true }
+    );
 
     console.log(
       `[SummerGuideDrip] Found ${snapshot.size} active guide leads`

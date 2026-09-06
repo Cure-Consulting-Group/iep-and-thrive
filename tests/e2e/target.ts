@@ -22,8 +22,23 @@ export const PRODUCTION_ORIGINS = [
 
 export function isProductionTarget(baseUrl: string | undefined): boolean {
   if (!baseUrl) return false
-  const normalized = baseUrl.trim().replace(/\/+$/, '')
-  return PRODUCTION_ORIGINS.some((o) => normalized === o || normalized.startsWith(`${o}/`))
+  // Compare parsed origins, not strings. `https://IEPANDTHRIVE.COM` and
+  // `https://iepandthrive.com:443` are the production origin but did not match
+  // a case-sensitive comparison, so a mutating spec pointed at either form
+  // sailed past assertSafeTargetForMutation and could write real data.
+  let origin: string
+  try {
+    origin = new URL(baseUrl.trim()).origin.toLowerCase()
+  } catch {
+    return false
+  }
+  return PRODUCTION_ORIGINS.some((o) => {
+    try {
+      return new URL(o).origin.toLowerCase() === origin
+    } catch {
+      return false
+    }
+  })
 }
 
 /**

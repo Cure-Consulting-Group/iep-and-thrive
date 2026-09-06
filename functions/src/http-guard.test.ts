@@ -89,11 +89,12 @@ test("over-limit quota responds with 429 and Retry-After", () => {
   assert.equal(rejectQuota(res as unknown as Response, 37), false);
   assert.equal(res.statusCode, 429);
   assert.equal(res.headers["retry-after"], "37");
+  // `error` is a string, not an object. Clients read it directly
+  // (app/enroll/agreement/page.tsx, app/unsubscribe/page.tsx), so nesting the
+  // message rendered "[object Object]" to a parent.
   assert.deepEqual(res.body, {
-    error: {
-      code: "quota_exceeded",
-      message: "Too many requests right now. Please wait a moment and try again.",
-    },
+    error: "Too many requests right now. Please wait a moment and try again.",
+    code: "quota_exceeded",
   });
 });
 
@@ -105,6 +106,8 @@ test("error envelope never echoes input", () => {
 
   assert.equal(JSON.stringify(res.body).includes(offendingInput), false);
   assert.deepEqual(res.body, {
-    error: { code: "invalid_request", message: "Invalid form data." },
+    error: "Invalid form data.",
+    code: "invalid_request",
   });
+  assert.equal(typeof res.body.error, "string", "clients render this value directly");
 });
