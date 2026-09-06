@@ -9,10 +9,9 @@
  * `firebase deploy` (it expects `functions/lib/index.js` per package.json).
  *
  * This file mirrors the subset of `lib/subscription.ts` that functions code
- * actually needs (types + tier helpers + price-ID env-var lookup). Keep
- * in sync manually if either file changes — there's a unit-test snapshot
- * in tests/unit/subscription.test.mjs that exercises the canonical file
- * to catch drift via the TUTORING_PRICING values.
+ * actually needs (types and tier helpers). Keep
+ * in sync manually if either file changes. This backend copy is retained so
+ * historical and in-flight Stripe subscription events remain processable.
  */
 
 export type SubscriptionTier = "weekly" | "twice-weekly"
@@ -63,10 +62,4 @@ export function tierPrice(tier: SubscriptionTier): {
         perSession: TUTORING_PRICING.twiceWeekly.perSession,
         sessionsPerCycle: TUTORING_PRICING.twiceWeekly.sessionsPerCycle,
       }
-}
-
-export function stripePriceIdEnvVar(tier: SubscriptionTier): string {
-  return tier === "weekly"
-    ? "STRIPE_TUTORING_WEEKLY_PRICE_ID"
-    : "STRIPE_TUTORING_TWICE_WEEKLY_PRICE_ID"
 }

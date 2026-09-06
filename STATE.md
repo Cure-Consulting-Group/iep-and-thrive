@@ -1,6 +1,18 @@
 # IEP & Thrive — Build State
 
-## Current handoff — September 6, 2026 (evening)
+## Current handoff — September 6, 2026 (tutoring scheduling and sales removed)
+
+- **Active branch:** `feat/remove-booking-tutoring` off `main` (`7090ac7`), verified and ready for review.
+- **Objective/status:** parent-facing tutoring scheduling is not part of this product. The public `/tutoring` page no longer sells sessions through Stripe, the portal booking and subscription routes are gone, and their client services, admin management pages, and booking-trigger Functions are removed. Tutoring remains described as a contact-led service.
+- **Summer program enrollment checkout is untouched.** `components/sections/ProgramCards.tsx` shares the `stripeCheckout` endpoint with the removed tutoring paths but is the actual business; confirmed zero diff, as is `functions/src/stripe-webhook.ts` and `app/enroll/**`.
+- **Historical billing compatibility preserved:** `stripeWebhook` and its subscription/invoice handlers are unchanged, so an in-flight or historical Stripe event is still processed rather than throwing. `customerPortal` stays exported for anyone with an existing subscription; its links now return to `/portal`, and historical emails point scheduling questions at `/contact`.
+- **`availableSlots` and `bookings`** are now explicitly server-only in `firestore.rules`, with parent/admin/anonymous denial covered by the security suite.
+- **Verification (run outside the lane sandbox, which cannot bind loopback ports):** `tsc --noEmit` clean · `test:unit` 53/53 · `functions build` exit 0 · `functions test` 24 (16 pass, 0 fail, 8 skipped) · `test:security` 26/26 · dead-reference grep clean.
+- **Next action on resume:** Sprint 7 continues with TASK-LP-007 (instructor-private notes, startable now) and TASK-LP-060 (observability). See [the sprint plan](docs/sprints/sprint-plan.md).
+- **Open question for the owner:** TASK-LP-042/043/044/049 describe booking reservation, cancellation, booking email and invoice cycle accounting — 32 points for a scheduling product that is not being built. Close them out-of-scope unless existing tutoring customers create obligations.
+- **Authorization boundary:** implementation and merge are authorized. Production deployment is not; the deploy job remains `workflow_dispatch`-only pending admin-claim provisioning.
+
+## Previous handoff — September 6, 2026 (evening)
 
 - **Active branch:** `feat/sprint-1-3-containment`, 9 commits ahead of `main`, not yet merged.
 - **Objective/status:** Phase A containment (sprints 1-3 of [the sprint plan](docs/sprints/sprint-plan.md)) implemented via cure-tri-lane. All eight tickets have code; two are operationally blocked (below).

@@ -22,7 +22,7 @@ test.describe('Portal state per lifecycle stage', () => {
 
   test('portal navigation links resolve without 4xx', async ({ page }) => {
     await login(page, 'enrolled')
-    for (const path of ['/portal/bookings', '/portal/intake', '/portal/profile', '/portal/reports', '/portal/resources', '/portal/notifications']) {
+    for (const path of ['/portal/intake', '/portal/profile', '/portal/reports', '/portal/resources', '/portal/notifications']) {
       const response = await page.goto(path)
       expect(response?.status(), `${path} should not 4xx`).toBeLessThan(400)
     }

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/lib/auth-context'
-import { getBookingsByParent, Booking } from '@/lib/booking-service'
 import { getReportsByParent, ProgressReport } from '@/lib/report-service'
 import { getStudentsByParent, Student } from '@/lib/student-service'
 import {
@@ -14,8 +13,6 @@ import {
 } from '@/lib/portal-progress'
 import { IOSSessionTile } from '@/components/portal/IOSSessionTile'
 import { getUnreadCount } from '@/lib/notification-service'
-import { getUserSubscription } from '@/lib/subscription-service'
-import { sessionsRemaining, type SubscriptionState } from '@/lib/subscription'
 
 const STATUS_COLORS: Record<string, string> = {
   inquiry: 'bg-gray-100 text-gray-700',
@@ -231,35 +228,27 @@ function WeeklyProgressTile({ student, progress, loading }: WeeklyProgressTilePr
 export default function PortalDashboard() {
   const { profile, user } = useAuth()
   const [students, setStudents] = useState<Student[]>([])
-  const [bookings, setBookings] = useState<Booking[]>([])
   const [reports, setReports] = useState<ProgressReport[]>([])
   const [progress, setProgress] = useState<Record<string, WeeklyStudentProgress>>({})
   const [loading, setLoading] = useState(true)
   const [progressLoading, setProgressLoading] = useState(true)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const [photoReleaseSigned, setPhotoReleaseSigned] = useState<null | { signedAt: string; checked: boolean }>(null)
-  const [subscription, setSubscription] = useState<SubscriptionState | null>(null)
 
   const load = useCallback(async () => {
     if (!user) return
     setLoading(true)
     const results = await Promise.allSettled([
       getStudentsByParent(user.uid),
-      getBookingsByParent(user.uid),
       getReportsByParent(user.uid),
       getUnreadCount(user.uid),
-      getUserSubscription(user.uid),
     ])
     if (results[0].status === 'fulfilled') setStudents(results[0].value)
     else console.error('Failed to load students:', results[0].reason)
-    if (results[1].status === 'fulfilled') setBookings(results[1].value)
-    else console.error('Failed to load bookings:', results[1].reason)
-    if (results[2].status === 'fulfilled') setReports(results[2].value)
-    else console.error('Failed to load reports:', results[2].reason)
-    if (results[3].status === 'fulfilled') setUnreadNotifications(results[3].value)
-    else console.error('Failed to load notifications:', results[3].reason)
-    if (results[4].status === 'fulfilled') setSubscription(results[4].value)
-    else console.error('Failed to load subscription:', results[4].reason)
+    if (results[1].status === 'fulfilled') setReports(results[1].value)
+    else console.error('Failed to load reports:', results[1].reason)
+    if (results[2].status === 'fulfilled') setUnreadNotifications(results[2].value)
+    else console.error('Failed to load notifications:', results[2].reason)
     setLoading(false)
   }, [user])
 
@@ -325,10 +314,6 @@ export default function PortalDashboard() {
     return () => { cancelled = true }
   }, [user, students])
 
-  const [today, setToday] = useState('')
-  useEffect(() => { setToday(new Date().toISOString().split('T')[0]) }, [])
-  const upcomingBookings = bookings.filter((b) => b.date >= today && b.status === 'confirmed')
-  const nextBooking = upcomingBookings[0]
   const unreadReports = reports.filter((r) => !r.viewedAt).length
   const enrolledStudents = students.filter(
     (s) => s.enrollmentStatus === 'deposited' || s.enrollmentStatus === 'enrolled'
@@ -416,14 +401,10 @@ export default function PortalDashboard() {
       ) : (
         <>
           {/* Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <div className="bg-white rounded-2xl border border-border p-6">
               <div className="text-3xl font-display font-bold text-forest">{students.length}</div>
               <p className="text-sm font-body text-text-muted mt-1">Students Enrolled</p>
-            </div>
-            <div className="bg-white rounded-2xl border border-border p-6">
-              <div className="text-3xl font-display font-bold text-forest">{upcomingBookings.length}</div>
-              <p className="text-sm font-body text-text-muted mt-1">Upcoming Sessions</p>
             </div>
             <div className="bg-white rounded-2xl border border-border p-6">
               <div className="flex items-center gap-2">
@@ -475,59 +456,6 @@ export default function PortalDashboard() {
             </div>
           )}
 
-          {/* Subscription tile — surfaces when an active tutoring sub exists */}
-          {subscription && subscription.status === 'active' && (
-            <Link
-              href="/portal/subscription"
-              data-testid="dashboard-subscription-tile"
-              className="block bg-white rounded-2xl border border-sage p-5 mb-6 hover:bg-sage/5 transition-colors"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-body font-semibold uppercase tracking-[0.1em] text-forest-light">
-                    Tutoring subscription
-                  </p>
-                  <p className="font-body font-semibold text-text mt-1">
-                    {sessionsRemaining(subscription)} of{' '}
-                    {subscription.sessionsAllowedPerCycle} sessions remaining
-                  </p>
-                  <p className="text-xs font-body text-text-muted">
-                    {subscription.tier === 'weekly' ? 'Weekly' : 'Twice-Weekly'} plan ·
-                    Manage subscription →
-                  </p>
-                </div>
-                <span className="text-2xl shrink-0" aria-hidden="true">
-                  💳
-                </span>
-              </div>
-            </Link>
-          )}
-
-          {/* Next Booking */}
-          {nextBooking && (
-            <div className="bg-white rounded-2xl border border-sage p-6 mb-6">
-              <h2 className="font-display text-sm font-semibold text-text-muted uppercase mb-3">Next Session</h2>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-sage/20 flex flex-col items-center justify-center">
-                  <span className="text-xs font-body font-semibold text-forest">
-                    {new Date(nextBooking.date + 'T00:00').toLocaleDateString('en-US', { month: 'short' })}
-                  </span>
-                  <span className="text-lg font-display font-bold text-forest">
-                    {new Date(nextBooking.date + 'T00:00').getDate()}
-                  </span>
-                </div>
-                <div>
-                  <p className="font-body font-semibold text-text">
-                    {nextBooking.type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </p>
-                  <p className="text-sm font-body text-text-muted">
-                    {nextBooking.startTime} – {nextBooking.endTime} · {nextBooking.studentName}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Student Cards */}
           {students.length > 0 && (
             <div className="mb-6">
@@ -554,11 +482,7 @@ export default function PortalDashboard() {
           )}
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Link href="/book" className="bg-forest/10 rounded-2xl p-6 text-center hover:bg-forest/20 transition-colors group">
-              <span className="text-2xl block mb-2">📅</span>
-              <p className="font-body font-semibold text-forest group-hover:underline">Book a Session</p>
-            </Link>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link href="/portal/resources" className="bg-forest/10 rounded-2xl p-6 text-center hover:bg-forest/20 transition-colors group">
               <span className="text-2xl block mb-2">📁</span>
               <p className="font-body font-semibold text-forest group-hover:underline">View Resources</p>

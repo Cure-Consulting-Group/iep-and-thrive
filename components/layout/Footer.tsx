@@ -12,10 +12,8 @@ const programLinks = [
 
 const tutoringLinks = [
   { label: 'Year-Round Tutoring', href: '/tutoring' },
-  { label: 'Single Session ($125)', href: '/tutoring#pricing-drop-in' },
-  { label: 'Weekly Subscription', href: '/tutoring#pricing-weekly' },
-  { label: 'Twice-Weekly Subscription', href: '/tutoring#pricing-twice-weekly' },
-  { label: 'IEP Review Session', href: '/tutoring#iep-review' },
+  { label: 'Ask About Tutoring', href: '/contact' },
+  { label: 'IEP Advocacy Services', href: '/contact' },
 ]
 
 const baseEnrollLinks = [
@@ -42,7 +40,6 @@ export default function Footer() {
     : [
         ...baseEnrollLinks,
         portalLink,
-        { label: 'My Subscription', href: '/portal/subscription' },
       ]
 
   return (
@@ -82,7 +79,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* Column 3 — Tutoring (Subscription) */}
+          {/* Column 3 — Tutoring */}
           <nav aria-label="Tutoring links">
             <h4 className="mb-4 text-sm font-semibold text-white/80 font-body">
               Tutoring

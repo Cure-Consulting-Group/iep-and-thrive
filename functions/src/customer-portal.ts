@@ -2,8 +2,8 @@
  * H11 — Stripe Customer Portal Cloud Function
  *
  * Mints a Stripe billing-portal session URL for the authenticated parent
- * so they can self-serve cancel / pause / update-card without engineering
- * tickets. Called from /portal/subscription "Manage subscription" CTA.
+ * so historical customers can self-serve cancel / pause / update-card during
+ * the tutoring-subscription wind-down. No current product UI links here.
  *
  * Implemented as an HTTPS endpoint (rather than onCall) to mirror the
  * other functions in this codebase and to keep CORS handling explicit.
@@ -94,7 +94,7 @@ export const customerPortal = onRequest(
     try {
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: stripeCustomerId,
-        return_url: `${siteUrl}/portal/subscription`,
+        return_url: `${siteUrl}/portal`,
       });
 
       if (!portalSession.url) {
