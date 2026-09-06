@@ -1,4 +1,33 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Browser } from '@playwright/test'
+
+/**
+ * Opens a context whose clock is pinned to `iso` before any page script runs.
+ * The countdown derives its copy from `new Date()` at render time, so without
+ * a pinned clock these assertions silently change meaning as real time passes
+ * and become time bombs — which is exactly how the two "open state" tests
+ * below started failing once May 30 2026 went by.
+ *
+ * Both `new Date()` and `Date.now()` honor the override.
+ */
+async function contextAtTime(browser: Browser, iso: string) {
+  const context = await browser.newContext()
+  await context.addInitScript(`(() => {
+    const fakeNow = new Date(${JSON.stringify(iso)}).getTime()
+    const RealDate = Date
+    class FakeDate extends RealDate {
+      constructor(...args) {
+        if (args.length === 0) { super(fakeNow) } else { super(...args) }
+      }
+      static now() { return fakeNow }
+    }
+    globalThis.Date = FakeDate
+  })()`)
+  return context
+}
+
+// Fixed points either side of the May 30 2026 enrollment deadline.
+const BEFORE_DEADLINE = '2026-05-01T12:00:00Z'
+const AFTER_DEADLINE = '2026-07-15T12:00:00Z'
 
 test.describe('Marketing site', () => {
   test('landing page renders hero + countdown + login link', async ({ page }) => {
@@ -20,13 +49,15 @@ test.describe('Marketing site', () => {
     expect(body).not.toMatch(/Mon-Thu|Mon–Thu/)
   })
 
-  test('countdown is visible adjacent to hero CTA cluster (ticket A3)', async ({ page }) => {
+  test('countdown is visible adjacent to hero CTA cluster (ticket A3)', async ({ browser }) => {
+    const context = await contextAtTime(browser, BEFORE_DEADLINE)
+    const page = await context.newPage()
     await page.goto('/')
     const heroCountdown = page.getByTestId('enrollment-countdown').first()
     await expect(heroCountdown).toBeVisible()
     // Wait for hydration so we get the live "open"/"closed" state, not the
     // SSR placeholder.
-    await expect(heroCountdown).toHaveAttribute('data-status', /open|closed/)
+    await expect(heroCountdown).toHaveAttribute('data-status', 'open')
     const text = (await heroCountdown.textContent())?.trim() ?? ''
     expect(text).toContain('Enrollment closes')
     expect(text).toContain('May 30, 2026')
@@ -36,43 +67,24 @@ test.describe('Marketing site', () => {
     if (match) {
       expect(Number(match[1])).toBeGreaterThan(0)
     }
+    await context.close()
   })
 
-  test('countdown is visible inside the standalone /enroll form header', async ({ page }) => {
+  test('countdown is visible inside the standalone /enroll form header', async ({ browser }) => {
+    const context = await contextAtTime(browser, BEFORE_DEADLINE)
+    const page = await context.newPage()
     await page.goto('/enroll')
     const formCountdown = page.getByTestId('enrollment-countdown').first()
     await expect(formCountdown).toBeVisible()
-    await expect(formCountdown).toHaveAttribute('data-status', /open|closed/)
+    await expect(formCountdown).toHaveAttribute('data-status', 'open')
     const text = (await formCountdown.textContent())?.trim() ?? ''
     expect(text).toContain('Enrollment closes')
     expect(text).toContain('May 30, 2026')
+    await context.close()
   })
 
   test('countdown falls back to waitlist copy after the deadline', async ({ browser }) => {
-    // Inject a fake "now" well past May 30 2026 before any page script runs.
-    // Both Date() with no args and Date.now() honor the override; tagged
-    // template literals downstream consume Date through these surfaces.
-    const context = await browser.newContext()
-    await context.addInitScript(() => {
-      const fakeNow = new Date('2026-07-15T12:00:00Z').getTime()
-      const RealDate = Date
-      // @ts-ignore - intentional override for test
-      class FakeDate extends RealDate {
-        constructor(...args: unknown[]) {
-          if (args.length === 0) {
-            super(fakeNow)
-          } else {
-            // @ts-ignore - forward args verbatim
-            super(...(args as []))
-          }
-        }
-        static now() {
-          return fakeNow
-        }
-      }
-      // @ts-ignore - replace global Date
-      globalThis.Date = FakeDate
-    })
+    const context = await contextAtTime(browser, AFTER_DEADLINE)
     const page = await context.newPage()
     await page.goto('/')
     const heroCountdown = page.getByTestId('enrollment-countdown').first()

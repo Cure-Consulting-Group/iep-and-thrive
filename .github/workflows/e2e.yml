@@ -1,27 +1,54 @@
 name: E2E (Playwright)
 
+# Both jobs run against the DEPLOYED site, not the PR's code. That is a known
+# structural problem tracked in TASK-LP-055 (gate releases on verification and
+# deploy every Firebase surface): a pull request cannot change what these tests
+# observe, so a red result here is a statement about production, not about the
+# diff. Until that ticket lands, the split below keeps the merge gate honest.
+#
+#   pr-gate       — specs that are deterministic and read-only against
+#                   production. These must pass to merge.
+#   full-suite    — everything, including specs that write to production data
+#                   or require the admin custom claim. Non-gating, on a
+#                   schedule and on demand, so the signal stays visible.
+#
+# The three admin-curriculum specs, photo-release, and enrollment-agreement are
+# in the second group because they fail for an operational reason no PR can
+# fix: writes to adminTasks / probes / assessmentResults require
+# request.auth.token.admin, and the seeded production admin account does not
+# carry that claim. See the September 6 2026 correction on TASK-LP-006. Do not
+# move them back into the gate by loosening their assertions — they are
+# reporting a real gap.
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # 07:00 America/New_York, daily.
+    - cron: '0 11 * * *'
   workflow_dispatch:
 
 concurrency:
   group: e2e-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  E2E_BASE_URL: https://iep-and-thrive.web.app
+
 jobs:
-  playwright:
-    name: Playwright smoke tests (production)
+  pr-gate:
+    name: Playwright smoke tests (production, gating)
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     env:
-      E2E_BASE_URL: https://iep-and-thrive.web.app
       E2E_INQUIRY_PASSWORD: ${{ secrets.E2E_INQUIRY_PASSWORD }}
       E2E_DEPOSITED_PASSWORD: ${{ secrets.E2E_DEPOSITED_PASSWORD }}
       E2E_ENROLLED_PASSWORD: ${{ secrets.E2E_ENROLLED_PASSWORD }}
+      E2E_SUBSCRIBER_PASSWORD: ${{ secrets.E2E_SUBSCRIBER_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -53,14 +80,20 @@ jobs:
 
       - run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
-        run: npx playwright test
+      - name: Run gating Playwright specs
+        run: |
+          npx playwright test \
+            tests/e2e/marketing.spec.ts \
+            tests/e2e/tutoring.spec.ts \
+            tests/e2e/auth-personas.spec.ts \
+            tests/e2e/portal-state.spec.ts \
+            tests/e2e/email-lifecycle.spec.ts
 
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-gate
           path: playwright-report/
           retention-days: 7
 
@@ -68,6 +101,62 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces
+          name: playwright-traces-gate
+          path: test-results/
+          retention-days: 7
+
+  full-suite:
+    name: Playwright full suite (production, non-gating)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      E2E_INQUIRY_PASSWORD: ${{ secrets.E2E_INQUIRY_PASSWORD }}
+      E2E_DEPOSITED_PASSWORD: ${{ secrets.E2E_DEPOSITED_PASSWORD }}
+      E2E_ENROLLED_PASSWORD: ${{ secrets.E2E_ENROLLED_PASSWORD }}
+      E2E_SUBSCRIBER_PASSWORD: ${{ secrets.E2E_SUBSCRIBER_PASSWORD }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@cure-consulting-group'
+
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PACKAGES_READ_TOKEN }}
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run full Playwright suite
+        run: npx playwright test
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-full
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload trace artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-full
           path: test-results/
           retention-days: 7

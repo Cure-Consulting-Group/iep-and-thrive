@@ -74,9 +74,15 @@ export const SignatureCanvas = forwardRef<SignatureCanvasHandle, SignatureCanvas
         e.preventDefault()
         const c = canvasRef.current
         if (!c) return
-        c.setPointerCapture(e.pointerId)
+        // Start drawing before capturing. setPointerCapture throws
+        // NotFoundError when the pointer is already released (fast clicks,
+        // synthetic pointers); letting that escape used to abort the handler
+        // and leave the pad permanently unresponsive with no visible error.
+        // Capture is an enhancement for strokes leaving the canvas, not a
+        // prerequisite for drawing. releasePointerCapture was already guarded.
         drawingRef.current = true
         lastPointRef.current = pointAt(e)
+        try { c.setPointerCapture(e.pointerId) } catch { /* ignore */ }
       },
       [pointAt]
     )

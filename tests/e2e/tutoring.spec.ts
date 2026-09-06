@@ -41,7 +41,13 @@ test.describe('/tutoring marketing page (Epic H1)', () => {
   test('pricing CTAs link to the correct Stripe endpoints', async ({ page }) => {
     await page.goto('/tutoring')
 
-    const dropInCta = page.getByRole('link', { name: /Book a single session/i }).first()
+    // The hero also renders a "Book a single session" link, but it is an
+    // in-page anchor to #pricing-drop-in. Its accessible name is exactly that
+    // phrase, whereas the pricing-card CTA's aria-label appends the price
+    // ("Book a single session, $125"), so requiring the comma selects the real
+    // checkout link. Matching on the bare phrase with .first() picked up the
+    // jump link and asserted a Stripe URL against it.
+    const dropInCta = page.getByRole('link', { name: /Book a single session, / })
     await expect(dropInCta).toHaveAttribute('href', /product=drop-in/)
 
     const weeklyCta = page.getByRole('link', { name: /Start weekly subscription/i })

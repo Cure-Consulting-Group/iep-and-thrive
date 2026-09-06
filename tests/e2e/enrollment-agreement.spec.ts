@@ -17,7 +17,10 @@ test.describe('E3 enrollment agreement signing', () => {
 
     // Page renders the agreement and the audit pane (version + sha256 hash).
     await expect(page.getByRole('heading', { name: /Sign the enrollment agreement/i })).toBeVisible({ timeout: 15_000 })
-    await expect(page.getByText(/SHA-256/i)).toBeVisible()
+    // The agreement body also contains the literal "SHA-256", so a loose
+    // match resolves to two nodes and trips strict mode. Pin to the audit
+    // pane's own label.
+    await expect(page.getByText('SHA-256', { exact: true })).toBeVisible()
     await expect(page.getByText(/Version/i).first()).toBeVisible()
 
     // Draw on the canvas (mouse path).
