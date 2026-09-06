@@ -8,6 +8,10 @@ name: Recovery readiness
 # scheduled-run failure. The previous `npm run verify:backups` existed but ran
 # nowhere, so a stale backup produced no signal at all.
 
+permissions:
+  contents: read
+  id-token: write   # google-github-actions/auth
+
 on:
   schedule:
     # 08:00 America/New_York daily, after the 03:00 export window.

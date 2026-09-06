@@ -195,6 +195,21 @@ setHttpsRequest(((options: unknown, callback?: (response: unknown) => void) => {
   return request as never;
 }) as typeof https.request);
 
+/** True when the URL's host is google.com/googleapis.com or a real subdomain. */
+function isGoogleHost(rawUrl: string): boolean {
+  let host: string;
+  try {
+    host = new URL(rawUrl).hostname.toLowerCase();
+  } catch {
+    // An unparseable URL is not something this harness should let through
+    // silently; treat it as external so the test fails loudly.
+    return true;
+  }
+  return ["googleapis.com", "google.com"].some(
+    (domain) => host === domain || host.endsWith(`.${domain}`)
+  );
+}
+
 function providerResponse(data: unknown, status = 200): unknown {
   return {
     config: {},
@@ -236,10 +251,12 @@ Gaxios.prototype.request = async function testProviderTransport(
     }
   }
 
-  if (
-    url.includes("googleapis.com") ||
-    url.includes("google.com")
-  ) {
+  // Match the parsed hostname, not a substring of the URL. `includes` here
+  // would treat https://googleapis.com.attacker.example/ as Google — and, more
+  // to the point for a guard, would MISS a host that does not literally spell
+  // the domain while still leaving the machine. The same substring mistake
+  // appeared in the CORS allowlist this repo fixed in TASK-LP-010.
+  if (isGoogleHost(url)) {
     throw new Error(`Unexpected external Google transport in emulator test: ${url}`);
   }
 

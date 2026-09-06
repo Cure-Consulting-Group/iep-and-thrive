@@ -3,151 +3,151 @@ TAP version 13
 # Subtest: sendEmail returns false leaves the phase/counter unchanged and records failed
 ok 1 - sendEmail returns false leaves the phase/counter unchanged and records failed
   ---
-  duration_ms: 2.254333
+  duration_ms: 2.057291
   type: 'test'
   ...
 # Subtest: preference lookup throws suppresses marketing and records skipped, not delivered
 ok 2 - preference lookup throws suppresses marketing and records skipped, not delivered
   ---
-  duration_ms: 0.224583
+  duration_ms: 0.198167
   type: 'test'
   ...
 # Subtest: same template, recipient, program, and phase delivers only once
 ok 3 - same template, recipient, program, and phase delivers only once
   ---
-  duration_ms: 0.10025
+  duration_ms: 0.092417
   type: 'test'
   ...
 # Subtest: service template still sends when preference lookup fails
 ok 4 - service template still sends when preference lookup fails
   ---
-  duration_ms: 0.4565
+  duration_ms: 0.41775
   type: 'test'
   ...
 # Subtest: test-flagged recipient receives nothing
 ok 5 - test-flagged recipient receives nothing
   ---
-  duration_ms: 0.09775
+  duration_ms: 0.058084
   type: 'test'
   ...
 # Subtest: a Firestore emulator write rejection is never acknowledged as success
 ok 6 - a Firestore emulator write rejection is never acknowledged as success # SKIP
   ---
-  duration_ms: 318.017417
+  duration_ms: 333.467958
   type: 'test'
   ...
 # Subtest: Stripe provider failure leaves a failed checkout record and never returns success
 ok 7 - Stripe provider failure leaves a failed checkout record and never returns success # SKIP provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067
   ---
-  duration_ms: 0.076542
+  duration_ms: 0.078167
   type: 'test'
   ...
 # Subtest: Stripe webhook duplicate delivery is idempotent and out-of-order lifecycle events do not duplicate welcome effects
 ok 8 - Stripe webhook duplicate delivery is idempotent and out-of-order lifecycle events do not duplicate welcome effects # SKIP provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067
   ---
-  duration_ms: 0.048167
+  duration_ms: 0.058292
   type: 'test'
   ...
 # Subtest: the emulator rules refuse cross-family reads and writes
 ok 9 - the emulator rules refuse cross-family reads and writes
   ---
-  duration_ms: 233.608167
+  duration_ms: 246.904125
   type: 'test'
   ...
 # Subtest: tampered enrollment agreement payload is rejected before any durable artifact is written
 ok 10 - tampered enrollment agreement payload is rejected before any durable artifact is written # SKIP provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067
   ---
-  duration_ms: 0.071667
+  duration_ms: 0.075541
   type: 'test'
   ...
 # Subtest: an authorized agreement is persisted in Firestore and Storage, while a different family is refused
 ok 11 - an authorized agreement is persisted in Firestore and Storage, while a different family is refused # SKIP provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067
   ---
-  duration_ms: 0.028167
+  duration_ms: 0.03
   type: 'test'
   ...
 # Subtest: booking create and cancellation handlers persist their real side effects through provider transports
 ok 12 - booking create and cancellation handlers persist their real side effects through provider transports # SKIP provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067
   ---
-  duration_ms: 0.026125
+  duration_ms: 0.035625
   type: 'test'
   ...
 # Subtest: a retried welcome invocation sends once and records its outbox progress
 ok 13 - a retried welcome invocation sends once and records its outbox progress # SKIP provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067
   ---
-  duration_ms: 0.037167
+  duration_ms: 0.032291
   type: 'test'
   ...
 # Subtest: unsubscribe withdrawal changes the real user record and is idempotent
 ok 14 - unsubscribe withdrawal changes the real user record and is idempotent # SKIP provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067
   ---
-  duration_ms: 0.023625
+  duration_ms: 0.025917
   type: 'test'
   ...
 # Subtest: consent withdrawal/deletion detaches all claimed media
 ok 15 - consent withdrawal/deletion detaches all claimed media # SKIP
   ---
-  duration_ms: 0.029709
+  duration_ms: 0.031875
   type: 'test'
   ...
 # Subtest: failure after claim is retried on the next delivery
 ok 16 - failure after claim is retried on the next delivery
   ---
-  duration_ms: 12.038416
+  duration_ms: 12.659792
   type: 'test'
   ...
 # Subtest: two concurrent deliveries produce one billing transition and one outbox effect
 ok 17 - two concurrent deliveries produce one billing transition and one outbox effect
   ---
-  duration_ms: 0.181958
+  duration_ms: 0.176708
   type: 'test'
   ...
 # Subtest: duplicate of a succeeded event returns 200 without a second effect
 ok 18 - duplicate of a succeeded event returns 200 without a second effect
   ---
-  duration_ms: 0.630458
+  duration_ms: 0.650792
   type: 'test'
   ...
 # Subtest: expired lease is reclaimable by a later delivery
 ok 19 - expired lease is reclaimable by a later delivery
   ---
-  duration_ms: 0.118625
+  duration_ms: 0.1185
   type: 'test'
   ...
 # Subtest: permanently invalid event returns 200, is marked failed, and is not retried forever
 ok 20 - permanently invalid event returns 200, is marked failed, and is not retried forever
   ---
-  duration_ms: 0.139708
+  duration_ms: 0.143209
   type: 'test'
   ...
 # Subtest: method rejection sets 405 and Allow
 ok 21 - method rejection sets 405 and Allow
   ---
-  duration_ms: 0.581083
+  duration_ms: 0.568458
   type: 'test'
   ...
 # Subtest: content-type rejection sets 415
 ok 22 - content-type rejection sets 415
   ---
-  duration_ms: 0.070208
+  duration_ms: 0.066916
   type: 'test'
   ...
 # Subtest: oversize body rejection sets 413 before parsing
 ok 23 - oversize body rejection sets 413 before parsing
   ---
-  duration_ms: 0.052041
+  duration_ms: 0.055791
   type: 'test'
   ...
 # Subtest: over-limit quota responds with 429 and Retry-After
 ok 24 - over-limit quota responds with 429 and Retry-After
   ---
-  duration_ms: 0.580084
+  duration_ms: 0.528958
   type: 'test'
   ...
 # Subtest: error envelope never echoes input
 ok 25 - error envelope never echoes input
   ---
-  duration_ms: 0.069625
+  duration_ms: 0.059459
   type: 'test'
   ...
 1..25
@@ -158,4 +158,4 @@ ok 25 - error envelope never echoes input
 # cancelled 0
 # skipped 9
 # todo 0
-# duration_ms 1484.148916
+# duration_ms 1517.724792

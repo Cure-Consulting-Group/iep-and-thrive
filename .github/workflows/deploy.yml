@@ -34,6 +34,12 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+# Least privilege by default (TASK-LP-055 scope item 3). Jobs opt into only
+# what they need; the deploy job authenticates to Google separately and needs
+# id-token for that, not repository write.
+permissions:
+  contents: read
+
 env:
   # Matches the `engines.node` declared in functions/package.json. CI previously
   # ran Node 20 against Functions declaring 22, so CI was not exercising the
@@ -146,6 +152,9 @@ jobs:
   deploy:
     name: Deploy all surfaces
     needs: [verify, build]
+    permissions:
+      contents: read
+      id-token: write   # google-github-actions/auth
     # Deliberately workflow_dispatch ONLY — a push to main verifies and builds
     # but does not deploy.
     #
