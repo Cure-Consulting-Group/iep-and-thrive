@@ -1,12 +1,21 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { trackSignupCompleted } from '@/lib/analytics'
+import { safeNextPath } from '@/lib/safe-redirect'
 
 export default function SignUpPage() {
+  return (
+    <Suspense fallback={<main id="main" className="min-h-screen bg-cream" />}>
+      <SignUpPageContent />
+    </Suspense>
+  )
+}
+
+function SignUpPageContent() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -15,6 +24,8 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false)
   const { signUp, signInWithGoogle } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextPath = safeNextPath(searchParams.get('next'))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,7 +45,7 @@ export default function SignUpPage() {
     try {
       await signUp(email, password, name)
       trackSignupCompleted()
-      router.push('/portal')
+      router.push(nextPath ?? '/portal')
     } catch (err: unknown) {
       const firebaseError = err as { code?: string }
       if (firebaseError.code === 'auth/email-already-in-use') {
@@ -55,7 +66,7 @@ export default function SignUpPage() {
     setError('')
     try {
       await signInWithGoogle()
-      router.push('/portal')
+      router.push(nextPath ?? '/portal')
     } catch {
       setError('Google sign-in failed. Please try again.')
     }

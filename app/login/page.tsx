@@ -1,17 +1,28 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { safeNextPath } from '@/lib/safe-redirect'
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<main id="main" className="min-h-screen bg-cream" />}>
+      <LoginPageContent />
+    </Suspense>
+  )
+}
+
+function LoginPageContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { signIn, signInWithGoogle } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextPath = safeNextPath(searchParams.get('next'))
 
   const redirectAfterLogin = async () => {
     const { auth: firebaseAuth } = await import('@/lib/firebase')
@@ -20,7 +31,7 @@ export default function LoginPage() {
       router.push('/admin')
       return
     }
-    router.push('/portal')
+    router.push(nextPath ?? '/portal')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
