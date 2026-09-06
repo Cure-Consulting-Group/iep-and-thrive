@@ -54,3 +54,8 @@ ios/build/
 ios/*.ipa
 ios/*.dSYM.zip
 ios/AuthKey_*.p8
+
+# local Firebase emulator diagnostics
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*

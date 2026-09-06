@@ -1,5 +1,7 @@
 # IEP & Thrive — Claude Code Build Brief
 
+> Start with [AGENTS.md](AGENTS.md) and the current handoff in [STATE.md](STATE.md). The guide below contains historical plans; the September 2026 audit supersedes conflicting direction and readiness claims.
+
 ## Project Overview
 
 **Product:** IEP & Thrive — SPED Summer Intensive Program website

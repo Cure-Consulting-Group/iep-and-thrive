@@ -1,0 +1,53 @@
+
+> iep-and-thrive@1.0.0 test:security
+> node --test tests/security/*.test.cjs
+
+✔ parent can initialize a basic profile and edit contact/preferences (190.108875ms)
+[2026-09-06T00:38:14.495Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916a4 error. Code: 7 Message: 7 PERMISSION_DENIED:
+Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ parent cannot update protected field stripeCustomerId (17.990958ms)
+[2026-09-06T00:38:14.508Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916a5 error. Code: 7 Message: 7 PERMISSION_DENIED:
+Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ parent cannot update protected field role (12.107333ms)
+[2026-09-06T00:38:14.525Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916a6 error. Code: 7 Message: 7 PERMISSION_DENIED:
+Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ parent cannot update protected field subscription (16.910583ms)
+[2026-09-06T00:38:14.539Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916a7 error. Code: 7 Message: 7 PERMISSION_DENIED:
+Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ parent cannot update protected field subscription.sessionsUsedThisCycle (13.76875ms)
+[2026-09-06T00:38:14.554Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916a8 error. Code: 7 Message: 7 PERMISSION_DENIED:
+Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ parent cannot update protected field isTest (15.222959ms)
+[2026-09-06T00:38:14.566Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916a9 error. Code: 7 Message: 7 PERMISSION_DENIED:
+Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ parent cannot update protected field unknownPrivilege (12.328458ms)
+[2026-09-06T00:38:14.578Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916aa error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'create' @ L24, Property admin is undefined on object. for 'update' @ L28, false for 'create' @ L24
+✔ signup cannot inject protected field role (12.177541ms)
+[2026-09-06T00:38:14.591Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916ab error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'create' @ L24, Property admin is undefined on object. for 'update' @ L28, false for 'create' @ L24
+✔ signup cannot inject protected field stripeCustomerId (12.624042ms)
+[2026-09-06T00:38:14.606Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916ac error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'create' @ L24, Property admin is undefined on object. for 'update' @ L28, false for 'create' @ L24
+✔ signup cannot inject protected field subscription (14.895792ms)
+[2026-09-06T00:38:14.615Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916ad error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'create' @ L24, Property admin is undefined on object. for 'update' @ L28, false for 'create' @ L24
+✔ signup cannot inject protected field isTest (9.32325ms)
+[2026-09-06T00:38:14.626Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916ae error. Code: 7 Message: 7 PERMISSION_DENIED:
+false for 'create' @ L24, Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ replacement cannot delete existing server-owned fields (10.927625ms)
+[2026-09-06T00:38:14.653Z]  @firebase/firestore: Firestore (12.11.0): GrpcConnection RPC 'Write' stream 0x42f916b0 error. Code: 7 Message: 7 PERMISSION_DENIED:
+Property admin is undefined on object. for 'update' @ L28, Property admin is undefined on object. for 'update' @ L28
+✔ cross-family and anonymous profile access are denied (37.34875ms)
+✔ token admin can maintain server fields (9.673208ms)
+✔ persisted admin role grants no cross-family access (9.248833ms)
+✔ signed PDFs deny direct access to parents, unauthenticated clients, and admins (113.238375ms)
+✔ owner report access remains available and cross-family reads stay denied (32.812875ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 725.579833

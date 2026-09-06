@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-05",
+  "markdown_files_checked": 86,
+  "local_links_checked": 1633,
+  "source_line_links_checked": 394,
+  "tickets": 76,
+  "findings": 44,
+  "epics": 10,
+  "priority_counts": {
+    "P1": 34,
+    "P0": 41,
+    "P2": 1
+  },
+  "dependency_graph_acyclic": true,
+  "bidirectional_finding_coverage_valid": true,
+  "errors": [],
+  "passed": true
+}

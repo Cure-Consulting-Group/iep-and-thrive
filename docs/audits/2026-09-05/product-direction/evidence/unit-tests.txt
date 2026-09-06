@@ -1,0 +1,53 @@
+
+> iep-and-thrive@1.0.0 test:unit
+> node --test tests/unit/*.mjs
+
+✔ forged profile admin role and uid cannot override verified identity (1.720375ms)
+✔ admin requires boolean token claim and responds to refreshed claims (0.465125ms)
+✔ late profile response cannot restore admin UI after sign-out (0.999416ms)
+✔ failed token lookup leaves admin UI inaccessible (2.148042ms)
+✔ ENROLLMENT_DEADLINE is May 30, 2026 (label aligned) (1.165417ms)
+✔ daysUntilDeadline returns positive integer well before the deadline (0.164542ms)
+✔ daysUntilDeadline returns 1 the day before the deadline (0.114334ms)
+✔ daysUntilDeadline returns 0 on the deadline date itself (0.098917ms)
+✔ daysUntilDeadline goes negative after the deadline (0.093083ms)
+✔ getEnrollmentCountdown reports open + N days · May 30, 2026 (plural) (0.18825ms)
+✔ getEnrollmentCountdown uses singular day when one day remains (0.113667ms)
+✔ getEnrollmentCountdown swaps to waitlist copy on the deadline (N <= 0) (0.083583ms)
+✔ getEnrollmentCountdown stays in waitlist mode after the deadline (0.216166ms)
+✔ LessonProgressSchema accepts a well-formed lesson doc (Date) (2.702417ms)
+✔ LessonProgressSchema accepts ISO-string dates (Firestore JSON fallback) (0.359417ms)
+✔ LessonProgressSchema rejects unknown category (0.53725ms)
+✔ LessonProgressSchema rejects negative levelIndex (0.230834ms)
+✔ LessonProgressSchema rejects malformed date string (0.22875ms)
+✔ SparksRecordSchema accepts a well-formed sparks doc (0.363291ms)
+✔ SparksRecordSchema rejects non-integer amount (0.236625ms)
+✔ SparksRecordSchema accepts negative amounts (corrections/refunds) (0.103791ms)
+✔ planSlots: 1 week from Monday produces expected slot count (4.0075ms)
+✔ planSlots: cohort blackout July 7–Aug 14 is skipped (0.380458ms)
+✔ planSlots: boundary dates 2026-07-07 (skipped) and 2026-07-06 (kept) (0.206041ms)
+✔ planSlots: boundary date 2026-08-15 (Sat, day after blackout) is kept (0.209042ms)
+✔ planSlots: empty template produces zero slots (0.168042ms)
+✔ planSlots: end time computed correctly with custom duration (0.167125ms)
+✔ planSlots: day-of-week mapping aligns to start date weekday (0.126291ms)
+✔ planSlots: slots within a day are emitted in template-input order (1.351083ms)
+✔ anonymous when no authUid (0.676083ms)
+✔ no-subscription when authed but no sub doc (0.053459ms)
+✔ no-subscription when status is incomplete (0.055792ms)
+✔ paused when status=paused regardless of session count (0.041ms)
+✔ past-due when status=past_due (0.041709ms)
+✔ canceled when status=canceled even with sessions remaining (0.039125ms)
+✔ active-bookable when active + sessions remaining (0.538583ms)
+✔ active-exhausted when used >= allowed (0.038ms)
+✔ active-exhausted clamps when usage exceeds allowed (defensive) (0.049417ms)
+✔ canBookSession is true only for active+remaining (0.088834ms)
+✔ sessionsRemaining clamps to 0 and reflects allowance (0.047667ms)
+✔ TUTORING_PRICING shape matches design spec (0.0375ms)
+ℹ tests 41
+ℹ suites 0
+ℹ pass 41
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1554.071167

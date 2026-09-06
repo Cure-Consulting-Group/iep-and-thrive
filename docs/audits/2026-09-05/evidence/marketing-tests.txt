@@ -1,0 +1,66 @@
+
+Running 9 tests using 1 worker
+
+(node:30721) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30721) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/e2e/marketing.spec.ts:4:7 › Marketing site › landing page renders hero + countdown + login link (351ms)
+  ✓  2 tests/e2e/marketing.spec.ts:14:7 › Marketing site › hero advertises cohort cap of 6 and excludes stale numbers (404ms)
+  ✘  3 tests/e2e/marketing.spec.ts:23:7 › Marketing site › countdown is visible adjacent to hero CTA cluster (ticket A3) (322ms)
+(node:30751) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30751) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 tests/e2e/marketing.spec.ts:41:7 › Marketing site › countdown is visible inside the standalone /enroll form header (271ms)
+(node:30768) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30768) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 tests/e2e/marketing.spec.ts:51:7 › Marketing site › countdown falls back to waitlist copy after the deadline (329ms)
+  ✓  6 tests/e2e/marketing.spec.ts:87:7 › Marketing site › FAQ page loads (159ms)
+  ✓  7 tests/e2e/marketing.spec.ts:93:7 › Marketing site › program page loads (140ms)
+  ✓  8 tests/e2e/marketing.spec.ts:98:7 › Marketing site › legal pages return 200 (205ms)
+  ✓  9 tests/e2e/marketing.spec.ts:105:7 › Marketing site › login page renders form (194ms)
+
+
+  1) tests/e2e/marketing.spec.ts:23:7 › Marketing site › countdown is visible adjacent to hero CTA cluster (ticket A3)
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected substring: [32m"Enrollment closes"[39m
+    Received string:    [31m"Waitlist only · enrollment closed May 30, 2026"[39m
+
+      29 |     await expect(heroCountdown).toHaveAttribute('data-status', /open|closed/)
+      30 |     const text = (await heroCountdown.textContent())?.trim() ?? ''
+    > 31 |     expect(text).toContain('Enrollment closes')
+         |                  ^
+      32 |     expect(text).toContain('May 30, 2026')
+      33 |     // Day count must parse as a positive integer.
+      34 |     const match = text.match(/Enrollment closes in (\d+) days?/)
+        at /Volumes/CureVault/projects/iep-and-thrive/tests/e2e/marketing.spec.ts:31:18
+
+    Error Context: ../../../../tmp/iep-audit-playwright-results/marketing-Marketing-site-c-cd821-hero-CTA-cluster-ticket-A3-/error-context.md
+
+  2) tests/e2e/marketing.spec.ts:41:7 › Marketing site › countdown is visible inside the standalone /enroll form header
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected substring: [32m"Enrollment closes"[39m
+    Received string:    [31m"Waitlist only · enrollment closed May 30, 2026"[39m
+
+      45 |     await expect(formCountdown).toHaveAttribute('data-status', /open|closed/)
+      46 |     const text = (await formCountdown.textContent())?.trim() ?? ''
+    > 47 |     expect(text).toContain('Enrollment closes')
+         |                  ^
+      48 |     expect(text).toContain('May 30, 2026')
+      49 |   })
+      50 |
+        at /Volumes/CureVault/projects/iep-and-thrive/tests/e2e/marketing.spec.ts:47:18
+
+    Error Context: ../../../../tmp/iep-audit-playwright-results/marketing-Marketing-site-c-f07d0-andalone-enroll-form-header/error-context.md
+
+  2 failed
+    tests/e2e/marketing.spec.ts:23:7 › Marketing site › countdown is visible adjacent to hero CTA cluster (ticket A3)
+    tests/e2e/marketing.spec.ts:41:7 › Marketing site › countdown is visible inside the standalone /enroll form header
+  7 passed (4.3s)

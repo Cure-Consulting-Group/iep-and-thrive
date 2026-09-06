@@ -14,17 +14,11 @@ export default function LoginPage() {
   const router = useRouter()
 
   const redirectAfterLogin = async () => {
-    // Check Firestore profile to determine redirect
-    const { doc, getDoc } = await import('firebase/firestore')
-    const { db } = await import('@/lib/firebase')
     const { auth: firebaseAuth } = await import('@/lib/firebase')
-    const uid = firebaseAuth.currentUser?.uid
-    if (uid) {
-      const snap = await getDoc(doc(db, 'users', uid))
-      if (snap.exists() && snap.data().role === 'admin') {
-        router.push('/admin')
-        return
-      }
+    const token = await firebaseAuth.currentUser?.getIdTokenResult()
+    if (token?.claims.admin === true) {
+      router.push('/admin')
+      return
     }
     router.push('/portal')
   }

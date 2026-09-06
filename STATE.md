@@ -1,5 +1,15 @@
 # IEP & Thrive — Build State
 
+## Current handoff — September 5, 2026
+
+The [full product-direction review](docs/audits/2026-09-05/product-direction/README.md) is the current handoff: 44 findings, 10 epics, and 76 detailed local tickets covering web, native, backend, data, security, curriculum, payments, release, and operations. Review the [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md) and [ticket index](docs/audits/2026-09-05/product-direction/ticket-index.md) before further implementation. The recommended direction is an independently useful focused reading product, with tutoring retained as a separate service and feedback channel; a school remains optional.
+
+The [original build audit](docs/audits/2026-09-05/build-audit.md) supersedes historical launch-readiness claims. A01 (billing/profile trust and token-based UI roles) and A02 (signed-PDF access) remain implemented and tested locally, not deployed; see [repair progress](docs/audits/2026-09-05/repair-progress.md). The expanded audit added documentation and synthetic emulator probes, not further product repairs. Current verification: 41 web unit tests and 17 security regressions pass; 12 diagnostic rules observations reproduce additional exposures/denials; Functions compiles. First work is current-user protection and isolated operations alongside product/data contracts, followed by the narrow reading slice and a gated consented pilot. All new tickets remain proposals for review; no external issues were created.
+
+**Portable handoff — September 6, 2026:** Start with [AGENTS.md](AGENTS.md), this current section, and the selected ticket; the full audit need not be reloaded. Current next action is review and prioritize the proposed backlog. No additional feature implementation or deployment has occurred since the audit. Repository handoff files, audit evidence, tickets, and the existing local security repair are included in the checkpoint; local debug logs and credentials are excluded.
+
+The sprint history below is retained as historical context, not a current readiness decision.
+
 ## Status: SPRINT 6 — CORE LEARNING LOOP SHIPPED
 The end-to-end student loop (Onboarding → Journey → Literacy/Math mission → Mission Complete) now works on device with real validation. P0 silent-correctness bugs, P1 UX gaps, the SpriteKit Math engine, and Sand Tray shape matching are all merged into `main`. Remaining work is design assets, telemetry-driven tuning, and a test harness.
 

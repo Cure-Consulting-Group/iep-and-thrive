@@ -1,0 +1,49 @@
+
+> iep-and-thrive@1.0.0 test:unit
+> node --test tests/unit/*.mjs
+
+✔ ENROLLMENT_DEADLINE is May 30, 2026 (label aligned) (1.796333ms)
+✔ daysUntilDeadline returns positive integer well before the deadline (0.17525ms)
+✔ daysUntilDeadline returns 1 the day before the deadline (0.251541ms)
+✔ daysUntilDeadline returns 0 on the deadline date itself (0.469792ms)
+✔ daysUntilDeadline goes negative after the deadline (0.069667ms)
+✔ getEnrollmentCountdown reports open + N days · May 30, 2026 (plural) (0.169416ms)
+✔ getEnrollmentCountdown uses singular day when one day remains (0.045959ms)
+✔ getEnrollmentCountdown swaps to waitlist copy on the deadline (N <= 0) (0.042459ms)
+✔ getEnrollmentCountdown stays in waitlist mode after the deadline (0.099792ms)
+✔ LessonProgressSchema accepts a well-formed lesson doc (Date) (3.236042ms)
+✔ LessonProgressSchema accepts ISO-string dates (Firestore JSON fallback) (0.183417ms)
+✔ LessonProgressSchema rejects unknown category (0.278417ms)
+✔ LessonProgressSchema rejects negative levelIndex (0.104541ms)
+✔ LessonProgressSchema rejects malformed date string (0.12475ms)
+✔ SparksRecordSchema accepts a well-formed sparks doc (0.160208ms)
+✔ SparksRecordSchema rejects non-integer amount (0.097208ms)
+✔ SparksRecordSchema accepts negative amounts (corrections/refunds) (0.04625ms)
+✔ planSlots: 1 week from Monday produces expected slot count (1.645667ms)
+✔ planSlots: cohort blackout July 7–Aug 14 is skipped (0.208958ms)
+✔ planSlots: boundary dates 2026-07-07 (skipped) and 2026-07-06 (kept) (0.118042ms)
+✔ planSlots: boundary date 2026-08-15 (Sat, day after blackout) is kept (0.118833ms)
+✔ planSlots: empty template produces zero slots (0.201666ms)
+✔ planSlots: end time computed correctly with custom duration (0.075125ms)
+✔ planSlots: day-of-week mapping aligns to start date weekday (0.057208ms)
+✔ planSlots: slots within a day are emitted in template-input order (0.95275ms)
+✔ anonymous when no authUid (0.724583ms)
+✔ no-subscription when authed but no sub doc (0.054834ms)
+✔ no-subscription when status is incomplete (0.057084ms)
+✔ paused when status=paused regardless of session count (0.043ms)
+✔ past-due when status=past_due (0.044291ms)
+✔ canceled when status=canceled even with sessions remaining (0.040375ms)
+✔ active-bookable when active + sessions remaining (0.050208ms)
+✔ active-exhausted when used >= allowed (0.036542ms)
+✔ active-exhausted clamps when usage exceeds allowed (defensive) (0.053125ms)
+✔ canBookSession is true only for active+remaining (0.284167ms)
+✔ sessionsRemaining clamps to 0 and reflects allowance (0.142875ms)
+✔ TUTORING_PRICING shape matches design spec (0.092084ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4011.11925

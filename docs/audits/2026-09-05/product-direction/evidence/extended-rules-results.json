@@ -1,0 +1,62 @@
+[
+  {
+    "name": "parent reads private attendance note",
+    "expected": "allowed",
+    "actual": "allowed"
+  },
+  {
+    "name": "parent creates confirmed booking without reserving a slot",
+    "expected": "allowed",
+    "actual": "allowed"
+  },
+  {
+    "name": "parent changes booking owner and recipient",
+    "expected": "allowed",
+    "actual": "allowed"
+  },
+  {
+    "name": "parent changes student enrollment state and identity fields",
+    "expected": "allowed",
+    "actual": "allowed"
+  },
+  {
+    "name": "parent changes notification content and adds arbitrary fields",
+    "expected": "allowed",
+    "actual": "allowed"
+  },
+  {
+    "name": "parent reads enrollment-only resource without enrollment",
+    "expected": "allowed",
+    "actual": "allowed"
+  },
+  {
+    "name": "parent download-counter write",
+    "expected": "permission-denied",
+    "actual": "permission-denied"
+  },
+  {
+    "name": "admin pipeline query has no matching rule",
+    "expected": "permission-denied",
+    "actual": "permission-denied"
+  },
+  {
+    "name": "parent attendance query without parentId filter",
+    "expected": "permission-denied",
+    "actual": "permission-denied"
+  },
+  {
+    "name": "parent report query without parentId filter",
+    "expected": "permission-denied",
+    "actual": "permission-denied"
+  },
+  {
+    "name": "profile IEP upload uses unmatched path",
+    "expected": "storage/unauthorized",
+    "actual": "storage/unauthorized"
+  },
+  {
+    "name": "expected IEP upload path is allowed",
+    "expected": "allowed",
+    "actual": "allowed"
+  }
+]

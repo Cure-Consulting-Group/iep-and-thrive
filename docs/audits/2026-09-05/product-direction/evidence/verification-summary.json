@@ -1,0 +1,122 @@
+{
+  "date": "2026-09-05",
+  "timezone": "America/New_York",
+  "baseline_commit": "c60cc3b6d1599a6c5e39f89e999b111a0cc25b2a",
+  "baseline_note": "Includes existing uncommitted A01/A02 code/rules/tests; this audit adds documentation and demo emulator probes only.",
+  "toolchain": {
+    "node": "v25.9.0",
+    "npm": "11.12.1",
+    "functions_declared_node": "22"
+  },
+  "current_checks": [
+    {
+      "name": "web unit",
+      "command": "npm run test:unit",
+      "passed": 41,
+      "exit_code": 0,
+      "evidence": "unit-tests.txt"
+    },
+    {
+      "name": "security regressions",
+      "command": "npm run test:security",
+      "passed": 17,
+      "exit_code": 0,
+      "evidence": "security-tests.txt"
+    },
+    {
+      "name": "extended rules observations",
+      "observations": 12,
+      "matched_expected": 12,
+      "security_pass": false,
+      "explanation": "Several expected observations demonstrate exposures or broken permitted workflows.",
+      "evidence": "extended-rules-results.json"
+    },
+    {
+      "name": "functions compilation",
+      "command": "npm run build",
+      "cwd": "functions",
+      "exit_code": 0,
+      "evidence": "functions-build.txt"
+    },
+    {
+      "name": "root production dependency audit",
+      "flagged_packages": 23,
+      "counts": {
+        "critical": 2,
+        "high": 8,
+        "moderate": 12,
+        "low": 1
+      },
+      "exit_code": 1,
+      "evidence": "web-dependency-audit.json"
+    },
+    {
+      "name": "functions production dependency audit",
+      "flagged_packages": 22,
+      "counts": {
+        "critical": 2,
+        "high": 5,
+        "moderate": 13,
+        "low": 2
+      },
+      "exit_code": 1,
+      "evidence": "functions-dependency-audit.json"
+    }
+  ],
+  "carried_forward": [
+    {
+      "name": "configured web build and TypeScript",
+      "result": "passed",
+      "source": "../../repair-progress.md",
+      "reason": "No web app changes during expanded audit"
+    },
+    {
+      "name": "native simulator build/tests",
+      "passed": 95,
+      "source": "../../evidence/verification-summary.json",
+      "reason": "Same-day audit; native source unchanged"
+    },
+    {
+      "name": "marketing browser suite",
+      "passed": 7,
+      "failed": 2,
+      "reason": "Stale deadline expectations; not rerun",
+      "source": "../../evidence/marketing-tests.txt"
+    },
+    {
+      "name": "browser route/layout observations",
+      "count": 18,
+      "source": "../../evidence/browser-results.json"
+    }
+  ],
+  "not_verified": [
+    "Deployed rules/functions/configuration and production records",
+    "Historical billing mappings and signed download tokens",
+    "Actual provider webhook API version and financial reconciliation",
+    "Production IAM, recovery, alerts, load and cost",
+    "Signed TestFlight release and real-device accessibility",
+    "External learning outcomes, paid demand and institutional readiness"
+  ],
+  "source_counts": {
+    "app": 72,
+    "components": 38,
+    "lib": 34,
+    "functions/src": 31,
+    "ios/IEPAndThrive": 50,
+    "ios/IEPAndThriveTests": 12,
+    "curriculum": 42,
+    ".github/workflows": 4,
+    "scripts": 12,
+    "tests": 21,
+    "styles": 1,
+    "public": 7,
+    "configuration": 15
+  },
+  "deliverables": {
+    "findings": 44,
+    "epics": 10,
+    "tickets": 76
+  },
+  "external_mutations": false,
+  "deployment_performed": false
+}

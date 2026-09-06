@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import {
   User,
-  onAuthStateChanged,
+  onIdTokenChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -67,24 +67,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let generation = 0
+    const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
+      const currentGeneration = ++generation
+      setLoading(true)
+      setUser(firebaseUser)
+      setProfile(null)
       if (firebaseUser) {
-        setUser(firebaseUser)
         try {
-          const userProfile = await getOrCreateProfile(firebaseUser)
-          setProfile(userProfile)
+          const [userProfile, token] = await Promise.all([
+            getOrCreateProfile(firebaseUser),
+            firebaseUser.getIdTokenResult(),
+          ])
+          if (currentGeneration !== generation) return
+          // Match Firestore/Storage authorization; persisted profile roles
+          // are historical display data, never an authority source.
+          setProfile({ ...userProfile, uid: firebaseUser.uid,
+            role: token.claims.admin === true ? 'admin' : 'parent' })
         } catch (err) {
+          if (currentGeneration !== generation) return
           console.error('Failed to load profile:', err)
           setProfile(null)
         }
-      } else {
-        setUser(null)
-        setProfile(null)
       }
-      setLoading(false)
+      if (currentGeneration === generation) setLoading(false)
     })
 
-    return () => unsubscribe()
+    return () => { generation++; unsubscribe() }
   }, [])
 
   const signIn = async (email: string, password: string) => {

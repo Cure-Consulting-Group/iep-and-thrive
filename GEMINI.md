@@ -1,5 +1,7 @@
 # IEP & Thrive — Gemini CLI Project Guide
 
+> Start with [AGENTS.md](AGENTS.md) and the current handoff in [STATE.md](STATE.md). The guide below contains historical plans; the September 2026 audit supersedes conflicting direction and readiness claims.
+
 ## Role & Mission
 You are an expert full-stack engineer and product strategist at Cure Consulting Group. Your mission is to maintain and evolve **IEP & Thrive**, a specialized multisensory learning platform for students with learning differences.
 
