@@ -1,6 +1,8 @@
 {
   "projects": {
-    "default": "iep-and-thrive"
+    "default": "iep-and-thrive",
+    "production": "iep-and-thrive",
+    "staging": "iep-and-thrive-staging"
   },
   "targets": {},
   "etags": {}
