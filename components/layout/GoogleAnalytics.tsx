@@ -1,11 +1,28 @@
 "use client"
 
 import Script from 'next/script'
+import { usePathname } from 'next/navigation'
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+const PUBLIC_MARKETING_ROUTES = new Set([
+  '/',
+  '/about',
+  '/program',
+  '/tutoring',
+  '/faq',
+  '/contact',
+  '/enroll',
+  '/summer-guide',
+])
+
+export function isPublicMarketingRoute(pathname: string | null): boolean {
+  return pathname !== null && PUBLIC_MARKETING_ROUTES.has(pathname)
+}
 
 export default function GoogleAnalytics() {
-  if (!GA_MEASUREMENT_ID) return null
+  const pathname = usePathname()
+
+  if (!GA_MEASUREMENT_ID || !isPublicMarketingRoute(pathname)) return null
 
   return (
     <>

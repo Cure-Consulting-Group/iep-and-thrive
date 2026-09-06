@@ -10,29 +10,54 @@
 
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { z } from "zod";
 import { verifyUnsubscribeToken } from "./unsubscribe-token";
+import {
+  PUBLIC_CORS_ORIGINS,
+  assertBodySize,
+  assertContentType,
+  assertMethod,
+  assertQuota,
+  errorEnvelope,
+} from "./http-guard";
+
+const unsubscribeSchema = z.object({
+  token: z.string().min(1).max(2048),
+}).strict();
+
+const MAX_BODY_BYTES = 4 * 1024;
 
 export const unsubscribe = onRequest(
   {
     region: "us-east1",
-    cors: true,
+    cors: PUBLIC_CORS_ORIGINS,
   },
   async (req, res) => {
-    const token =
-      (req.method === "POST" ? (req.body?.token as string) : (req.query.token as string)) || "";
+    if (!assertMethod(req, res, ["GET", "POST"])) return;
+    if (req.method === "POST" && !assertContentType(req, res)) return;
+    if (!assertBodySize(req, res, MAX_BODY_BYTES)) return;
+    if (
+      !(await assertQuota(req, res, "unsubscribe", {
+        limit: 10,
+        windowSeconds: 60 * 60,
+      }))
+    ) return;
 
-    if (!token) {
-      res.status(400).json({ ok: false, error: "Missing token." });
+    const params = req.method === "POST" ? req.body : req.query;
+    const parsed = unsubscribeSchema.safeParse(params);
+    if (!parsed.success) {
+      errorEnvelope(res, 400, "invalid_request", "Missing or invalid unsubscribe token.");
       return;
     }
-
-    const uid = verifyUnsubscribeToken(token);
-    if (!uid) {
-      res.status(403).json({ ok: false, error: "Invalid or expired token." });
-      return;
-    }
+    const token = parsed.data.token;
 
     try {
+      const uid = verifyUnsubscribeToken(token);
+      if (!uid) {
+        errorEnvelope(res, 403, "invalid_token", "Invalid or expired unsubscribe token.");
+        return;
+      }
+
       const userRef = admin.firestore().collection("users").doc(uid);
       const snap = await userRef.get();
       if (!snap.exists) {
@@ -53,7 +78,12 @@ export const unsubscribe = onRequest(
       res.status(200).json({ ok: true, alreadyUnsubscribed: wasAlready });
     } catch (err) {
       console.error("[unsubscribe] failed:", err);
-      res.status(500).json({ ok: false, error: "Server error." });
+      errorEnvelope(
+        res,
+        500,
+        "internal_error",
+        "We could not update your preferences. Please try again."
+      );
     }
   }
 );

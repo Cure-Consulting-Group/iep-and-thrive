@@ -301,7 +301,6 @@ export default function IntakePage() {
 
   const handleSubmit = async () => {
     if (!validateStep(5)) return
-    console.log('Intake form submitted:', data)
     // G11: persist intake submission for the lifecycle pipeline.
     try {
       if (user) {

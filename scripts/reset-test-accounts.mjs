@@ -8,24 +8,49 @@
  * or before re-running the seed.
  *
  * Usage:
- *   node scripts/reset-test-accounts.mjs
+ *   E2E_SYNTHETIC_PROJECT_ID=<non-prod project> node scripts/reset-test-accounts.mjs
  *
  * Matches email prefix `parent-test-`; will not touch any other users.
+ *
+ * Project guard: this script DELETES accounts, so it refuses to run unless
+ * E2E_SYNTHETIC_PROJECT_ID names a non-production project and the resolved
+ * Firebase project agrees. The previous guard only compared GCLOUD_PROJECT
+ * when it happened to be set, which meant an unset variable silently targeted
+ * production. Matches the guard in seed-test-accounts.mjs (TASK-LP-011).
  */
 
 import { initializeApp, applicationDefault, getApps } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 
-const PROJECT_ID = 'iep-and-thrive'
+const PRODUCTION_PROJECT_ID = 'iep-and-thrive'
+const SYNTHETIC_PROJECT_ENV = 'E2E_SYNTHETIC_PROJECT_ID'
 const TEST_EMAIL_PREFIXES = ['parent-test-', 'admin-test']
 
 function assertEnvironment() {
-  const project = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || ''
-  if (project && project !== PROJECT_ID) {
-    console.error(`ABORT: GCLOUD_PROJECT="${project}", expected "${PROJECT_ID}"`)
+  const syntheticProject = process.env[SYNTHETIC_PROJECT_ENV]?.trim() || ''
+  const resolvedProject =
+    process.env.GCLOUD_PROJECT?.trim() ||
+    process.env.GOOGLE_CLOUD_PROJECT?.trim() ||
+    syntheticProject
+
+  if (!syntheticProject) {
+    console.error(`ABORT: Set ${SYNTHETIC_PROJECT_ENV} to the intended synthetic Firebase project.`)
+    console.error('This script deletes accounts and will not default to any project.')
     process.exit(1)
   }
+  if (resolvedProject === PRODUCTION_PROJECT_ID) {
+    console.error(`ABORT: Refusing to reset production project "${PRODUCTION_PROJECT_ID}".`)
+    process.exit(1)
+  }
+  if (resolvedProject !== syntheticProject) {
+    console.error(
+      `ABORT: Resolved Firebase project "${resolvedProject}" does not match ${SYNTHETIC_PROJECT_ENV}.`,
+    )
+    process.exit(1)
+  }
+
+  return syntheticProject
 }
 
 async function deleteUserCascading(db, uid) {
@@ -39,7 +64,7 @@ async function deleteUserCascading(db, uid) {
 }
 
 async function main() {
-  assertEnvironment()
+  const PROJECT_ID = assertEnvironment()
 
   if (!getApps().length) {
     initializeApp({ credential: applicationDefault(), projectId: PROJECT_ID })

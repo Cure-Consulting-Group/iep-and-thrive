@@ -1,0 +1,5 @@
+# Operator-supplied allowlists and release evidence contain staff email
+# addresses and account ids. Keep them out of the repo; the runbook writes
+# them here so they land in one predictable place on the operator's machine.
+*
+!.gitignore

@@ -25,6 +25,7 @@ import * as admin from "firebase-admin";
 import * as crypto from "crypto";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { sendEmailWithResult, logEmail, escapeHtml } from "./email-service";
+import { PUBLIC_CORS_ORIGINS } from "./http-guard";
 
 const PHOTO_RELEASE_VERSION = "1.0.0";
 
@@ -245,7 +246,7 @@ async function renderSignedPdf(opts: {
 export const submitPhotoRelease = onRequest(
   {
     region: "us-east1",
-    cors: ["https://iep-and-thrive.web.app", "https://iepandthrive.com", /localhost/],
+    cors: PUBLIC_CORS_ORIGINS,
     memory: '512MiB',
   },
   async (req, res) => {

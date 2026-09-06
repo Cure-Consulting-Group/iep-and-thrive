@@ -18,16 +18,13 @@ import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
+import { PUBLIC_CORS_ORIGINS } from "./http-guard";
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
 export const customerPortal = onRequest(
   {
-    cors: [
-      "https://iep-and-thrive.web.app",
-      "https://iepandthrive.com",
-      /localhost/,
-    ],
+    cors: PUBLIC_CORS_ORIGINS,
     region: "us-east1",
     secrets: [stripeSecretKey],
   },

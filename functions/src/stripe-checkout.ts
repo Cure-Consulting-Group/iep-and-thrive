@@ -10,7 +10,17 @@
 
 import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
+import * as admin from "firebase-admin";
 import Stripe from "stripe";
+import { z } from "zod";
+import {
+  PUBLIC_CORS_ORIGINS,
+  assertBodySize,
+  assertContentType,
+  assertMethod,
+  assertQuota,
+  errorEnvelope,
+} from "./http-guard";
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 
@@ -26,56 +36,73 @@ const balancePrices: Record<string, string | undefined> = {
   math: process.env.STRIPE_MATH_BALANCE_PRICE_ID,
 };
 
+const checkoutSchema = z.object({
+  program: z.enum(["full", "reading", "math"]),
+  type: z.enum(["deposit", "balance"]).optional().default("deposit"),
+}).strict();
+
+const MAX_BODY_BYTES = 8 * 1024;
+
 export const stripeCheckout = onRequest(
   {
-    cors: [
-      "https://iep-and-thrive.web.app",
-      "https://iepandthrive.com",
-      /localhost/,
-    ],
+    cors: PUBLIC_CORS_ORIGINS,
     region: "us-east1",
     secrets: [stripeSecretKey],
   },
   async (req, res) => {
-    if (req.method !== "GET" && req.method !== "POST") {
-      res.status(405).json({ error: "Method not allowed" });
-      return;
-    }
+    if (!assertMethod(req, res, ["GET", "POST"])) return;
+    if (req.method === "POST" && !assertContentType(req, res)) return;
+    if (!assertBodySize(req, res, MAX_BODY_BYTES)) return;
+    if (
+      !(await assertQuota(req, res, "stripe-checkout", {
+        limit: 10,
+        windowSeconds: 10 * 60,
+      }))
+    ) return;
 
+    let checkoutRef: admin.firestore.DocumentReference | undefined;
     try {
       const params = req.method === "GET" ? req.query : req.body;
-      const program = params.program as string;
-      const type = (params.type as string) || "deposit";
-
-      if (!program || !["full", "reading", "math"].includes(program)) {
-        res.status(400).json({
-          error: "Invalid or missing program. Use: full, reading, or math.",
-        });
+      const parsed = checkoutSchema.safeParse(params);
+      if (!parsed.success) {
+        errorEnvelope(res, 400, "invalid_request", "Invalid checkout request.");
         return;
       }
 
-      if (!["deposit", "balance"].includes(type)) {
-        res.status(400).json({
-          error: "Invalid payment type. Use: deposit or balance.",
-        });
-        return;
-      }
+      const { program, type } = parsed.data;
 
       const priceMap = type === "balance" ? balancePrices : depositPrices;
       const priceId = priceMap[program];
 
       if (!priceId) {
-        res.status(500).json({
-          error: `Stripe price ID not configured for ${program} ${type}.`,
-        });
+        errorEnvelope(
+          res,
+          500,
+          "configuration_error",
+          "Payments are temporarily unavailable. Please try again later."
+        );
         return;
       }
 
       const stripeKey = stripeSecretKey.value() || process.env.STRIPE_SECRET_KEY;
       if (!stripeKey) {
-        res.status(500).json({ error: "Stripe not configured." });
+        errorEnvelope(
+          res,
+          500,
+          "configuration_error",
+          "Payments are temporarily unavailable. Please try again later."
+        );
         return;
       }
+
+      // Record the checkout attempt before creating the external Stripe
+      // session so a provider failure cannot lose the durable request.
+      checkoutRef = await admin.firestore().collection("stripeCheckoutRequests").add({
+        program,
+        paymentType: type,
+        status: "pending",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
       const stripe = new Stripe(stripeKey);
       const siteUrl = process.env.SITE_URL || "https://iep-and-thrive.web.app";
@@ -102,14 +129,44 @@ export const stripeCheckout = onRequest(
       });
 
       if (!session.url) {
-        res.status(500).json({ error: "Failed to create checkout session." });
+        try {
+          await checkoutRef.update({
+            status: "failed",
+            failureCode: "missing_session_url",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        } catch (error) {
+          console.error("Stripe checkout status update failed:", error);
+        }
+        errorEnvelope(res, 500, "checkout_failed", "Failed to create checkout session.");
         return;
+      }
+
+      try {
+        await checkoutRef.update({
+          status: "created",
+          stripeSessionId: session.id,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Stripe checkout status update failed:", error);
       }
 
       res.status(200).json({ url: session.url });
     } catch (error) {
+      if (checkoutRef) {
+        try {
+          await checkoutRef.update({
+            status: "failed",
+            failureCode: "provider_error",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        } catch (statusError) {
+          console.error("Stripe checkout failure status update failed:", statusError);
+        }
+      }
       console.error("Stripe checkout error:", error);
-      res.status(500).json({ error: "Failed to create checkout session." });
+      errorEnvelope(res, 500, "checkout_failed", "Failed to create checkout session.");
     }
   }
 );

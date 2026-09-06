@@ -4,7 +4,7 @@
 | --- | --- |
 | Epic | [EPIC-LP-08](../../audits/2026-09-05/product-direction/epics.md#epic-lp-08) |
 | Priority / release gate | P0 / G0: protect existing users |
-| Status | Proposed — review required |
+| Status | Implemented locally — triage matrix complete; deployment and major upgrades remain out of scope |
 | Proposed owner | Security + web + backend |
 | Estimate | 8 points; planning estimate, not a delivery commitment |
 | Findings | [F26](../../audits/2026-09-05/product-direction/findings.md#f26) |

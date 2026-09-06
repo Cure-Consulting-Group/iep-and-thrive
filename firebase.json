@@ -21,7 +21,27 @@
     "cleanUrls": true,
     "rewrites": [
       {
-        "source": "**",
+        "source": "/portal/students/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/assessments/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/materials/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/probes/week/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/curriculum/week/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/curriculum/lesson/**",
         "destination": "/index.html"
       }
     ],

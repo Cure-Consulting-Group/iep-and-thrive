@@ -11,6 +11,7 @@ import { extractAuditMetadata } from "./audit"
 import { generateSignedPdf } from "./pdf-generator"
 import { sendEmailWithResult, logEmail } from "../email-service"
 import { signedAgreementDeliveryTemplate } from "../email-templates"
+import { PUBLIC_CORS_ORIGINS } from "../http-guard";
 
 const submitSchema = z.object({
   inquiryId: z.string().min(1),
@@ -25,11 +26,7 @@ const submitSchema = z.object({
   programTrack: z.enum(["full", "reading", "math"]),
 })
 
-const ALLOWED_ORIGINS = [
-  "https://iep-and-thrive.web.app",
-  "https://iepandthrive.com",
-  /localhost/,
-]
+const ALLOWED_ORIGINS = PUBLIC_CORS_ORIGINS
 
 function sha256Hex(text: string): string {
   return crypto.createHash("sha256").update(text, "utf8").digest("hex")

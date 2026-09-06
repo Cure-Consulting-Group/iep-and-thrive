@@ -16,6 +16,15 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Rate-limit counters written by Cloud Functions via the Admin SDK, which
+    // bypasses these rules. Firestore already denies unlisted collections, so
+    // this is explicit intent rather than a fix: a client that could write here
+    // would reset its own quota. Keep it closed if the collection is ever
+    // referenced from client code by mistake.
+    match /httpQuotaCounters/{counterId} {
+      allow read, write: if false;
+    }
+
     // Users collection
     match /users/{userId} {
       // Billing, subscription accounting, and roles are server-owned.

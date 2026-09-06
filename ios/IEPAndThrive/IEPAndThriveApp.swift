@@ -14,7 +14,6 @@ struct IEPAndThriveApp: App {
 
     let store = Store(initialState: RootFeature.State()) {
         RootFeature()
-            ._printChanges()
     }
     
     var body: some Scene {
