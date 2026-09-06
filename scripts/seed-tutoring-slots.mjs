@@ -271,8 +271,18 @@ export function planSlots({ startDate, weeks, template, durationMinutes = DEFAUL
 // ─── Firestore I/O (only loaded when not --dry-run) ────────────────────────
 
 async function loadAdminSdk() {
-  const project = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || ''
-  if (project && project !== PROJECT_ID) {
+  // Requiring the variable rather than only checking it when present. The
+  // earlier form defaulted to production whenever nothing was set, which is the
+  // same defect already removed from seed-test-accounts.mjs,
+  // reset-test-accounts.mjs and provision-admin-claims.mjs. This is the fourth
+  // script in the repo to carry it.
+  const project = (process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || '').trim()
+  if (!project) {
+    console.error('ABORT: set GCLOUD_PROJECT to the target project.')
+    console.error('This script writes bookable slots and will not assume one.')
+    process.exit(1)
+  }
+  if (project !== PROJECT_ID) {
     console.error(`ABORT: GCLOUD_PROJECT="${project}", expected "${PROJECT_ID}"`)
     process.exit(1)
   }
