@@ -133,8 +133,7 @@ export default function AdminSubscribersPage() {
             <div className="col-span-2">Tier</div>
             <div className="col-span-2">Status</div>
             <div className="col-span-2">Sessions</div>
-            <div className="col-span-2">Cycle ends</div>
-            <div className="col-span-1 text-right">No-shows</div>
+            <div className="col-span-3">Cycle ends</div>
           </div>
           <div className="space-y-2">
             {filtered.map((row) => (
@@ -192,7 +191,7 @@ function SubscriberRowCard({ row }: { row: SubscriberRow }) {
         </div>
 
         {/* Tier */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <span className="lg:hidden text-[11px] uppercase tracking-wide text-text-muted mr-1">
             Tier:
           </span>
@@ -238,26 +237,6 @@ function SubscriberRowCard({ row }: { row: SubscriberRow }) {
           <span className="font-body text-sm text-text">{cycleEndLabel}</span>
         </div>
 
-        {/* No-shows */}
-        <div className="lg:col-span-1 lg:text-right">
-          <span className="lg:hidden text-[11px] uppercase tracking-wide text-text-muted mr-1">
-            No-shows:
-          </span>
-          {row.recentNoShows > 0 ? (
-            <span
-              className={`inline-block px-2 py-0.5 rounded-full text-xs font-body font-semibold ${
-                row.recentNoShows >= 2
-                  ? 'bg-red-100 text-red-700'
-                  : 'bg-amber/20 text-amber'
-              }`}
-              title="No-shows in the last 90 days"
-            >
-              {row.recentNoShows}
-            </span>
-          ) : (
-            <span className="font-body text-xs text-text-muted">—</span>
-          )}
-        </div>
       </div>
     </Link>
   )
@@ -281,15 +260,14 @@ function EmptyState({ hasAny }: { hasAny: boolean }) {
         No active subscribers yet
       </h2>
       <p className="text-text-muted font-body text-sm max-w-md mx-auto mb-5">
-        When parents subscribe to weekly or twice-weekly tutoring, they&rsquo;ll
-        show up here. Until then, you can preview the marketing surface to
-        share with prospects.
+        Historical or in-flight tutoring subscriptions will appear here when
+        Stripe records them. New tutoring arrangements are coordinated directly.
       </p>
       <Link
         href="/tutoring"
         className="inline-flex items-center gap-2 rounded-full bg-forest text-white px-5 py-2.5 text-sm font-semibold font-body hover:bg-forest-mid transition-all"
       >
-        Preview /tutoring page
+        View tutoring service
         <span aria-hidden>→</span>
       </Link>
     </div>

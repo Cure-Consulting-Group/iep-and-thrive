@@ -2,7 +2,7 @@
  * Google Calendar Service
  * S5-05: Creates/deletes Google Calendar events for bookings
  *
- * Primary integration runs via Cloud Functions (functions/src/calendar-sync.ts).
+ * Legacy Google Calendar helper retained for non-client operational tooling.
  * This client-side module provides types and a thin wrapper for any
  * server-side Next.js usage (e.g., API routes if re-enabled).
  *

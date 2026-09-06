@@ -489,12 +489,12 @@ export interface SubscriptionEmailVars extends EmailVariables {
   customerPortalUrl?: string;
 }
 
-function tutoringBookHref(): string {
-  return `${SITE_URL}/book?type=tutoring`;
+function tutoringSupportHref(): string {
+  return `${SITE_URL}/contact`;
 }
 
-function portalSubscriptionHref(): string {
-  return `${SITE_URL}/portal/subscription`;
+function subscriptionSupportHref(): string {
+  return `${SITE_URL}/contact`;
 }
 
 function fmtCycleEnd(iso: string | undefined): string {
@@ -524,26 +524,26 @@ export function subscriptionWelcomeTemplate(
     layout: {
       kind: "transactional",
       classification: "service",
-      preheader: `Your ${tierName} tutoring subscription is active. Book your first session anytime.`,
+      preheader: `Your ${tierName} tutoring subscription is active. Contact us to arrange your sessions.`,
       content: `
         ${heading(`Welcome to ${tierName} tutoring`)}
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
-          Your <strong>${tierName}</strong> tutoring subscription is active. You can book
-          tutoring sessions any time the calendar shows availability — there is no need
-          to wait for a confirmation from me.
+          Your <strong>${tierName}</strong> tutoring subscription is active. Online
+          scheduling is no longer available, so we will coordinate your sessions
+          directly.
         </p>
         <table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
           <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;width:40%;">Plan</td><td style="padding:8px 12px;">${tierName}</td></tr>
           <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Monthly rate</td><td style="padding:8px 12px;">$${monthly}</td></tr>
           <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Sessions per cycle</td><td style="padding:8px 12px;">${allowance}</td></tr>
         </table>
-        ${ctaButton(tutoringBookHref(), "Book Your First Session")}
+        ${ctaButton(tutoringSupportHref(), "Arrange Your First Session")}
         <h2 style="font-family:Georgia,serif;color:#1B4332;font-size:17px;margin:20px 0 8px 0;">Policy quick reference</h2>
         <ul style="font-size:14px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;padding-left:20px;">
           <li>Sessions reset each billing cycle. Unused sessions do not roll over.</li>
           <li>Cancel or reschedule 24+ hours ahead — same-day cancels forfeit the session.</li>
-          <li>Manage billing anytime from <a href="${portalSubscriptionHref()}" style="color:#1B4332;font-weight:600;">your portal</a>.</li>
+          <li>Contact us directly for scheduling or billing support.</li>
           <li>Reply to this email for anything that needs a human — I read everything.</li>
         </ul>
         ${signOff()}
@@ -581,7 +581,7 @@ export function subscriptionMonthlyReceiptTemplate(
           <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Sessions remaining</td><td style="padding:8px 12px;"><strong>${remaining}</strong> of ${allowance}</td></tr>
           ${cycleEnd ? `<tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;">Cycle ends</td><td style="padding:8px 12px;">${cycleEnd}</td></tr>` : ""}
         </table>
-        ${ctaButton(tutoringBookHref(), "Book This Month's Sessions")}
+        ${ctaButton(tutoringSupportHref(), "Arrange This Month's Sessions")}
         <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
           Sessions do not carry over between cycles. If something comes up that throws
           off your week, reply to this email — easier to plan ahead than scramble.
@@ -621,9 +621,9 @@ export function sessionForfeitedTemplate(
         </table>
         ` : ""}
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
-          Easiest path forward: book another slot for next week so the rhythm stays put.
+          Easiest path forward: contact us to arrange the next session so the rhythm stays put.
         </p>
-        ${ctaButton(tutoringBookHref(), "Book Another Session")}
+        ${ctaButton(tutoringSupportHref(), "Arrange Another Session")}
         <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
           Reminder of the cancellation policy: 24 hours of notice keeps the session on
           your balance. Less than 24 hours forfeits it. The 24-hour line is a planning
@@ -646,7 +646,7 @@ export function subscriptionPausedTemplate(
     layout: {
       kind: "transactional",
       classification: "service",
-      preheader: `Your ${tierName} subscription is paused. Resume any time from your portal.`,
+      preheader: `Your ${tierName} subscription is paused. Contact us when you are ready to resume.`,
       content: `
         ${heading("Your subscription is paused")}
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">Hi ${parent},</p>
@@ -656,9 +656,9 @@ export function subscriptionPausedTemplate(
           new tutoring sessions until you resume.
         </p>
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
-          When you are ready to come back, resume from your portal — no waiting period:
+          When you are ready to come back, contact us and we will help with next steps:
         </p>
-        ${ctaButton(portalSubscriptionHref(), "Resume Subscription")}
+        ${ctaButton(subscriptionSupportHref(), "Contact Tutoring Support")}
         <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">
           If pausing was a mistake or something is going on with your family, reply to
           this email. I would rather hear from you than have you sitting with it.
@@ -689,16 +689,15 @@ export function subscriptionCanceledTemplate(
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
           Confirming your <strong>${tierName}</strong> tutoring subscription is cancelled.
           You will not be charged again. You can still use any remaining sessions
-          ${dateClause}, then the calendar will lock for tutoring slots.
+          ${dateClause}; contact us directly to arrange them.
         </p>
         ${cycleEnd ? `<table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
           <tr><td style="padding:8px 12px;background:#FDFAF4;font-weight:600;width:40%;">Sessions usable until</td><td style="padding:8px 12px;">${cycleEnd}</td></tr>
         </table>` : ""}
-        ${ctaButton(tutoringBookHref(), "Use Remaining Sessions")}
+        ${ctaButton(tutoringSupportHref(), "Arrange Remaining Sessions")}
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:16px 0 0 0;">
-          Come back anytime — your account is preserved, and resubscribing will pick up
-          where you left off. If there is something we should have done differently,
-          I would genuinely like to hear it. Reply to this email.
+          If there is something we should have done differently, I would genuinely
+          like to hear it. Reply to this email or contact us directly.
         </p>
         ${signOff()}
       `,
@@ -711,7 +710,7 @@ export function subscriptionPastDueTemplate(
 ): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const tierName = tierTitle(vars.tier);
-  const portalHref = vars.customerPortalUrl || portalSubscriptionHref();
+  const portalHref = vars.customerPortalUrl || subscriptionSupportHref();
 
   return {
     subject: `Action needed — payment didn't go through`,
@@ -728,8 +727,8 @@ export function subscriptionPastDueTemplate(
           temporary-hold, or expired-card thing — not a problem with the subscription itself.
         </p>
         <p style="font-size:15px;line-height:1.6;color:#1C1917;margin:0 0 16px 0;">
-          Until the payment clears, the tutoring booking calendar is paused for your account.
-          Update your payment method in the portal and Stripe will retry automatically:
+          Until the payment clears, new tutoring sessions cannot be arranged. Use the
+          secure billing link below when one is available, or contact us for help:
         </p>
         ${ctaButton(portalHref, "Update Payment Method")}
         <p style="font-size:14px;line-height:1.6;color:#78716C;margin:16px 0 0 0;font-style:italic;">

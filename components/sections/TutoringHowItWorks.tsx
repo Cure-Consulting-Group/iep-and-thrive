@@ -3,24 +3,24 @@ import SectionHeader from '@/components/ui/SectionHeader'
 const steps = [
   {
     number: '01',
-    title: 'Subscribe or book a session',
+    title: 'Tell us what your child needs',
     description:
-      'Pick weekly, twice-weekly, or a single session. Pay via Stripe — no setup fees, no contract.',
-    tag: 'Stripe secure checkout',
+      'Share the learning goals, current challenges, and whether Zoom or Long Island works best.',
+    tag: 'Start with a conversation',
   },
   {
     number: '02',
-    title: 'Pick your slot',
+    title: 'Build the right plan',
     description:
-      'Subscribers see a calendar in your portal and book sessions inside your monthly allowance. Drop-ins receive a booking link by email after checkout.',
+      'We review fit and availability together, then coordinate any tutoring schedule directly.',
     tag: 'Zoom or Long Island in-person',
   },
   {
     number: '03',
     title: 'Meet & continue',
     description:
-      'Show up, learn, get progress notes after each session. Sessions reset monthly. Pause or cancel anytime through Stripe — no friction.',
-    tag: 'Cancel or pause anytime',
+      'Your child receives focused instruction and progress notes, with next steps agreed directly with your family.',
+    tag: 'IEP-aligned support',
   },
 ]
 
@@ -33,7 +33,7 @@ export default function TutoringHowItWorks() {
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           eyebrow="How It Works"
-          title="From signup to first session — three steps."
+          title="From first conversation to focused support."
         />
 
         {/* Audience strip — 4 cards */}

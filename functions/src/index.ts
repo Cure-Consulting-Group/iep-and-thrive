@@ -14,13 +14,6 @@ export { enroll } from "./enroll";
 export { stripeCheckout } from "./stripe-checkout";
 export { stripeWebhook } from "./stripe-webhook";
 
-// ─── S4-02: Booking Email Triggers ───
-export {
-  onBookingCreated,
-  onBookingUpdated,
-  sendBookingReminders,
-} from "./booking-emails";
-
 // ─── Summer Guide Lead Capture + Drip ───
 export { summerGuideCapture } from "./summer-guide-capture";
 export { summerGuideDrip } from "./summer-guide-drip";
@@ -58,8 +51,5 @@ export { submitPhotoRelease } from "./photo-release";
 // ─── E3: Enrollment Agreement E-Signature ───
 export { submitEnrollmentAgreement, getSignedAgreementPdf } from "./e-signature";
 
-// ─── H3: Tutoring Subscription Checkout (Stripe subscription mode) ───
-export { subscriptionCheckout } from "./subscription-checkout";
-
-// ─── H11: Stripe Customer (Billing) Portal ───
+// Historical subscriptions may still need a billing portal during wind-down.
 export { customerPortal } from "./customer-portal";

@@ -39,23 +39,17 @@ export default function TutoringHero() {
           {/* Subhead */}
           <p className="mt-5 text-[16px] leading-[1.7] text-warm-gray max-w-[480px] animate-fade-up animation-delay-300">
             1-hour sessions with the credentialed NYC SPED interventionist behind
-            our summer intensive. Subscribe monthly for predictable support, or
-            try a single session.
+            our summer intensive. Tell us about your child&apos;s goals and we&apos;ll
+            follow up about fit and current availability.
           </p>
 
           {/* CTAs */}
           <div className="mt-8 flex flex-wrap items-center gap-3 animate-fade-up animation-delay-400">
             <a
-              href="#pricing"
+              href="/contact"
               className="inline-flex items-center rounded-full bg-forest px-6 py-3 text-white text-[15px] font-semibold transition-colors duration-200 hover:bg-forest-mid"
             >
-              See plans →
-            </a>
-            <a
-              href="#pricing-drop-in"
-              className="inline-flex items-center rounded-full border-2 border-forest px-6 py-3 text-forest text-[15px] font-semibold transition-colors duration-200 hover:bg-forest hover:text-white"
-            >
-              Book a single session
+              Ask about tutoring →
             </a>
           </div>
         </div>
@@ -122,9 +116,9 @@ export default function TutoringHero() {
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-8 py-10 sm:grid-cols-3 md:px-20 md:py-12">
           <div>
             <p className="font-display text-[2rem] font-bold text-sage leading-none">
-              $125
+              1 hour
             </p>
-            <p className="mt-2 text-[13px] text-white/65">Baseline per session</p>
+            <p className="mt-2 text-[13px] text-white/65">Focused 1-on-1 instruction</p>
           </div>
           <div>
             <p className="font-display text-[2rem] font-bold text-sage leading-none">

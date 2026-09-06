@@ -1,6 +1,16 @@
 # IEP & Thrive — Build State
 
-## Current handoff — September 6, 2026 (evening)
+## Current handoff — September 6, 2026 (remove tutoring scheduling/sales lane)
+
+- **Active branch:** `lane/remove-booking-tutoring-sales`, based on `7090ac7`; working tree contains the uncommitted implementation described here.
+- **Objective/status:** tutoring remains a contact-led service, but online tutoring checkout, scheduling, booking/subscription portal routes, their client services, and booking-trigger Functions are removed. Direct client access to historical `availableSlots` and `bookings` is explicitly denied. Summer program enrollment checkout is unchanged.
+- **Historical billing compatibility:** `stripeWebhook`, its subscription/invoice handlers, the Functions-local subscription contract, and `customerPortal` remain for historical or in-flight Stripe events. Their links now return to `/portal` or direct families to `/contact`; no current client config exposes the portal endpoint.
+- **Verification:** `npx tsc --noEmit` passed; root unit tests passed 53/53 with `TMPDIR` resolved to the worktree runner's absolute temp path; Functions TypeScript build passed; 15/15 non-emulator Functions tests passed; required dead-reference grep returned no matches; `git diff --check` passed. `npm --prefix functions test` could not start because this sandbox rejects all loopback binds with `listen EPERM`, before tests ran.
+- **Remaining work:** run `npm --prefix functions test` (and the updated Firestore security suite) in a loopback-enabled local or CI environment, then review and commit. No deployment was attempted.
+- **Authorization boundary:** implementation and local verification only; no deployment, production data operation, push, or merge was requested.
+- **Next executable action:** rerun the emulator-backed tests outside this restricted sandbox; if green, commit the lane for review.
+
+## Previous handoff — September 6, 2026 (evening)
 
 - **Active branch:** `feat/sprint-1-3-containment`, 9 commits ahead of `main`, not yet merged.
 - **Objective/status:** Phase A containment (sprints 1-3 of [the sprint plan](docs/sprints/sprint-plan.md)) implemented via cure-tri-lane. All eight tickets have code; two are operationally blocked (below).

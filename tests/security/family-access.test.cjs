@@ -60,13 +60,13 @@ test('owner report access remains available and cross-family reads stay denied',
   await assertFails(env.authenticatedContext('parent-b').storage().ref('reports/parent-a/synthetic.pdf').getDownloadURL());
 });
 
-// Sprints 4-6 added server-only collections written through the Admin SDK.
+// Server-only collections are written through the Admin SDK.
 // These assert no client — parent, admin, or anonymous — can reach them. The
 // quarantine collection is the sharpest case: it holds snapshots of records the
 // migration could not interpret, so it may contain personal data in an
 // unexpected shape. A client able to write emailLedger or the webhook
 // collections could suppress a real send or replay a billing effect.
-for (const collection of ['webhookEventLog', 'webhookOutbox', 'stripeBillingEffects', 'emailLedger', '_schedulerCursors', '_migrations', '_migrationQuarantine']) {
+for (const collection of ['webhookEventLog', 'webhookOutbox', 'stripeBillingEffects', 'emailLedger', '_schedulerCursors', '_migrations', '_migrationQuarantine', 'availableSlots', 'bookings']) {
   test(`server-only collection ${collection} is closed to every client`, async () => {
     const contexts = [
       ['parent', env.authenticatedContext('parent-a')],

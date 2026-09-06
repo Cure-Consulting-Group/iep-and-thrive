@@ -25,7 +25,6 @@ import {
 } from "./harness";
 import { stripeWebhook } from "../stripe-webhook";
 import { stripeCheckout } from "../stripe-checkout";
-import { onBookingCreated, onBookingUpdated } from "../booking-emails";
 import { submitEnrollmentAgreement, getSignedAgreementPdf } from "../e-signature";
 import { unsubscribe } from "../unsubscribe";
 import { sendWelcomeSequence } from "../welcome-sequence";
@@ -96,17 +95,6 @@ function stripeEvent(id: string, type: string, object: Record<string, unknown>):
     type,
     data: { object },
   };
-}
-
-async function runBookingHandler(
-  handler: { run(event: unknown): Promise<unknown> },
-  bookingId: string,
-  data: FirebaseFirestore.DocumentSnapshot | {
-    before: FirebaseFirestore.DocumentSnapshot;
-    after: FirebaseFirestore.DocumentSnapshot;
-  }
-): Promise<void> {
-  await handler.run({ params: { bookingId }, data });
 }
 
 test.skip(
@@ -278,39 +266,6 @@ test("an authorized agreement is persisted in Firestore and Storage, while a dif
     query: { enrollmentId },
   });
   assert.equal(forbidden.statusCode, 403);
-});
-
-test("booking create and cancellation handlers persist their real side effects through provider transports", { skip: PROVIDER_STUBS_COMPLETE ? false : "provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067" }, async () => {
-  const bookingId = uniqueId("booking");
-  await seedSyntheticDocument(`bookings/${bookingId}`, {
-    parentId: uniqueId("parent"),
-    parentName: "Synthetic Parent",
-    studentName: "Synthetic Student",
-    parentEmail: "booking@example.test",
-    date: "2026-10-10",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    type: "consultation",
-    status: "confirmed",
-  });
-  const createdSnapshot = await db.doc(`bookings/${bookingId}`).get();
-  await runBookingHandler(onBookingCreated, bookingId, createdSnapshot);
-
-  const createdBooking = await readSyntheticDocument(`bookings/${bookingId}`);
-  assert.equal(createdBooking?.calendarEventId, "calendar-event-1");
-  assert.equal(providerStubs.gmailSends, 1);
-  assert.equal(providerStubs.calendarCreates, 1);
-
-  await db.doc(`bookings/${bookingId}`).update({ status: "cancelled" });
-  const afterSnapshot = await db.doc(`bookings/${bookingId}`).get();
-  await runBookingHandler(onBookingUpdated, bookingId, {
-    before: createdSnapshot,
-    after: afterSnapshot,
-  });
-
-  assert.equal(providerStubs.calendarDeletes, 1);
-  const logs = await db.collection("emailLog").where("to", "==", "booking@example.test").get();
-  assert.equal(logs.size, 2);
 });
 
 test("a retried welcome invocation sends once and records its outbox progress", { skip: PROVIDER_STUBS_COMPLETE ? false : "provider stubs are incomplete: only api.stripe.com is emulated, so specs reaching Gmail, Calendar or Google OAuth cannot pass yet — outstanding half of TASK-LP-067" }, async () => {
