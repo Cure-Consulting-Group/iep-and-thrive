@@ -1,16 +1,22 @@
 # IEP & Thrive — Build State
 
-## Current handoff — September 6, 2026
+## Current handoff — September 6, 2026 (evening)
 
-- **Active branch:** `feature/product-audit-handoff`; open as [PR #39](https://github.com/Cure-Consulting-Group/iep-and-thrive/pull/39) into `main`, awaiting CI.
-- **Objective/status:** audit corpus reviewed and cleared for merge. Tri-lane review (Codex correctness, Antigravity system, fresh-context advisor) found one regression in the A01 auth change; fixed in `d23f8ee` on this branch.
-- **Regression fixed:** `onIdTokenChanged` fires on Firebase's ~hourly silent token refresh, which `onAuthStateChanged` did not. The listener reset `loading`/`profile` on every fire, remounting every `ProtectedRoute` child and discarding in-progress form state; a transient refresh failure additionally bounced admins to `/portal`. Reset is now keyed to a real identity change. Two regression tests added, verified to fail without the fix.
-- **Next action on resume:** merge PR #39 once CI is green, then work TASK-LP-006 (release the A01/A02 repairs — note the September 6 correction requiring admin custom-claim provisioning first) and TASK-LP-055 (wire `test:security` into CI; it currently runs in no workflow).
-- **Deferred by owner decision (September 6):** the design-system restoration. `CLAUDE.md` is 842 → 7 lines with the brand/token brief archived to `docs/history/assistant-guides/`. Engineering and technical work comes first; brand is applied last, once the system is further along. Do not re-raise as a blocker.
-- **E2E split (September 6):** `e2e.yml` now has a gating job (deterministic, read-only production specs — 31 passing) and a non-gating scheduled/dispatch job running the full suite. admin-curriculum (×3), photo-release and enrollment-agreement sit in the non-gating job: they fail because writes to `adminTasks`/`probes`/`assessmentResults` need `request.auth.token.admin` and the seeded production admin lacks that claim. That is the TASK-LP-006 correction, not a test defect — do not loosen their assertions to move them back into the gate.
-- **Sprint plan:** [docs/sprints/sprint-plan.md](docs/sprints/sprint-plan.md) — generated from the ticket dependency graph, not hand-ordered; regenerate rather than hand-edit. Owner decisions (September 6): containment subset first, 24 pts/sprint. Phase A is 52 pts / 3 sprints (054, 064, 006 → 058, 011, 057 → 010, 035), dependency-closed and startable now. **Phase A then stalls:** TASK-LP-001 (product brief — owner decision, not engineering) blocks 014 → 076, which gate 10 of the 22 remaining G0 tickets including the private-notes exposure (007). Approve 001 during Sprint 1 or 2.
-- **Authorization boundary:** merge of PR #39 is authorized. Production deployment, the admin-claim grant against real accounts, and the full 76-ticket implementation are not.
-- **Latest verification (September 6, on `d23f8ee`):** `tsc --noEmit` clean; `test:unit` 43/43; `test:security` 17/17 against the emulator. `npm run build` fails locally on `auth/invalid-api-key` with no `.env.local` present — reproduced identically on the unmodified branch, so environmental, not a code defect.
+- **Active branch:** `feat/sprint-1-3-containment`, 9 commits ahead of `main`, not yet merged.
+- **Objective/status:** Phase A containment (sprints 1-3 of [the sprint plan](docs/sprints/sprint-plan.md)) implemented via cure-tri-lane. All eight tickets have code; two are operationally blocked (below).
+- **Ticket outcomes:**
+  - TASK-LP-006 — `scripts/provision-admin-claims.mjs` + [release runbook](docs/runbooks/release-trust-repairs.md). **Prepared, not executed:** granting claims and deploying rules need production credentials, outside the authorization boundary.
+  - TASK-LP-010 — bounded input, Firestore quotas and safe error envelopes across all six public endpoints. Fixed a pre-existing unanchored `/localhost/` CORS entry that matched any attacker host containing the substring.
+  - TASK-LP-011 — credential fallbacks removed; **and** `reset-test-accounts.mjs`, which deletes accounts, no longer defaults to production when no env var is set.
+  - TASK-LP-035 — real 404, `safeNextPath` open-redirect guard, hosting rewrites narrowed from `**` to six dynamic-route prefixes.
+  - TASK-LP-054 — `lib/env.ts` single resolver; startup refuses contradictory config. `127.0.0.1` no longer silently calls production Functions.
+  - TASK-LP-057 — functions 22 → 14 advisories, root 23 → 10; **every critical and high cleared** in both. Remaining two highs need `next@16`.
+  - TASK-LP-058 — read-only `scripts/inventory-deployed-config.sh`. **Prepared, not executed.**
+  - TASK-LP-064 — child-name and state logging removed; GA gated off authenticated routes; analytics values allowlisted.
+- **Verification:** test:unit 62/62 · functions test 5/5 · test:security 17/17 · tsc clean · 16 deterministic production E2E green. `npm run build` still fails locally on `auth/invalid-api-key` with no `.env.local` — environmental, reproduces on unmodified `main`.
+- **Next action on resume:** land the review findings, open the PR, merge. Then Phase A is done and **Phase B stalls until TASK-LP-001 (the product brief) is approved** — it gates 014 → 076, and 10 of the 22 remaining G0 tickets including the private-notes exposure (007).
+- **Authorization boundary:** implementation and merge are authorized. Production deployment, the admin-claim grant against real accounts, and creating the staging project are not.
+- **Known gaps, deliberately open:** staging project does not exist (TASK-LP-054 is half-done by necessity); `out/404.html` generation unverified without env vars; five E2E specs remain non-gating pending the admin claim.
 
 The [full product-direction review](docs/audits/2026-09-05/product-direction/README.md) is the current handoff: 44 findings, 10 epics, and 76 detailed local tickets covering web, native, backend, data, security, curriculum, payments, release, and operations. Review the [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md) and [ticket index](docs/audits/2026-09-05/product-direction/ticket-index.md) before further implementation. The recommended direction is an independently useful focused reading product, with tutoring retained as a separate service and feedback channel; a school remains optional.
 
