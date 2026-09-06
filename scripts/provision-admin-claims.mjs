@@ -77,9 +77,19 @@ function parseArgs(argv) {
   return opts
 }
 
+/**
+ * Never defaults. This script grants admin privileges, and silently falling back
+ * to the production project is the same defect this repo just fixed in
+ * reset-test-accounts.mjs — with a worse blast radius.
+ */
 function resolveProjectId() {
-  const explicit = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
-  return explicit || PRODUCTION_PROJECT_ID
+  const explicit = (process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || '').trim()
+  if (!explicit) {
+    console.error('ABORT: set GCLOUD_PROJECT (or GOOGLE_CLOUD_PROJECT) to the target project.')
+    console.error('This script grants admin claims and will not assume a default.')
+    process.exit(1)
+  }
+  return explicit
 }
 
 function readAllowlist(path) {

@@ -87,8 +87,12 @@ echo "> Names, versions, and who can access them are the inventory."
 echo ""
 echo "## Cloud Functions"
 
+# Deliberately a field projection, not --format=json: the full resource embeds
+# serviceConfig.environmentVariables in plain text, and this output is written to
+# a file and attached to tickets as evidence.
 section "Deployed functions (region, runtime, trigger, service account)" \
-  gcloud functions list --project "$PROJECT" --format=json
+  gcloud functions list --project "$PROJECT" \
+    --format='table(name, state, environment, serviceConfig.uri, serviceConfig.serviceAccountEmail, buildConfig.runtime)' 
 
 echo ""
 echo "> Check every function's region against \`us-east1\` in"

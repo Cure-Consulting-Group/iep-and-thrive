@@ -13,6 +13,10 @@ const LOOPBACK_ORIGIN = /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d{1,5}
 const PRODUCTION_ORIGINS: Array<string | RegExp> = [
   "https://iep-and-thrive.web.app",
   "https://iepandthrive.com",
+  // The staging project declared in .firebaserc. Without this, staging's
+  // contact/enrollment/guide POSTs fail CORS preflight the moment that project
+  // is deployed, even though the client config routes them here correctly.
+  "https://iep-and-thrive-staging.web.app",
 ];
 
 // Loopback is only allowed outside production. A deployed production function
@@ -37,11 +41,31 @@ function sha256Hex(value: string): string {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
 
-/** Hash the first proxy-reported address so raw caller IPs are never persisted. */
+/**
+ * Hash the caller address so raw IPs are never persisted.
+ *
+ * The address must be one the caller cannot choose. A client may send its own
+ * X-Forwarded-For; Google's load balancer appends to it rather than replacing
+ * it, so the header arriving here is:
+ *
+ *     <anything the client invented>, <real client IP>, <load balancer IP>
+ *
+ * Taking the FIRST entry therefore lets a caller mint a fresh quota key on
+ * every request and bypass every limit below. Taking the LAST is the load
+ * balancer, identical for everyone, which would collapse all callers into one
+ * shared counter. The real client IP is the second-from-last entry — the last
+ * hop the infrastructure itself recorded.
+ *
+ * With fewer than two entries we are not behind the expected proxy chain
+ * (emulator, direct invocation, tests), so fall back to req.ip.
+ */
 export function getCallerKey(req: Request): string {
   const forwarded = firstHeaderValue(req.headers["x-forwarded-for"]);
-  const forwardedIp = forwarded?.split(",")[0]?.trim();
-  const caller = forwardedIp || req.ip?.trim() || "unknown";
+  const hops = forwarded
+    ? forwarded.split(",").map((h) => h.trim()).filter(Boolean)
+    : [];
+  const caller =
+    hops.length >= 2 ? hops[hops.length - 2] : req.ip?.trim() || hops[0] || "unknown";
   return sha256Hex(caller);
 }
 
