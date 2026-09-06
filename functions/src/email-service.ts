@@ -60,6 +60,20 @@ export interface SendEmailResult {
   error?: string;
 }
 
+/** Console logs must not become a second recipient/payment-data store. */
+function redactEmailLogText(error: unknown): string {
+  const raw = error instanceof Error ? error.message : "Email provider error";
+  return raw
+    .replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, "[redacted-email]")
+    .replace(
+      /\b(?:payment[_-]?method|paymentMethod|card|cvc|cvv|email)\s*[:=]\s*[^\s,;]+/gi,
+      "[redacted-sensitive-field]"
+    )
+    .replace(/\b(?:\d[ -]?){13,19}\b/g, "[redacted-payment-identifier]")
+    .replace(/\s+/g, " ")
+    .slice(0, 240);
+}
+
 // ─── Gmail API Setup ───
 
 function getGmailClient() {
@@ -109,7 +123,7 @@ export async function sendEmailWithResult(
         const data = userSnap.data() ?? {};
         if (data.unsubscribed === true) {
           console.log(
-            `[Email] Skipped ${kind} send to ${options.to} (uid=${options.recipientUid}) — unsubscribed.`
+            `[Email] Skipped ${kind} send (uid=${options.recipientUid}) — unsubscribed.`
           );
           return { ok: false, messageId: null, error: "recipient_unsubscribed" };
         }
@@ -117,13 +131,13 @@ export async function sendEmailWithResult(
           // E13: test accounts never receive production lifecycle/marketing
           // sends. Manual previewRampEmail bypasses by passing kind='transactional'.
           console.log(
-            `[Email] Skipped ${kind} send to ${options.to} (uid=${options.recipientUid}) — isTest.`
+            `[Email] Skipped ${kind} send (uid=${options.recipientUid}) — isTest.`
           );
           return { ok: false, messageId: null, error: "recipient_is_test" };
         }
       }
     } catch (err) {
-      console.error("[Email] Failed to check unsubscribe flag — proceeding with send:", err);
+      console.error("[Email] Failed to check unsubscribe flag — proceeding with send:", redactEmailLogText(err));
     }
   }
 
@@ -135,8 +149,6 @@ export async function sendEmailWithResult(
     console.log(
       "[Gmail] Credentials not configured — email NOT sent (scaffold mode)"
     );
-    console.log(`[Gmail] Would send to: ${options.to}`);
-    console.log(`[Gmail] Subject: ${options.subject}`);
     return { ok: false, messageId: null, error: "credentials_not_configured" };
   }
 
@@ -212,13 +224,11 @@ export async function sendEmailWithResult(
       requestBody: { raw },
     });
     const messageId = sendRes.data?.id ?? null;
-    console.log(
-      `[Gmail] Email sent to ${options.to}: ${options.subject} (id=${messageId})`
-    );
+    console.log(`[Gmail] Email sent (id=${messageId})`);
     return { ok: true, messageId };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error("[Gmail] Send failed:", error);
+    const message = redactEmailLogText(error);
+    console.error("[Gmail] Send failed:", message);
     return { ok: false, messageId: null, error: message };
   }
 }
@@ -282,7 +292,7 @@ export async function logEmail(
 
     await admin.firestore().collection("emailLog").add(entry);
   } catch (error) {
-    console.error("[EmailLog] Failed to log email:", error);
+    console.error("[EmailLog] Failed to log email:", redactEmailLogText(error));
   }
 }
 

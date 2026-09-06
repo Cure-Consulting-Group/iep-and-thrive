@@ -1,22 +1,14 @@
 # IEP & Thrive — Build State
 
-## Current handoff — September 6, 2026 (evening)
+## Current handoff — September 6, 2026 (luna implementation lane)
 
-- **Active branch:** `feat/sprint-1-3-containment`, 9 commits ahead of `main`, not yet merged.
-- **Objective/status:** Phase A containment (sprints 1-3 of [the sprint plan](docs/sprints/sprint-plan.md)) implemented via cure-tri-lane. All eight tickets have code; two are operationally blocked (below).
-- **Ticket outcomes:**
-  - TASK-LP-006 — `scripts/provision-admin-claims.mjs` + [release runbook](docs/runbooks/release-trust-repairs.md). **Prepared, not executed:** granting claims and deploying rules need production credentials, outside the authorization boundary.
-  - TASK-LP-010 — bounded input, Firestore quotas and safe error envelopes across all six public endpoints. Fixed a pre-existing unanchored `/localhost/` CORS entry that matched any attacker host containing the substring.
-  - TASK-LP-011 — credential fallbacks removed; **and** `reset-test-accounts.mjs`, which deletes accounts, no longer defaults to production when no env var is set.
-  - TASK-LP-035 — real 404, `safeNextPath` open-redirect guard, hosting rewrites narrowed from `**` to six dynamic-route prefixes.
-  - TASK-LP-054 — `lib/env.ts` single resolver; startup refuses contradictory config. `127.0.0.1` no longer silently calls production Functions.
-  - TASK-LP-057 — functions 22 → 14 advisories, root 23 → 10; **every critical and high cleared** in both. Remaining two highs need `next@16`.
-  - TASK-LP-058 — read-only `scripts/inventory-deployed-config.sh`. **Prepared, not executed.**
-  - TASK-LP-064 — child-name and state logging removed; GA gated off authenticated routes; analytics values allowlisted.
-- **Verification:** test:unit 62/62 · functions test 5/5 · test:security 17/17 · tsc clean · 16 deterministic production E2E green. `npm run build` still fails locally on `auth/invalid-api-key` with no `.env.local` — environmental, reproduces on unmodified `main`.
-- **Next action on resume:** land the review findings, open the PR, merge. Then Phase A is done and **Phase B stalls until TASK-LP-001 (the product brief) is approved** — it gates 014 → 076, and 10 of the 22 remaining G0 tickets including the private-notes exposure (007).
-- **Authorization boundary:** implementation and merge are authorized. Production deployment, the admin-claim grant against real accounts, and creating the staging project are not.
-- **Known gaps, deliberately open:** staging project does not exist (TASK-LP-054 is half-done by necessity); `out/404.html` generation unverified without env vars; five E2E specs remain non-gating pending the admin claim.
+- **Active branch:** `lane/lp048-webhook-states`; clean before this task, implementation changes uncommitted.
+- **Objective/status:** TASK-LP-048 webhook state/retry repair implemented locally. `webhookEventLog/{eventId}` now has atomic processing leases, succeeded/permanent/transient failure handling, and fenced terminal updates. Stripe signature verification is unchanged.
+- **Completed:** Billing writes are paired with deterministic `stripeBillingEffects` and `webhookOutbox` records in one transaction; email delivery is best-effort after billing and cannot trigger Stripe retry. Added five state-machine failure/concurrency tests and `scripts/replay-webhook-events.mjs` (dry-run default, explicit project and `--apply`, redacted output).
+- **Verification:** `npm --prefix functions run build` passes. `npm --prefix functions test` passes all 5 required webhook tests (0 failures). Replay syntax/help and no-project abort checks pass. No deployment or provider/emulator replay was run.
+- **Authorization boundary:** local implementation and verification are authorized. Production deployment, production replay, and changing Firestore rules are not authorized; the two new server-only collections rely on Admin SDK bypass plus default client denial, so no rules change was made.
+- **Known gaps:** no separate scheduled outbox worker was added in this ticket; failed email tasks remain durable for operational retry. Legacy claim-only records remain unreconciled and return 409 until an operator reviews and explicitly replays them.
+- **Next action:** architect review of the diff and staging/emulator/provider failure-path validation before a separately authorized deployment.
 
 The [full product-direction review](docs/audits/2026-09-05/product-direction/README.md) is the current handoff: 44 findings, 10 epics, and 76 detailed local tickets covering web, native, backend, data, security, curriculum, payments, release, and operations. Review the [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md) and [ticket index](docs/audits/2026-09-05/product-direction/ticket-index.md) before further implementation. The recommended direction is an independently useful focused reading product, with tutoring retained as a separate service and feedback channel; a school remains optional.
 
