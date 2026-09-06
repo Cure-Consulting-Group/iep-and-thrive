@@ -20,12 +20,15 @@
  */
 
 import { escapeHtml } from "./email-service";
+import type { EmailClassification } from "./email-service";
 import {
   EmailLayoutOpts,
   EmailVariables,
 } from "./email-templates";
 import type { SubscriptionTier } from "./subscription-types";
 import { tierLabel, tierPrice } from "./subscription-types";
+
+type ClassifiedLayout = EmailLayoutOpts & { classification: EmailClassification };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://iep-and-thrive.web.app";
 const STRIPE_CHECKOUT_BASE =
@@ -88,7 +91,7 @@ export interface WelcomeSequenceVars extends EmailVariables {
 export function welcomeSequenceTemplate(
   phase: WelcomePhase,
   vars: WelcomeSequenceVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const student = vars.studentName ? escapeHtml(vars.studentName) : "your child";
   const track = trackLabel(vars.programTrack);
@@ -101,6 +104,7 @@ export function welcomeSequenceTemplate(
       subject: `Welcome to IEP & Thrive — ${student} spot is held`,
       layout: {
         kind: "lifecycle",
+        classification: "lifecycle",
         preheader: `Your deposit is in. Here is what happens next, where the parent portal lives, and the one form I need from you this week.`,
         content: `
           ${heading(`${student} spot is officially held`)}
@@ -140,6 +144,7 @@ export function welcomeSequenceTemplate(
         subject: `Got ${student} intake — thank you`,
         layout: {
           kind: "lifecycle",
+          classification: "lifecycle",
           preheader: `Intake is in. Here is where we are now and what to expect over the next few weeks.`,
           content: `
             ${heading("Intake received")}
@@ -169,6 +174,7 @@ export function welcomeSequenceTemplate(
       subject: `Quick intake nudge for ${student}`,
       layout: {
         kind: "lifecycle",
+        classification: "lifecycle",
         preheader: `Two minutes to start the intake form — no need to finish it tonight, the form saves as you go.`,
         content: `
           ${heading("Two minutes to get the intake started")}
@@ -203,6 +209,7 @@ export function welcomeSequenceTemplate(
     subject: `What week 1 actually looks like — for ${student}`,
     layout: {
       kind: "lifecycle",
+      classification: "lifecycle",
       preheader: `A week in. Here is the shape of our first cohort week and what you will see come back from me.`,
       content: `
         ${heading("What week 1 will feel like")}
@@ -248,7 +255,7 @@ export interface BalanceReminderVars extends EmailVariables {
 export function balanceDueReminderTemplate(
   phase: BalancePhase,
   vars: BalanceReminderVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const student = vars.studentName ? escapeHtml(vars.studentName) : "your child";
   const track = trackLabel(vars.programTrack);
@@ -267,6 +274,7 @@ export function balanceDueReminderTemplate(
       subject: `Heads up: ${student} balance (${balance.dollars}) is due ${dueShort}`,
       layout: {
         kind: "lifecycle",
+        classification: "lifecycle",
         preheader: `Informational — balance is due in 30 days. Pay early any time; we never charge a card on file without warning.`,
         content: `
           ${heading("30 days to balance due")}
@@ -301,6 +309,7 @@ export function balanceDueReminderTemplate(
       subject: `Reminder: ${student} ${balance.dollars} balance — due in 2 weeks`,
       layout: {
         kind: "lifecycle",
+        classification: "lifecycle",
         preheader: `Two weeks to the balance due date. One link to pay; receipt arrives by email when it clears.`,
         content: `
           ${heading("Two weeks to balance due")}
@@ -332,6 +341,7 @@ export function balanceDueReminderTemplate(
     subject: `Final reminder: ${balance.dollars} balance for ${student} — 7 days`,
     layout: {
       kind: "lifecycle",
+      classification: "lifecycle",
       preheader: `One week to the balance due date. After that we will need to pause the spot until the balance clears.`,
       content: `
         ${heading("One week to balance due")}
@@ -362,7 +372,7 @@ export interface PhotoReleaseVars extends EmailVariables {
 
 export function photoReleaseReminderTemplate(
   vars: PhotoReleaseVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const student = vars.studentName ? escapeHtml(vars.studentName) : "your child";
   const startShort = fmtMonthDay(vars.cohortStartISO);
@@ -372,6 +382,7 @@ export function photoReleaseReminderTemplate(
     subject: `Quick form before ${startShort} — photo/video release for ${student}`,
     layout: {
       kind: "lifecycle",
+      classification: "lifecycle",
       preheader: `Two-minute form. Without it I cannot share portfolio photos or include the family showcase.`,
       content: `
         ${heading("Two-minute form before kickoff")}
@@ -412,7 +423,7 @@ export interface IntakeIncompleteVars extends EmailVariables {
 
 export function intakeIncompleteReminderTemplate(
   vars: IntakeIncompleteVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const student = vars.studentName ? escapeHtml(vars.studentName) : "your child";
   const intakeHref = `${SITE_URL}/portal/intake`;
@@ -421,6 +432,7 @@ export function intakeIncompleteReminderTemplate(
     subject: `Pick up where you left off — ${student} intake form`,
     layout: {
       kind: "lifecycle",
+      classification: "lifecycle",
       preheader: `You started the intake form a week ago. The form remembered everything; you just need ten minutes to finish.`,
       content: `
         ${heading("Pick up where you left off")}
@@ -501,7 +513,7 @@ function tierAllowance(tier: SubscriptionTier): number {
 
 export function subscriptionWelcomeTemplate(
   vars: SubscriptionEmailVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const tierName = tierTitle(vars.tier);
   const allowance = vars.sessionsAllowed ?? tierAllowance(vars.tier);
@@ -511,6 +523,7 @@ export function subscriptionWelcomeTemplate(
     subject: `Welcome to ${tierName} tutoring`,
     layout: {
       kind: "transactional",
+      classification: "service",
       preheader: `Your ${tierName} tutoring subscription is active. Book your first session anytime.`,
       content: `
         ${heading(`Welcome to ${tierName} tutoring`)}
@@ -541,7 +554,7 @@ export function subscriptionWelcomeTemplate(
 
 export function subscriptionMonthlyReceiptTemplate(
   vars: SubscriptionEmailVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const tierName = tierTitle(vars.tier);
   const allowance = vars.sessionsAllowed ?? tierAllowance(vars.tier);
@@ -553,6 +566,7 @@ export function subscriptionMonthlyReceiptTemplate(
     subject: `Your monthly receipt — IEP & Thrive`,
     layout: {
       kind: "transactional",
+      classification: "service",
       preheader: `${amount} for ${tierName} tutoring · ${remaining} of ${allowance} sessions available this cycle.`,
       content: `
         ${heading("Monthly receipt")}
@@ -580,7 +594,7 @@ export function subscriptionMonthlyReceiptTemplate(
 
 export function sessionForfeitedTemplate(
   vars: SubscriptionEmailVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const student = vars.studentName ? escapeHtml(vars.studentName) : "your child";
   const remaining = vars.sessionsRemaining;
@@ -590,6 +604,7 @@ export function sessionForfeitedTemplate(
     subject: `Heads up — session forfeited`,
     layout: {
       kind: "lifecycle",
+      classification: "lifecycle",
       preheader: `Same-day cancel — the session counts. Here is what is left this cycle and the easy way to rebook.`,
       content: `
         ${heading("A session was forfeited")}
@@ -622,7 +637,7 @@ export function sessionForfeitedTemplate(
 
 export function subscriptionPausedTemplate(
   vars: SubscriptionEmailVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const tierName = tierTitle(vars.tier);
 
@@ -630,6 +645,7 @@ export function subscriptionPausedTemplate(
     subject: `Subscription paused`,
     layout: {
       kind: "transactional",
+      classification: "service",
       preheader: `Your ${tierName} subscription is paused. Resume any time from your portal.`,
       content: `
         ${heading("Your subscription is paused")}
@@ -655,7 +671,7 @@ export function subscriptionPausedTemplate(
 
 export function subscriptionCanceledTemplate(
   vars: SubscriptionEmailVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const tierName = tierTitle(vars.tier);
   const cycleEnd = fmtCycleEnd(vars.cycleEndISO);
@@ -665,6 +681,7 @@ export function subscriptionCanceledTemplate(
     subject: `Subscription cancelled — sessions ${cycleEnd ? `through ${cycleEnd}` : "through current cycle"}`,
     layout: {
       kind: "transactional",
+      classification: "service",
       preheader: `Your subscription is cancelled. You can still use any remaining sessions ${dateClause}.`,
       content: `
         ${heading("Your subscription is cancelled")}
@@ -691,7 +708,7 @@ export function subscriptionCanceledTemplate(
 
 export function subscriptionPastDueTemplate(
   vars: SubscriptionEmailVars
-): { subject: string; layout: EmailLayoutOpts } {
+): { subject: string; layout: ClassifiedLayout } {
   const parent = vars.parentName ? escapeHtml(vars.parentName.split(" ")[0]) : "there";
   const tierName = tierTitle(vars.tier);
   const portalHref = vars.customerPortalUrl || portalSubscriptionHref();
@@ -700,6 +717,7 @@ export function subscriptionPastDueTemplate(
     subject: `Action needed — payment didn't go through`,
     layout: {
       kind: "transactional",
+      classification: "service",
       preheader: `Your ${tierName} subscription's last payment failed. Update the card to keep tutoring going.`,
       content: `
         ${heading("Your last payment didn't go through")}

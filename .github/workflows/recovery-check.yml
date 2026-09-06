@@ -1,0 +1,39 @@
+name: Recovery readiness
+
+# TASK-LP-059 acceptance criterion 1: "Given the newest backup is missing or
+# incomplete, when freshness monitoring runs, then the owner receives an
+# actionable alert."
+#
+# A failing scheduled workflow is that alert — GitHub emails the owner on a
+# scheduled-run failure. The previous `npm run verify:backups` existed but ran
+# nowhere, so a stale backup produced no signal at all.
+
+permissions:
+  contents: read
+  id-token: write   # google-github-actions/auth
+
+on:
+  schedule:
+    # 08:00 America/New_York daily, after the 03:00 export window.
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  recovery-readiness:
+    name: Verify every data class is recoverable
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      # Fails the run — and therefore notifies — when any data class is
+      # missing or stale. Do not add continue-on-error here; a silent
+      # recovery check is the thing this replaces.
+      - name: Check recovery readiness
+        run: ./scripts/verify-recovery-readiness.sh iep-and-thrive

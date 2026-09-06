@@ -16,18 +16,23 @@
  *                                         period, send monthly receipt
  *   - invoice.payment_failed          → status='past_due', send recover email
  *
- * Idempotency: every event is recorded in webhookEventLog/{event.id} BEFORE
- * processing. If the doc already exists, the event is acknowledged but
- * skipped (Stripe redelivers freely; we must not double-write).
+ * Delivery state: webhookEventLog/{event.id} is acquired atomically, remains
+ * processing while a lease is held, and is marked succeeded only after the
+ * billing effect is durable. Transient failures are marked failed and return
+ * 5xx so Stripe retries; permanent invalid events are marked failed and return
+ * 200 because another provider retry cannot repair them.
  *
- * The ONE-TIME payment flow (cohort deposits) MUST remain untouched.
+ * The existing one-time payment business result (cohort deposits/balances)
+ * remains intact; its mutation is now transactionally paired with its ledger
+ * and outbox records.
  */
 
 import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
-import { sendEmail, sendEmailWithResult, logEmail } from "./email-service";
+import { sendEmailWithResult, logEmail } from "./email-service";
+import type { EmailTemplateType, SendEmailResult } from "./email-service";
 import {
   depositConfirmationTemplate,
   balanceConfirmationTemplate,
@@ -47,6 +52,16 @@ import type {
   SubscriptionTier,
 } from "./subscription-types";
 import { tierPrice } from "./subscription-types";
+import {
+  PermanentWebhookError,
+  RetryableWebhookError,
+  WEBHOOK_LEASE_DURATION_MS,
+  WEBHOOK_OUTBOX_COLLECTION,
+  WEBHOOK_BILLING_EFFECT_COLLECTION,
+  redactWebhookError,
+  runWebhookEvent,
+  webhookStableId,
+} from "./webhook-state";
 
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
@@ -147,49 +162,271 @@ async function findUidForCustomer(
   return null;
 }
 
-/**
- * Idempotency gate: claim the event id by writing webhookEventLog/{id}.
- * Returns false if the event was already processed.
- */
-async function claimEvent(
-  db: admin.firestore.Firestore,
-  event: Stripe.Event
-): Promise<boolean> {
-  const ref = db.collection("webhookEventLog").doc(event.id);
-  try {
-    await ref.create({
-      eventId: event.id,
-      type: event.type,
-      receivedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-    return true;
-  } catch (err) {
-    const code = (err as { code?: number | string }).code;
-    if (code === 6 || code === "ALREADY_EXISTS") {
-      console.log(`[StripeWebhook] Duplicate event ignored: ${event.id} (${event.type})`);
-      return false;
+type WebhookResponseLike = {
+  status: (n: number) => { json: (body: unknown) => void };
+};
+
+type FirestoreWrite =
+  | {
+      operation: "create";
+      ref: admin.firestore.DocumentReference;
+      data: Record<string, unknown>;
     }
-    throw err;
+  | {
+      operation: "update";
+      ref: admin.firestore.DocumentReference;
+      data: Record<string, unknown>;
+    }
+  | {
+      operation: "set";
+      ref: admin.firestore.DocumentReference;
+      data: Record<string, unknown>;
+      options?: admin.firestore.SetOptions;
+    };
+
+interface EmailOutboxInput {
+  taskKey: string;
+  to: string;
+  subject: string;
+  htmlBody: string;
+  textBody?: string;
+  templateType: EmailTemplateType;
+  recipientUid?: string;
+}
+
+interface BillingEffectPlan {
+  writes: FirestoreWrite[];
+  emails: EmailOutboxInput[];
+}
+
+/**
+ * A business-effect ledger is separate from webhookEventLog. Its document and
+ * the billing writes/outbox records are committed in one transaction, so a
+ * retry cannot apply a second payment transition even if the delivery claim
+ * was lost after the transaction committed.
+ */
+async function runAtomicBillingEffect(
+  db: admin.firestore.Firestore,
+  event: Stripe.Event,
+  effectKey: string,
+  build: (
+    transaction: admin.firestore.Transaction,
+    now: admin.firestore.Timestamp
+  ) => Promise<BillingEffectPlan>
+): Promise<void> {
+  await db.runTransaction(async (transaction) => {
+    const effectRef = db
+      .collection(WEBHOOK_BILLING_EFFECT_COLLECTION)
+      .doc(webhookStableId(effectKey));
+    const effectSnapshot = await transaction.get(effectRef);
+    if (effectSnapshot.exists) return;
+
+    const now = admin.firestore.Timestamp.now();
+    // `build` only reads and returns staged writes. All Firestore writes happen
+    // below, after the outbox existence reads, to satisfy transaction ordering.
+    const plan = await build(transaction, now);
+    const outboxRefs = plan.emails.map((email) =>
+      db
+        .collection(WEBHOOK_OUTBOX_COLLECTION)
+        .doc(webhookStableId(effectKey, email.taskKey))
+    );
+    const outboxSnapshots = outboxRefs.length
+      ? await transaction.getAll(...outboxRefs)
+      : [];
+
+    for (const write of plan.writes) {
+      if (write.operation === "create") transaction.create(write.ref, write.data);
+      else if (write.operation === "update") transaction.update(write.ref, write.data);
+      else transaction.set(write.ref, write.data, write.options ?? { merge: true });
+    }
+
+    transaction.create(effectRef, {
+      effectKey,
+      eventId: event.id,
+      eventType: event.type,
+      status: "applied",
+      appliedAt: now,
+      updatedAt: now,
+    });
+
+    for (let index = 0; index < plan.emails.length; index += 1) {
+      if (outboxSnapshots[index]?.exists) continue;
+      const email = plan.emails[index];
+      transaction.create(outboxRefs[index], {
+        effectKey,
+        eventId: event.id,
+        eventType: event.type,
+        taskKey: email.taskKey,
+        channel: "email",
+        status: "pending",
+        attempts: 0,
+        leaseId: null,
+        leaseExpiresAt: null,
+        firstSeenAt: now,
+        lastError: null,
+        to: email.to,
+        subject: email.subject,
+        htmlBody: email.htmlBody,
+        textBody: email.textBody ?? null,
+        templateType: email.templateType,
+        recipientUid: email.recipientUid ?? null,
+        updatedAt: now,
+      });
+    }
+  });
+
+  // Email delivery is deliberately best-effort after the billing transaction.
+  // A provider failure leaves a durable outbox task and never causes billing to
+  // be rolled back or retried by Stripe.
+  await dispatchEmailOutboxForEffect(db, effectKey);
+}
+
+function timestampMillis(value: unknown): number | null {
+  if (value instanceof admin.firestore.Timestamp) return value.toMillis();
+  if (value && typeof value === "object") {
+    const candidate = value as { toMillis?: () => number; seconds?: number; _seconds?: number };
+    if (typeof candidate.toMillis === "function") return candidate.toMillis();
+    const seconds = candidate.seconds ?? candidate._seconds;
+    if (typeof seconds === "number") return seconds * 1000;
+  }
+  return null;
+}
+
+async function claimEmailOutboxTask(
+  db: admin.firestore.Firestore,
+  ref: admin.firestore.DocumentReference
+): Promise<{ task: Record<string, unknown>; leaseId: string } | null> {
+  return db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists) return null;
+
+    const task = snapshot.data() ?? {};
+    if (task.status === "sent") return null;
+    const now = admin.firestore.Timestamp.now();
+    const expiresAt = timestampMillis(task.leaseExpiresAt);
+    if (task.status === "processing" && expiresAt !== null && expiresAt > now.toMillis()) {
+      return null;
+    }
+
+    const attempts =
+      typeof task.attempts === "number" && Number.isInteger(task.attempts) && task.attempts >= 0
+        ? task.attempts + 1
+        : 1;
+    const leaseId = webhookStableId(ref.id, String(now.toMillis()), String(attempts));
+    transaction.update(ref, {
+      status: "processing",
+      attempts,
+      leaseId,
+      leaseExpiresAt: admin.firestore.Timestamp.fromMillis(
+        now.toMillis() + WEBHOOK_LEASE_DURATION_MS
+      ),
+      updatedAt: now,
+    });
+    return { task, leaseId };
+  });
+}
+
+async function finishEmailOutboxTask(
+  db: admin.firestore.Firestore,
+  ref: admin.firestore.DocumentReference,
+  leaseId: string,
+  result: SendEmailResult
+): Promise<void> {
+  try {
+    await db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists) return;
+      const task = snapshot.data() ?? {};
+      if (task.status !== "processing" || task.leaseId !== leaseId) return;
+      const now = admin.firestore.Timestamp.now();
+      transaction.update(ref, {
+        status: result.ok ? "sent" : "failed",
+        leaseId: null,
+        leaseExpiresAt: null,
+        providerMessageId: result.messageId ?? null,
+        lastError: result.ok ? null : redactWebhookError(new Error(result.error ?? "Email delivery failed")),
+        deliveredAt: result.ok ? now : null,
+        updatedAt: now,
+      });
+    });
+  } catch (error) {
+    console.error("[StripeWebhook] Email outbox state update failed:", redactWebhookError(error));
   }
 }
 
-async function fetchUserData(
+async function dispatchEmailOutboxTask(
   db: admin.firestore.Firestore,
-  uid: string
-): Promise<{ parentName: string; parentEmail: string; studentName: string }> {
-  const snap = await db.collection("users").doc(uid).get();
-  const data = snap.exists ? snap.data() ?? {} : {};
-  const parentName =
-    (data.displayName as string | undefined) ||
-    (data.parentName as string | undefined) ||
-    "Parent";
-  const parentEmail =
-    (data.email as string | undefined) ||
-    "";
-  const studentName =
-    (data.studentName as string | undefined) ||
-    "";
-  return { parentName, parentEmail, studentName };
+  ref: admin.firestore.DocumentReference
+): Promise<void> {
+  const claimed = await claimEmailOutboxTask(db, ref);
+  if (!claimed) return;
+
+  const task = claimed.task;
+  let result: SendEmailResult;
+  try {
+    result = await sendEmailWithResult({
+      to: String(task.to ?? ""),
+      subject: String(task.subject ?? ""),
+      htmlBody: String(task.htmlBody ?? ""),
+      textBody: typeof task.textBody === "string" ? task.textBody : undefined,
+      kind: "transactional",
+      recipientUid: typeof task.recipientUid === "string" ? task.recipientUid : undefined,
+    });
+  } catch (error) {
+    result = {
+      ok: false,
+      messageId: null,
+      error: redactWebhookError(error),
+    };
+  }
+
+  try {
+    const redactedEmailError = result.error
+      ? redactWebhookError(new Error(result.error))
+      : undefined;
+    await logEmail(
+      String(task.to ?? ""),
+      String(task.subject ?? ""),
+      (task.templateType as EmailTemplateType) || "general",
+      result.ok,
+      {
+        messageId: result.messageId,
+        error: redactedEmailError,
+        meta: {
+          source: "stripe-webhook-outbox",
+          effectKey: task.effectKey,
+          eventId: task.eventId,
+          taskKey: task.taskKey,
+        },
+      }
+    );
+  } catch (error) {
+    // `logEmail` is already fail-safe, but keep the billing path isolated if
+    // its implementation ever changes.
+    console.error("[StripeWebhook] Email audit failed:", redactWebhookError(error));
+  }
+
+  await finishEmailOutboxTask(db, ref, claimed.leaseId, result);
+  if (!result.ok) {
+    console.warn(
+      `[StripeWebhook] Email outbox task failed: ${ref.id}; billing effect remains committed`
+    );
+  }
+}
+
+async function dispatchEmailOutboxForEffect(
+  db: admin.firestore.Firestore,
+  effectKey: string
+): Promise<void> {
+  try {
+    const snapshot = await db
+      .collection(WEBHOOK_OUTBOX_COLLECTION)
+      .where("effectKey", "==", effectKey)
+      .get();
+    for (const task of snapshot.docs) await dispatchEmailOutboxTask(db, task.ref);
+  } catch (error) {
+    console.error("[StripeWebhook] Email outbox dispatch failed:", redactWebhookError(error));
+  }
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -198,7 +435,7 @@ async function fetchUserData(
 
 async function handleCheckoutSessionCompleted(
   event: Stripe.Event,
-  res: { status: (n: number) => { json: (b: unknown) => void } }
+  res: WebhookResponseLike
 ): Promise<void> {
   const session = event.data.object as Stripe.Checkout.Session;
 
@@ -212,23 +449,33 @@ async function handleCheckoutSessionCompleted(
       typeof session.customer === "string"
         ? session.customer
         : session.customer?.id || null;
-    if (uid && customerId) {
-      try {
-        await admin
-          .firestore()
-          .collection("users")
-          .doc(uid)
-          .set(
-            {
-              stripeCustomerId: customerId,
-              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            },
-            { merge: true }
-          );
-      } catch (err) {
-        console.error("[StripeWebhook] subscription session write failed:", err);
-      }
+    if (!uid || !customerId) {
+      throw new PermanentWebhookError(
+        "invalid_subscription_checkout",
+        "Subscription checkout is missing its account or customer reference."
+      );
     }
+
+    const db = admin.firestore();
+    await runAtomicBillingEffect(
+      db,
+      event,
+      `checkout.session.completed:${session.id}`,
+      async (_transaction, now) => ({
+        writes: [
+          {
+            operation: "set",
+            ref: db.collection("users").doc(uid),
+            data: {
+              stripeCustomerId: customerId,
+              updatedAt: now,
+            },
+            options: { merge: true },
+          },
+        ],
+        emails: [],
+      })
+    );
     res.status(200).json({ received: true });
     return;
   }
@@ -243,9 +490,10 @@ async function handleCheckoutSessionCompleted(
   const customerName = session.customer_details?.name || "Parent/Guardian";
 
   if (!customerEmail) {
-    console.error("[StripeWebhook] No customer email in session");
-    res.status(200).json({ received: true });
-    return;
+    throw new PermanentWebhookError(
+      "missing_customer_email",
+      "Checkout session has no customer email for payment association."
+    );
   }
 
   const amountTotal = session.amount_total
@@ -255,135 +503,148 @@ async function handleCheckoutSessionCompleted(
   const db = admin.firestore();
   const isDeposit = paymentType === "deposit";
   const isBalance = paymentType === "balance";
-  const now = admin.firestore.FieldValue.serverTimestamp();
+  if (!isDeposit && !isBalance) {
+    throw new PermanentWebhookError(
+      "invalid_payment_type",
+      "Checkout session has an unsupported payment type."
+    );
+  }
 
+  const paymentIntentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : session.payment_intent?.id || null;
   const usersRef = db.collection("users");
-  const existingQuery = await usersRef
-    .where("email", "==", customerEmail)
-    .limit(1)
-    .get();
 
-  const paymentData: Record<string, unknown> = {
-    email: customerEmail,
-    displayName: customerName,
-    program,
-    programLabel,
-    paymentType,
-    stripeSessionId: session.id,
-    stripePaymentIntentId: session.payment_intent,
-    updatedAt: now,
-  };
+  await runAtomicBillingEffect(
+    db,
+    event,
+    `checkout.session.completed:${session.id}`,
+    async (transaction, now) => {
+      const existingQuery = await transaction.get(
+        usersRef.where("email", "==", customerEmail).limit(1)
+      );
+      const pipelineQuery = await transaction.get(
+        db.collection("enrollmentInquiries").where("email", "==", customerEmail).limit(1)
+      );
 
-  if (isDeposit) {
-    paymentData.depositPaid = true;
-    paymentData.depositPaidAt = now;
-    paymentData.status = "enrolled";
-    paymentData.enrolledAt = now;
-  }
+      const paymentData: Record<string, unknown> = {
+        email: customerEmail,
+        displayName: customerName,
+        program,
+        programLabel,
+        paymentType,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: paymentIntentId,
+        updatedAt: now,
+      };
 
-  if (isBalance) {
-    paymentData.balancePaid = true;
-    paymentData.balancePaidAt = now;
-    paymentData.status = "paid_in_full";
-  }
+      if (isDeposit) {
+        paymentData.depositPaid = true;
+        paymentData.depositPaidAt = now;
+        paymentData.status = "enrolled";
+        paymentData.enrolledAt = now;
+      }
 
-  let userDocRef: admin.firestore.DocumentReference;
+      if (isBalance) {
+        paymentData.balancePaid = true;
+        paymentData.balancePaidAt = now;
+        paymentData.status = "paid_in_full";
+      }
 
-  if (!existingQuery.empty) {
-    userDocRef = existingQuery.docs[0].ref;
-    const existingData = existingQuery.docs[0].data();
-    if (existingData.enrolledAt && isDeposit) {
-      delete paymentData.enrolledAt;
+      const writes: FirestoreWrite[] = [];
+      if (!existingQuery.empty) {
+        const userDoc = existingQuery.docs[0];
+        if (userDoc.data().enrolledAt && isDeposit) delete paymentData.enrolledAt;
+        writes.push({ operation: "update", ref: userDoc.ref, data: paymentData });
+      } else {
+        const userDocRef = usersRef.doc();
+        writes.push({
+          operation: "create",
+          ref: userDocRef,
+          data: { ...paymentData, createdAt: now },
+        });
+      }
+
+      if (!pipelineQuery.empty) {
+        writes.push({
+          operation: "update",
+          ref: pipelineQuery.docs[0].ref,
+          data: {
+            status: isBalance ? "paid_in_full" : "deposit_paid",
+            stripeSessionId: session.id,
+            paymentReceivedAt: now,
+          },
+        });
+      }
+
+      const emails: EmailOutboxInput[] = [];
+      if (isDeposit) {
+        const template = depositConfirmationTemplate({
+          name: customerName,
+          program: programLabel,
+          amount: amountTotal,
+        });
+        emails.push({
+          taskKey: "parent:deposit_confirmation",
+          to: customerEmail,
+          subject: template.subject,
+          htmlBody: template.html,
+          templateType: "deposit_confirmation",
+        });
+      } else {
+        const template = balanceConfirmationTemplate({
+          name: customerName,
+          program: programLabel,
+          amount: amountTotal,
+        });
+        emails.push({
+          taskKey: "parent:balance_confirmation",
+          to: customerEmail,
+          subject: template.subject,
+          htmlBody: template.html,
+          templateType: "balance_confirmation",
+        });
+      }
+
+      const operatorEmail = process.env.OPERATOR_EMAIL || "hello@iepandthrive.com";
+      const notifTemplate = operatorPaymentNotificationTemplate({
+        name: customerName,
+        email: customerEmail,
+        program: programLabel,
+        type: paymentType,
+        amount: amountTotal,
+        sessionId: session.id,
+      });
+      emails.push({
+        taskKey: "operator:payment_notification",
+        to: operatorEmail,
+        subject: notifTemplate.subject,
+        htmlBody: notifTemplate.html,
+        templateType: "operator_payment_notification",
+      });
+
+      return { writes, emails };
     }
-    await userDocRef.update(paymentData);
-    console.log(`[StripeWebhook] Updated existing user: ${customerEmail}`);
-  } else {
-    paymentData.createdAt = now;
-    userDocRef = await usersRef.add(paymentData);
-    console.log(`[StripeWebhook] Created new user: ${customerEmail}`);
-  }
-
-  // Pipeline status
-  const pipelineQuery = await db
-    .collection("enrollmentInquiries")
-    .where("email", "==", customerEmail)
-    .limit(1)
-    .get();
-
-  if (!pipelineQuery.empty) {
-    const pipelineDoc = pipelineQuery.docs[0];
-    await pipelineDoc.ref.update({
-      status: isBalance ? "paid_in_full" : "deposit_paid",
-      stripeSessionId: session.id,
-      paymentReceivedAt: now,
-    });
-  }
-
-  // Parent confirmation email
-  if (isDeposit) {
-    const template = depositConfirmationTemplate({
-      name: customerName,
-      program: programLabel,
-      amount: amountTotal,
-    });
-    const sent = await sendEmail({
-      to: customerEmail,
-      subject: template.subject,
-      htmlBody: template.html,
-    });
-    await logEmail(customerEmail, template.subject, "deposit_confirmation", sent);
-  } else if (isBalance) {
-    const template = balanceConfirmationTemplate({
-      name: customerName,
-      program: programLabel,
-      amount: amountTotal,
-    });
-    const sent = await sendEmail({
-      to: customerEmail,
-      subject: template.subject,
-      htmlBody: template.html,
-    });
-    await logEmail(customerEmail, template.subject, "balance_confirmation", sent);
-  }
-
-  // Operator notification
-  const operatorEmail = process.env.OPERATOR_EMAIL || "hello@iepandthrive.com";
-  const notifTemplate = operatorPaymentNotificationTemplate({
-    name: customerName,
-    email: customerEmail,
-    program: programLabel,
-    type: paymentType,
-    amount: amountTotal,
-    sessionId: session.id,
-  });
-  const notifSent = await sendEmail({
-    to: operatorEmail,
-    subject: notifTemplate.subject,
-    htmlBody: notifTemplate.html,
-  });
-  await logEmail(
-    operatorEmail,
-    notifTemplate.subject,
-    "operator_payment_notification",
-    notifSent
   );
 
   console.log(
-    `[StripeWebhook] Processed ${paymentType} for ${customerEmail} — ${programLabel}`
+    `[StripeWebhook] Processed ${paymentType} checkout session ${session.id}`
   );
   res.status(200).json({ received: true });
 }
 
 async function handleSubscriptionCreated(
   event: Stripe.Event,
-  res: { status: (n: number) => { json: (b: unknown) => void } }
+  res: WebhookResponseLike
 ): Promise<void> {
   const sub = event.data.object as Stripe.Subscription;
   const tier = tierFromSubscription(sub);
   if (!tier) {
-    console.warn(`[StripeWebhook] subscription ${sub.id} has unknown tier — skipped`);
-    res.status(200).json({ received: true });
-    return;
+    throw new PermanentWebhookError(
+      "unknown_subscription_tier",
+      "Subscription event has no supported tutoring tier."
+    );
   }
 
   const db = admin.firestore();
@@ -397,72 +658,95 @@ async function handleSubscriptionCreated(
     uidFromMeta || (await findUidForCustomer(db, customerId, uidFromMeta));
 
   if (!uid) {
-    console.error(
-      `[StripeWebhook] subscription.created could not resolve uid (sub=${sub.id}, customer=${customerId})`
+    throw new RetryableWebhookError(
+      "subscription_account_not_ready",
+      "Subscription event cannot yet be associated with a user account."
     );
-    res.status(200).json({ received: true });
-    return;
   }
 
   const period = readSubscriptionPeriod(sub);
   const status = mapStripeStatus(sub.status);
   const allowance = tierPrice(tier).sessionsPerCycle;
-  const now = admin.firestore.FieldValue.serverTimestamp();
 
-  const state: Omit<SubscriptionState, "createdAt" | "updatedAt"> & {
-    createdAt: admin.firestore.FieldValue;
-    updatedAt: admin.firestore.FieldValue;
-  } = {
-    tier,
-    status,
-    stripeCustomerId: customerId || "",
-    stripeSubscriptionId: sub.id,
-    currentPeriodStart: unixToISO(period.startEpoch),
-    currentPeriodEnd: unixToISO(period.endEpoch),
-    sessionsAllowedPerCycle: allowance,
-    sessionsUsedThisCycle: 0,
-    cancelAtPeriodEnd: !!sub.cancel_at_period_end,
-    createdAt: now,
-    updatedAt: now,
-  };
+  await runAtomicBillingEffect(
+    db,
+    event,
+    `customer.subscription.created:${sub.id}`,
+    async (transaction, now) => {
+      const userRef = db.collection("users").doc(uid);
+      const userSnapshot = await transaction.get(userRef);
+      if (!userSnapshot.exists) {
+        throw new RetryableWebhookError(
+          "subscription_user_not_ready",
+          "Resolved subscription user document is not available yet."
+        );
+      }
+      const userData = userSnapshot.data() ?? {};
+      const parentName =
+        (userData.displayName as string | undefined) ||
+        (userData.parentName as string | undefined) ||
+        "Parent";
+      const parentEmail = (userData.email as string | undefined) || "";
+      const studentName = (userData.studentName as string | undefined) || "";
 
-  await db.collection("users").doc(uid).set(
-    {
-      stripeCustomerId: customerId || admin.firestore.FieldValue.delete(),
-      subscription: state,
-      updatedAt: now,
-    },
-    { merge: true }
+      const state: Omit<SubscriptionState, "createdAt" | "updatedAt"> & {
+        createdAt: admin.firestore.Timestamp;
+        updatedAt: admin.firestore.Timestamp;
+      } = {
+        tier,
+        status,
+        stripeCustomerId: customerId || "",
+        stripeSubscriptionId: sub.id,
+        currentPeriodStart: unixToISO(period.startEpoch),
+        currentPeriodEnd: unixToISO(period.endEpoch),
+        sessionsAllowedPerCycle: allowance,
+        sessionsUsedThisCycle: 0,
+        cancelAtPeriodEnd: !!sub.cancel_at_period_end,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      const emails: EmailOutboxInput[] = [];
+      if (parentEmail) {
+        const tpl = subscriptionWelcomeTemplate({
+          tier,
+          parentName,
+          studentName,
+          sessionsAllowed: allowance,
+        });
+        const rendered = renderEmail({
+          subject: tpl.subject,
+          layout: tpl.layout,
+          recipientUid: uid,
+        });
+        emails.push({
+          taskKey: "parent:subscription_welcome",
+          to: parentEmail,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          templateType: "general",
+          recipientUid: uid,
+        });
+      }
+
+      return {
+        writes: [
+          {
+            operation: "set",
+            ref: userRef,
+            data: {
+              stripeCustomerId: customerId || admin.firestore.FieldValue.delete(),
+              subscription: state,
+              updatedAt: now,
+            },
+            options: { merge: true },
+          },
+        ],
+        emails,
+      };
+    }
   );
-
-  // Welcome email (transactional, but still respects unsubscribed for safety)
-  const { parentName, parentEmail, studentName } = await fetchUserData(db, uid);
-  if (parentEmail) {
-    const tpl = subscriptionWelcomeTemplate({
-      tier,
-      parentName,
-      studentName,
-      sessionsAllowed: allowance,
-    });
-    const rendered = renderEmail({
-      subject: tpl.subject,
-      layout: tpl.layout,
-      recipientUid: uid,
-    });
-    const sendRes = await sendEmailWithResult({
-      to: parentEmail,
-      subject: rendered.subject,
-      htmlBody: rendered.html,
-      textBody: rendered.text,
-      kind: "transactional",
-      recipientUid: uid,
-    });
-    await logEmail(parentEmail, rendered.subject, "general", sendRes.ok, {
-      messageId: sendRes.messageId,
-      error: sendRes.error,
-      meta: { template: "subscription_welcome", uid, tier },
-    });
-  }
 
   console.log(`[StripeWebhook] subscription.created — uid=${uid} tier=${tier}`);
   res.status(200).json({ received: true });
@@ -470,14 +754,15 @@ async function handleSubscriptionCreated(
 
 async function handleSubscriptionUpdated(
   event: Stripe.Event,
-  res: { status: (n: number) => { json: (b: unknown) => void } }
+  res: WebhookResponseLike
 ): Promise<void> {
   const sub = event.data.object as Stripe.Subscription;
   const tier = tierFromSubscription(sub);
   if (!tier) {
-    console.warn(`[StripeWebhook] subscription.updated ${sub.id} has unknown tier — skipped`);
-    res.status(200).json({ received: true });
-    return;
+    throw new PermanentWebhookError(
+      "unknown_subscription_tier",
+      "Subscription event has no supported tutoring tier."
+    );
   }
 
   const db = admin.firestore();
@@ -486,103 +771,114 @@ async function handleSubscriptionUpdated(
   const uid = uidFromMeta || (await findUidForCustomer(db, customerId));
 
   if (!uid) {
-    console.error(
-      `[StripeWebhook] subscription.updated could not resolve uid (sub=${sub.id})`
+    throw new RetryableWebhookError(
+      "subscription_account_not_ready",
+      "Subscription event cannot yet be associated with a user account."
     );
-    res.status(200).json({ received: true });
-    return;
   }
 
   const userRef = db.collection("users").doc(uid);
-  const userSnap = await userRef.get();
-  const previous = (userSnap.data()?.subscription || null) as SubscriptionState | null;
-  const previousStatus = previous?.status;
-
   const period = readSubscriptionPeriod(sub);
   const status = mapStripeStatus(sub.status);
   const allowance = tierPrice(tier).sessionsPerCycle;
-  const now = admin.firestore.FieldValue.serverTimestamp();
 
-  // Patch (don't overwrite sessionsUsedThisCycle — that's owned by the
-  // booking flow + invoice.paid renewal handler).
-  const patch: Record<string, unknown> = {
-    "subscription.tier": tier,
-    "subscription.status": status,
-    "subscription.stripeCustomerId": customerId || "",
-    "subscription.stripeSubscriptionId": sub.id,
-    "subscription.currentPeriodStart": unixToISO(period.startEpoch),
-    "subscription.currentPeriodEnd": unixToISO(period.endEpoch),
-    "subscription.sessionsAllowedPerCycle": allowance,
-    "subscription.cancelAtPeriodEnd": !!sub.cancel_at_period_end,
-    "subscription.updatedAt": now,
-    updatedAt: now,
-  };
+  await runAtomicBillingEffect(
+    db,
+    event,
+    `customer.subscription.updated:${event.id}`,
+    async (transaction, now) => {
+      const userSnapshot = await transaction.get(userRef);
+      if (!userSnapshot.exists) {
+        throw new RetryableWebhookError(
+          "subscription_user_not_ready",
+          "Resolved subscription user document is not available yet."
+        );
+      }
+      const userData = userSnapshot.data() ?? {};
+      const previous = (userData.subscription || null) as SubscriptionState | null;
+      const previousStatus = previous?.status;
+      const parentName =
+        (userData.displayName as string | undefined) ||
+        (userData.parentName as string | undefined) ||
+        "Parent";
+      const parentEmail = (userData.email as string | undefined) || "";
+      const studentName = (userData.studentName as string | undefined) || "";
 
-  // Initialize new fields if subscription doc didn't exist before.
-  if (!previous) {
-    patch["subscription.createdAt"] = now;
-    patch["subscription.sessionsUsedThisCycle"] = 0;
-  }
+      // Patch (don't overwrite sessionsUsedThisCycle — that's owned by the
+      // booking flow + invoice.paid renewal handler).
+      const patch: Record<string, unknown> = {
+        "subscription.tier": tier,
+        "subscription.status": status,
+        "subscription.stripeCustomerId": customerId || "",
+        "subscription.stripeSubscriptionId": sub.id,
+        "subscription.currentPeriodStart": unixToISO(period.startEpoch),
+        "subscription.currentPeriodEnd": unixToISO(period.endEpoch),
+        "subscription.sessionsAllowedPerCycle": allowance,
+        "subscription.cancelAtPeriodEnd": !!sub.cancel_at_period_end,
+        "subscription.updatedAt": now,
+        updatedAt: now,
+      };
 
-  await userRef.set(patch, { merge: true });
+      if (!previous) {
+        patch["subscription.createdAt"] = now;
+        patch["subscription.sessionsUsedThisCycle"] = 0;
+      }
 
-  // Status-transition emails. Only fire when status actually changes
-  // into the corresponding state — Stripe redelivers on no-op updates.
-  const { parentName, parentEmail, studentName } = await fetchUserData(db, uid);
-  const cycleEndISO = unixToISO(period.endEpoch);
+      type TemplateFn = (vars: Parameters<typeof subscriptionPausedTemplate>[0]) => {
+        subject: string;
+        layout: Parameters<typeof renderEmail>[0]["layout"];
+      };
+      let template: { fn: TemplateFn; meta: string } | null = null;
+      if (status !== previousStatus) {
+        if (status === "paused") {
+          template = { fn: subscriptionPausedTemplate, meta: "subscription_paused" };
+        } else if (status === "past_due") {
+          template = { fn: subscriptionPastDueTemplate, meta: "subscription_past_due" };
+        } else if (status === "canceled") {
+          template = { fn: subscriptionCanceledTemplate, meta: "subscription_canceled" };
+        }
+      }
 
-  type TemplateFn = (vars: Parameters<typeof subscriptionPausedTemplate>[0]) => {
-    subject: string;
-    layout: Parameters<typeof renderEmail>[0]["layout"];
-  };
-  let template: { fn: TemplateFn; meta: string } | null = null;
+      const emails: EmailOutboxInput[] = [];
+      if (template && parentEmail) {
+        const tpl = template.fn({
+          tier,
+          parentName,
+          studentName,
+          cycleEndISO: unixToISO(period.endEpoch),
+        });
+        const rendered = renderEmail({
+          subject: tpl.subject,
+          layout: tpl.layout,
+          recipientUid: uid,
+        });
+        emails.push({
+          taskKey: `parent:${template.meta}`,
+          to: parentEmail,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          templateType: "general",
+          recipientUid: uid,
+        });
+      }
 
-  if (status !== previousStatus) {
-    if (status === "paused") {
-      template = { fn: subscriptionPausedTemplate, meta: "subscription_paused" };
-    } else if (status === "past_due") {
-      template = { fn: subscriptionPastDueTemplate, meta: "subscription_past_due" };
-    } else if (status === "canceled") {
-      template = { fn: subscriptionCanceledTemplate, meta: "subscription_canceled" };
+      return {
+        writes: [{ operation: "set", ref: userRef, data: patch, options: { merge: true } }],
+        emails,
+      };
     }
-  }
-
-  if (template && parentEmail) {
-    const tpl = template.fn({
-      tier,
-      parentName,
-      studentName,
-      cycleEndISO,
-    });
-    const rendered = renderEmail({
-      subject: tpl.subject,
-      layout: tpl.layout,
-      recipientUid: uid,
-    });
-    const sendRes = await sendEmailWithResult({
-      to: parentEmail,
-      subject: rendered.subject,
-      htmlBody: rendered.html,
-      textBody: rendered.text,
-      kind: "transactional",
-      recipientUid: uid,
-    });
-    await logEmail(parentEmail, rendered.subject, "general", sendRes.ok, {
-      messageId: sendRes.messageId,
-      error: sendRes.error,
-      meta: { template: template.meta, uid, tier, fromStatus: previousStatus, toStatus: status },
-    });
-  }
+  );
 
   console.log(
-    `[StripeWebhook] subscription.updated — uid=${uid} tier=${tier} status=${previousStatus ?? "(none)"} → ${status}`
+    `[StripeWebhook] subscription.updated — uid=${uid} tier=${tier} status=${status}`
   );
   res.status(200).json({ received: true });
 }
 
 async function handleSubscriptionDeleted(
   event: Stripe.Event,
-  res: { status: (n: number) => { json: (b: unknown) => void } }
+  res: WebhookResponseLike
 ): Promise<void> {
   const sub = event.data.object as Stripe.Subscription;
   const tier = tierFromSubscription(sub);
@@ -592,59 +888,84 @@ async function handleSubscriptionDeleted(
   const uid = uidFromMeta || (await findUidForCustomer(db, customerId));
 
   if (!uid) {
-    console.error(`[StripeWebhook] subscription.deleted could not resolve uid (sub=${sub.id})`);
-    res.status(200).json({ received: true });
-    return;
+    throw new RetryableWebhookError(
+      "subscription_account_not_ready",
+      "Subscription deletion cannot yet be associated with a user account."
+    );
   }
 
   const period = readSubscriptionPeriod(sub);
   const cycleEndISO = unixToISO(period.endEpoch);
-  const now = admin.firestore.FieldValue.serverTimestamp();
 
-  await db.collection("users").doc(uid).set(
-    {
-      subscription: {
-        ...(tier ? { tier } : {}),
-        status: "canceled",
-        stripeSubscriptionId: sub.id,
-        cancelAtPeriodEnd: false,
-        currentPeriodEnd: cycleEndISO,
-        updatedAt: now,
-      },
-      updatedAt: now,
-    },
-    { merge: true }
-  );
+  await runAtomicBillingEffect(
+    db,
+    event,
+    `customer.subscription.deleted:${sub.id}`,
+    async (transaction, now) => {
+      const userRef = db.collection("users").doc(uid);
+      const userSnapshot = await transaction.get(userRef);
+      if (!userSnapshot.exists) {
+        throw new RetryableWebhookError(
+          "subscription_user_not_ready",
+          "Resolved subscription user document is not available yet."
+        );
+      }
+      const userData = userSnapshot.data() ?? {};
+      const previous = (userData.subscription || null) as SubscriptionState | null;
+      const parentName =
+        (userData.displayName as string | undefined) ||
+        (userData.parentName as string | undefined) ||
+        "Parent";
+      const parentEmail = (userData.email as string | undefined) || "";
+      const studentName = (userData.studentName as string | undefined) || "";
+      const emails: EmailOutboxInput[] = [];
 
-  if (tier) {
-    const { parentName, parentEmail, studentName } = await fetchUserData(db, uid);
-    if (parentEmail) {
-      const tpl = subscriptionCanceledTemplate({
-        tier,
-        parentName,
-        studentName,
-        cycleEndISO,
-      });
-      const rendered = renderEmail({
-        subject: tpl.subject,
-        layout: tpl.layout,
-        recipientUid: uid,
-      });
-      const sendRes = await sendEmailWithResult({
-        to: parentEmail,
-        subject: rendered.subject,
-        htmlBody: rendered.html,
-        textBody: rendered.text,
-        kind: "transactional",
-        recipientUid: uid,
-      });
-      await logEmail(parentEmail, rendered.subject, "general", sendRes.ok, {
-        messageId: sendRes.messageId,
-        error: sendRes.error,
-        meta: { template: "subscription_canceled", uid, tier, source: "subscription.deleted" },
-      });
+      if (tier && parentEmail && previous?.status !== "canceled") {
+        const tpl = subscriptionCanceledTemplate({
+          tier,
+          parentName,
+          studentName,
+          cycleEndISO,
+        });
+        const rendered = renderEmail({
+          subject: tpl.subject,
+          layout: tpl.layout,
+          recipientUid: uid,
+        });
+        emails.push({
+          taskKey: "parent:subscription_canceled",
+          to: parentEmail,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          templateType: "general",
+          recipientUid: uid,
+        });
+      }
+
+      return {
+        writes: [
+          {
+            operation: "set",
+            ref: userRef,
+            data: {
+              subscription: {
+                ...(tier ? { tier } : {}),
+                status: "canceled",
+                stripeSubscriptionId: sub.id,
+                cancelAtPeriodEnd: false,
+                currentPeriodEnd: cycleEndISO,
+                updatedAt: now,
+              },
+              updatedAt: now,
+            },
+            options: { merge: true },
+          },
+        ],
+        emails,
+      };
     }
-  }
+  );
 
   console.log(`[StripeWebhook] subscription.deleted — uid=${uid}`);
   res.status(200).json({ received: true });
@@ -652,7 +973,7 @@ async function handleSubscriptionDeleted(
 
 async function handleInvoicePaid(
   event: Stripe.Event,
-  res: { status: (n: number) => { json: (b: unknown) => void } }
+  res: WebhookResponseLike
 ): Promise<void> {
   const invoice = event.data.object as Stripe.Invoice;
 
@@ -675,24 +996,27 @@ async function handleInvoicePaid(
       : ((invoice as unknown as { subscription?: { id?: string } }).subscription?.id || null);
 
   if (!subId) {
-    console.warn("[StripeWebhook] invoice.paid had no subscription id — skipped");
-    res.status(200).json({ received: true });
-    return;
+    throw new PermanentWebhookError(
+      "missing_invoice_subscription",
+      "Renewal invoice has no subscription reference."
+    );
   }
 
   const stripeKey = stripeSecretKey.value() || process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {
-    console.error("[StripeWebhook] Stripe key missing for invoice.paid renewal");
-    res.status(500).json({ error: "Stripe not configured." });
-    return;
+    throw new RetryableWebhookError(
+      "stripe_not_configured",
+      "Stripe configuration is unavailable for invoice reconciliation."
+    );
   }
   const stripe = new Stripe(stripeKey);
   const sub = await stripe.subscriptions.retrieve(subId);
   const tier = tierFromSubscription(sub);
   if (!tier) {
-    console.warn(`[StripeWebhook] invoice.paid subscription ${sub.id} has unknown tier`);
-    res.status(200).json({ received: true });
-    return;
+    throw new PermanentWebhookError(
+      "unknown_subscription_tier",
+      "Renewal invoice subscription has no supported tutoring tier."
+    );
   }
 
   const db = admin.firestore();
@@ -701,69 +1025,94 @@ async function handleInvoicePaid(
   const uid = uidFromMeta || (await findUidForCustomer(db, customerId));
 
   if (!uid) {
-    console.error(`[StripeWebhook] invoice.paid could not resolve uid (sub=${sub.id})`);
-    res.status(200).json({ received: true });
-    return;
+    throw new RetryableWebhookError(
+      "subscription_account_not_ready",
+      "Renewal invoice cannot yet be associated with a user account."
+    );
   }
 
   const period = readSubscriptionPeriod(sub);
   const allowance = tierPrice(tier).sessionsPerCycle;
   const status = mapStripeStatus(sub.status);
-  const now = admin.firestore.FieldValue.serverTimestamp();
 
-  await db.collection("users").doc(uid).set(
-    {
-      subscription: {
-        tier,
-        status,
-        stripeCustomerId: customerId || "",
-        stripeSubscriptionId: sub.id,
-        currentPeriodStart: unixToISO(period.startEpoch),
-        currentPeriodEnd: unixToISO(period.endEpoch),
-        sessionsAllowedPerCycle: allowance,
-        sessionsUsedThisCycle: 0,
-        cancelAtPeriodEnd: !!sub.cancel_at_period_end,
-        updatedAt: now,
-      },
-      updatedAt: now,
-    },
-    { merge: true }
+  await runAtomicBillingEffect(
+    db,
+    event,
+    `invoice.paid:${invoice.id}`,
+    async (transaction, now) => {
+      const userRef = db.collection("users").doc(uid);
+      const userSnapshot = await transaction.get(userRef);
+      if (!userSnapshot.exists) {
+        throw new RetryableWebhookError(
+          "subscription_user_not_ready",
+          "Resolved subscription user document is not available yet."
+        );
+      }
+      const userData = userSnapshot.data() ?? {};
+      const parentName =
+        (userData.displayName as string | undefined) ||
+        (userData.parentName as string | undefined) ||
+        "Parent";
+      const parentEmail = (userData.email as string | undefined) || "";
+      const studentName = (userData.studentName as string | undefined) || "";
+      const emails: EmailOutboxInput[] = [];
+
+      if (parentEmail) {
+        const amountPaid = invoice.amount_paid
+          ? `$${(invoice.amount_paid / 100).toFixed(2)}`
+          : undefined;
+        const tpl = subscriptionMonthlyReceiptTemplate({
+          tier,
+          parentName,
+          studentName,
+          sessionsAllowed: allowance,
+          sessionsRemaining: allowance,
+          cycleEndISO: unixToISO(period.endEpoch),
+          amountPaid,
+        });
+        const rendered = renderEmail({
+          subject: tpl.subject,
+          layout: tpl.layout,
+          recipientUid: uid,
+        });
+        emails.push({
+          taskKey: "parent:subscription_monthly_receipt",
+          to: parentEmail,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          templateType: "general",
+          recipientUid: uid,
+        });
+      }
+
+      return {
+        writes: [
+          {
+            operation: "set",
+            ref: userRef,
+            data: {
+              subscription: {
+                tier,
+                status,
+                stripeCustomerId: customerId || "",
+                stripeSubscriptionId: sub.id,
+                currentPeriodStart: unixToISO(period.startEpoch),
+                currentPeriodEnd: unixToISO(period.endEpoch),
+                sessionsAllowedPerCycle: allowance,
+                sessionsUsedThisCycle: 0,
+                cancelAtPeriodEnd: !!sub.cancel_at_period_end,
+                updatedAt: now,
+              },
+              updatedAt: now,
+            },
+            options: { merge: true },
+          },
+        ],
+        emails,
+      };
+    }
   );
-
-  const { parentName, parentEmail, studentName } = await fetchUserData(db, uid);
-  if (parentEmail) {
-    const amountPaid = invoice.amount_paid
-      ? `$${(invoice.amount_paid / 100).toFixed(2)}`
-      : undefined;
-
-    const tpl = subscriptionMonthlyReceiptTemplate({
-      tier,
-      parentName,
-      studentName,
-      sessionsAllowed: allowance,
-      sessionsRemaining: allowance,
-      cycleEndISO: unixToISO(period.endEpoch),
-      amountPaid,
-    });
-    const rendered = renderEmail({
-      subject: tpl.subject,
-      layout: tpl.layout,
-      recipientUid: uid,
-    });
-    const sendRes = await sendEmailWithResult({
-      to: parentEmail,
-      subject: rendered.subject,
-      htmlBody: rendered.html,
-      textBody: rendered.text,
-      kind: "transactional",
-      recipientUid: uid,
-    });
-    await logEmail(parentEmail, rendered.subject, "general", sendRes.ok, {
-      messageId: sendRes.messageId,
-      error: sendRes.error,
-      meta: { template: "subscription_monthly_receipt", uid, tier, invoiceId: invoice.id },
-    });
-  }
 
   console.log(`[StripeWebhook] invoice.paid (renewal) — uid=${uid} tier=${tier}`);
   res.status(200).json({ received: true });
@@ -771,7 +1120,7 @@ async function handleInvoicePaid(
 
 async function handleInvoicePaymentFailed(
   event: Stripe.Event,
-  res: { status: (n: number) => { json: (b: unknown) => void } }
+  res: WebhookResponseLike
 ): Promise<void> {
   const invoice = event.data.object as Stripe.Invoice;
 
@@ -781,16 +1130,18 @@ async function handleInvoicePaymentFailed(
       : ((invoice as unknown as { subscription?: { id?: string } }).subscription?.id || null);
 
   if (!subId) {
-    console.warn("[StripeWebhook] invoice.payment_failed had no subscription id — skipped");
-    res.status(200).json({ received: true });
-    return;
+    throw new PermanentWebhookError(
+      "missing_invoice_subscription",
+      "Failed invoice has no subscription reference."
+    );
   }
 
   const stripeKey = stripeSecretKey.value() || process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {
-    console.error("[StripeWebhook] Stripe key missing for invoice.payment_failed");
-    res.status(500).json({ error: "Stripe not configured." });
-    return;
+    throw new RetryableWebhookError(
+      "stripe_not_configured",
+      "Stripe configuration is unavailable for payment recovery."
+    );
   }
   const stripe = new Stripe(stripeKey);
   const sub = await stripe.subscriptions.retrieve(subId);
@@ -802,56 +1153,80 @@ async function handleInvoicePaymentFailed(
   const uid = uidFromMeta || (await findUidForCustomer(db, customerId));
 
   if (!uid) {
-    console.error(`[StripeWebhook] invoice.payment_failed could not resolve uid (sub=${sub.id})`);
-    res.status(200).json({ received: true });
-    return;
+    throw new RetryableWebhookError(
+      "subscription_account_not_ready",
+      "Failed invoice cannot yet be associated with a user account."
+    );
   }
 
-  const now = admin.firestore.FieldValue.serverTimestamp();
+  await runAtomicBillingEffect(
+    db,
+    event,
+    `invoice.payment_failed:${invoice.id}`,
+    async (transaction, now) => {
+      const userRef = db.collection("users").doc(uid);
+      const userSnapshot = await transaction.get(userRef);
+      if (!userSnapshot.exists) {
+        throw new RetryableWebhookError(
+          "subscription_user_not_ready",
+          "Resolved subscription user document is not available yet."
+        );
+      }
+      const userData = userSnapshot.data() ?? {};
+      const previous = (userData.subscription || null) as SubscriptionState | null;
+      const parentName =
+        (userData.displayName as string | undefined) ||
+        (userData.parentName as string | undefined) ||
+        "Parent";
+      const parentEmail = (userData.email as string | undefined) || "";
+      const studentName = (userData.studentName as string | undefined) || "";
+      const emails: EmailOutboxInput[] = [];
 
-  await db.collection("users").doc(uid).set(
-    {
-      subscription: {
-        ...(tier ? { tier } : {}),
-        status: "past_due",
-        stripeCustomerId: customerId || "",
-        stripeSubscriptionId: sub.id,
-        cancelAtPeriodEnd: !!sub.cancel_at_period_end,
-        updatedAt: now,
-      },
-      updatedAt: now,
-    },
-    { merge: true }
-  );
+      if (tier && parentEmail && previous?.status !== "past_due") {
+        const tpl = subscriptionPastDueTemplate({
+          tier,
+          parentName,
+          studentName,
+        });
+        const rendered = renderEmail({
+          subject: tpl.subject,
+          layout: tpl.layout,
+          recipientUid: uid,
+        });
+        emails.push({
+          taskKey: "parent:subscription_past_due",
+          to: parentEmail,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          templateType: "general",
+          recipientUid: uid,
+        });
+      }
 
-  if (tier) {
-    const { parentName, parentEmail, studentName } = await fetchUserData(db, uid);
-    if (parentEmail) {
-      const tpl = subscriptionPastDueTemplate({
-        tier,
-        parentName,
-        studentName,
-      });
-      const rendered = renderEmail({
-        subject: tpl.subject,
-        layout: tpl.layout,
-        recipientUid: uid,
-      });
-      const sendRes = await sendEmailWithResult({
-        to: parentEmail,
-        subject: rendered.subject,
-        htmlBody: rendered.html,
-        textBody: rendered.text,
-        kind: "transactional",
-        recipientUid: uid,
-      });
-      await logEmail(parentEmail, rendered.subject, "general", sendRes.ok, {
-        messageId: sendRes.messageId,
-        error: sendRes.error,
-        meta: { template: "subscription_past_due", uid, tier, invoiceId: invoice.id },
-      });
+      return {
+        writes: [
+          {
+            operation: "set",
+            ref: userRef,
+            data: {
+              subscription: {
+                ...(tier ? { tier } : {}),
+                status: "past_due",
+                stripeCustomerId: customerId || "",
+                stripeSubscriptionId: sub.id,
+                cancelAtPeriodEnd: !!sub.cancel_at_period_end,
+                updatedAt: now,
+              },
+              updatedAt: now,
+            },
+            options: { merge: true },
+          },
+        ],
+        emails,
+      };
     }
-  }
+  );
 
   console.log(`[StripeWebhook] invoice.payment_failed — uid=${uid}`);
   res.status(200).json({ received: true });
@@ -860,6 +1235,60 @@ async function handleInvoicePaymentFailed(
 // ────────────────────────────────────────────────────────────────────────
 //   HTTP entry point
 // ────────────────────────────────────────────────────────────────────────
+
+interface BufferedWebhookResponse extends WebhookResponseLike {
+  statusCode: number;
+  body: unknown;
+}
+
+function bufferedWebhookResponse(): BufferedWebhookResponse {
+  const response: BufferedWebhookResponse = {
+    statusCode: 200,
+    body: { received: true },
+    status(code: number) {
+      response.statusCode = code;
+      return {
+        json(body: unknown) {
+          response.body = body;
+        },
+      };
+    },
+  };
+  return response;
+}
+
+const SUPPORTED_EVENT_TYPES = new Set([
+  "checkout.session.completed",
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+  "invoice.paid",
+  "invoice.payment_failed",
+]);
+
+function validateSignedEventForProcessing(event: Stripe.Event): void {
+  if (!event.data || !event.data.object || typeof event.data.object !== "object") {
+    throw new PermanentWebhookError(
+      "malformed_event",
+      "Signed event has no processable data object."
+    );
+  }
+
+  if (!SUPPORTED_EVENT_TYPES.has(event.type)) {
+    throw new PermanentWebhookError(
+      "unsupported_event_type",
+      "Signed event type is not supported by this endpoint."
+    );
+  }
+
+  const object = event.data.object as unknown as { id?: unknown };
+  if (typeof object.id !== "string" || object.id.length === 0) {
+    throw new PermanentWebhookError(
+      "malformed_event_object",
+      "Signed event object has no provider identifier."
+    );
+  }
+}
 
 export const stripeWebhook = onRequest(
   {
@@ -895,57 +1324,79 @@ export const stripeWebhook = onRequest(
     try {
       event = stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      console.error(`[StripeWebhook] Signature verification failed: ${message}`);
+      console.error(
+        "[StripeWebhook] Signature verification failed:",
+        redactWebhookError(err)
+      );
       res.status(400).json({ error: "Invalid signature." });
       return;
     }
 
-    // ── Idempotency claim ──
-    let claimed: boolean;
-    try {
-      claimed = await claimEvent(admin.firestore(), event);
-    } catch (err) {
-      console.error("[StripeWebhook] webhookEventLog write failed:", err);
-      // Treat as already-processed to be safe; Stripe will retry.
-      res.status(500).json({ error: "Idempotency claim failed." });
-      return;
-    }
-    if (!claimed) {
-      res.status(200).json({ received: true, duplicate: true });
+    // A verified Stripe event should always carry an ID. If a provider/parser
+    // ever hands us an envelope without one, there is no safe document key on
+    // which to record the permanent failure; acknowledge it without logging
+    // the malformed body.
+    if (typeof event.id !== "string" || event.id.length === 0 || !event.type) {
+      console.warn("[StripeWebhook] Verified event missing an id or type");
+      res.status(200).json({ received: true });
       return;
     }
 
-    try {
-      switch (event.type) {
-        case "checkout.session.completed":
-          await handleCheckoutSessionCompleted(event, res);
-          return;
-        case "customer.subscription.created":
-          await handleSubscriptionCreated(event, res);
-          return;
-        case "customer.subscription.updated":
-          await handleSubscriptionUpdated(event, res);
-          return;
-        case "customer.subscription.deleted":
-          await handleSubscriptionDeleted(event, res);
-          return;
-        case "invoice.paid":
-          await handleInvoicePaid(event, res);
-          return;
-        case "invoice.payment_failed":
-          await handleInvoicePaymentFailed(event, res);
-          return;
-        default:
-          console.log(`[StripeWebhook] Ignoring event type: ${event.type}`);
-          res.status(200).json({ received: true });
-          return;
+    const buffered = bufferedWebhookResponse();
+    const execution = await runWebhookEvent(
+      admin.firestore(),
+      event,
+      async () => {
+        validateSignedEventForProcessing(event);
+        switch (event.type) {
+          case "checkout.session.completed":
+            await handleCheckoutSessionCompleted(event, buffered);
+            break;
+          case "customer.subscription.created":
+            await handleSubscriptionCreated(event, buffered);
+            break;
+          case "customer.subscription.updated":
+            await handleSubscriptionUpdated(event, buffered);
+            break;
+          case "customer.subscription.deleted":
+            await handleSubscriptionDeleted(event, buffered);
+            break;
+          case "invoice.paid":
+            await handleInvoicePaid(event, buffered);
+            break;
+          case "invoice.payment_failed":
+            await handleInvoicePaymentFailed(event, buffered);
+            break;
+          default:
+            // The validator catches this branch. Keep the default explicit so
+            // adding a new Stripe type cannot accidentally acknowledge it as
+            // succeeded without a handler.
+            throw new PermanentWebhookError(
+              "unsupported_event_type",
+              "Signed event type is not supported by this endpoint."
+            );
+        }
+
+        if (buffered.statusCode >= 500) {
+          throw new RetryableWebhookError(
+            "handler_failed",
+            "Webhook handler returned a retryable failure."
+          );
+        }
+        return buffered.body;
+      },
+      {
+        onFailure: (error) => {
+          console.error(
+            "[StripeWebhook] Processing error:",
+            redactWebhookError(error)
+          );
+        },
       }
-    } catch (error) {
-      console.error("[StripeWebhook] Processing error:", error);
-      // Return 200 so Stripe doesn't retry on application bugs; the
-      // webhookEventLog/{id} doc holds the audit trail for manual replay.
-      res.status(200).json({ received: true, error: "Processing failed" });
-    }
+    );
+
+    res.status(execution.statusCode).json(
+      execution.value !== undefined ? execution.value : execution.body
+    );
   }
 );

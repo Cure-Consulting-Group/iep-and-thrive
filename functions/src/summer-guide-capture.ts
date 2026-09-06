@@ -7,7 +7,8 @@
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { z } from "zod";
-import { sendEmail, logEmail, escapeHtml } from "./email-service";
+import { logEmail, escapeHtml, redactError } from "./email-service";
+import { deliverEmail } from "./email-ledger";
 import { summerGuideDeliveryTemplate } from "./summer-guide-emails";
 import {
   PUBLIC_CORS_ORIGINS,
@@ -51,14 +52,16 @@ export const summerGuideCapture = onRequest(
       const cleanName = parsed.data.name;
       const cleanEmail = parsed.data.email.toLowerCase();
 
-      // Store the lead in Firestore
-      await admin.firestore().collection("guideLeads").add({
+      // Store the lead before consent lookup: anonymous lead preference is
+      // attached to this record and must exist before the marketing send.
+      const leadRef = await admin.firestore().collection("guideLeads").add({
         name: cleanName,
         email: cleanEmail,
         capturedAt: admin.firestore.FieldValue.serverTimestamp(),
         source: "summer-guide",
-        emailsSent: 1,
+        emailsSent: 0,
         status: "active",
+        unsubscribed: false,
       });
 
       // Send guide delivery email (Email #1) immediately
@@ -66,25 +69,40 @@ export const summerGuideCapture = onRequest(
         name: escapeHtml(cleanName),
       });
 
-      const sent = await sendEmail({
-        to: cleanEmail,
-        subject: template.subject,
-        htmlBody: template.html,
+      const result = await deliverEmail({
+        key: {
+          template: "guide_delivery",
+          recipient: cleanEmail,
+          program: "summer-guide",
+          phase: "immediate",
+        },
+        options: {
+          to: cleanEmail,
+          subject: template.subject,
+          htmlBody: template.html,
+          classification: template.classification,
+        },
       });
 
-      await logEmail(
-        cleanEmail,
-        template.subject,
-        "guide_delivery",
-        sent
-      );
+      await logEmail(cleanEmail, template.subject, "guide_delivery", result.ok, {
+        messageId: result.messageId,
+        error: result.error,
+        skipped: result.status === "skipped",
+      });
+
+      if (result.ok) {
+        await leadRef.update({ emailsSent: 1 });
+      } else {
+        errorEnvelope(res, 503, "delivery_unavailable", "We could not send the guide right now. Please try again.");
+        return;
+      }
 
       res.status(200).json({
         success: true,
         message: "Guide sent! Check your email.",
       });
     } catch (error) {
-      console.error("Summer guide capture error:", error);
+      console.error("Summer guide capture error:", redactError(error));
       errorEnvelope(
         res,
         500,

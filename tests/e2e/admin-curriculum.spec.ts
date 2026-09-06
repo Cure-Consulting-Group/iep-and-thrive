@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test'
 import { loginAdmin } from './fixtures'
+import { assertSafeTargetForMutation } from './target'
 
 test.describe('Admin curriculum capture surfaces (C2/C4/C5)', () => {
+  // These specs write real records — never against production.
+  test.beforeAll(({ }, testInfo) => {
+    assertSafeTargetForMutation(testInfo.project.use.baseURL)
+  })
+
   test.beforeEach(async ({ page }) => {
     await loginAdmin(page)
   })

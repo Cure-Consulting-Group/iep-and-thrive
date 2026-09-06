@@ -1,6 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const BASE_URL = process.env.E2E_BASE_URL || 'https://iep-and-thrive.web.app'
+import { resolveBaseUrl } from './tests/e2e/target'
+
+// Throws when no target is given rather than defaulting to production.
+// See tests/e2e/target.ts (TASK-LP-069).
+const BASE_URL = resolveBaseUrl()
 
 export default defineConfig({
   testDir: './tests/e2e',

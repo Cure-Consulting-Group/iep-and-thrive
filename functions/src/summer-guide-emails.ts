@@ -44,8 +44,9 @@ function ctaButton(text: string, href: string): string {
 
 export function summerGuideDeliveryTemplate(data: {
   name: string;
-}): { subject: string; html: string } {
+}): { subject: string; html: string; classification: "marketing" } {
   return {
+    classification: "marketing",
     subject: "Your IEP Summer Guide Is Here",
     html: emailLayout(`
       <h1 style="font-family: Georgia, serif; color: #1B4332; font-size: 24px; margin-bottom: 8px;">
@@ -77,8 +78,9 @@ export function summerGuideDeliveryTemplate(data: {
 
 export function summerGuideDripEmail2Template(data: {
   name: string;
-}): { subject: string; html: string } {
+}): { subject: string; html: string; classification: "marketing" } {
   return {
+    classification: "marketing",
     subject: "The summer regression problem nobody talks about",
     html: emailLayout(`
       <h1 style="font-family: Georgia, serif; color: #1B4332; font-size: 24px; margin-bottom: 8px;">
@@ -136,8 +138,9 @@ export function summerGuideDripEmail2Template(data: {
 
 export function summerGuideDripEmail3Template(data: {
   name: string;
-}): { subject: string; html: string } {
+}): { subject: string; html: string; classification: "marketing" } {
   return {
+    classification: "marketing",
     subject: "A few spots left for Summer 2026",
     html: emailLayout(`
       <h1 style="font-family: Georgia, serif; color: #1B4332; font-size: 24px; margin-bottom: 8px;">
