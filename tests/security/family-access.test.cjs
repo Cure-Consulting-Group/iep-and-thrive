@@ -66,7 +66,7 @@ test('owner report access remains available and cross-family reads stay denied',
 // migration could not interpret, so it may contain personal data in an
 // unexpected shape. A client able to write emailLedger or the webhook
 // collections could suppress a real send or replay a billing effect.
-for (const collection of ['webhookEventLog', 'webhookOutbox', 'stripeBillingEffects', 'emailLedger', '_migrations', '_migrationQuarantine']) {
+for (const collection of ['webhookEventLog', 'webhookOutbox', 'stripeBillingEffects', 'emailLedger', '_schedulerCursors', '_migrations', '_migrationQuarantine']) {
   test(`server-only collection ${collection} is closed to every client`, async () => {
     const contexts = [
       ['parent', env.authenticatedContext('parent-a')],

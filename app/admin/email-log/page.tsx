@@ -91,7 +91,17 @@ function normalize(
 
   return {
     id: docId,
-    to: (raw.to as string | undefined) ?? '',
+    // TASK-LP-063 stopped writing the raw recipient to the email log and
+    // records recipientFingerprint instead, so this reader showed "—" for every
+    // message written after that change. Older documents still carry `to`, so
+    // both are read: the address where it exists, the fingerprint otherwise.
+    // The fingerprint is still useful operationally — it correlates a delivery
+    // with a ledger entry — without putting an address back into an admin list.
+    to:
+      (raw.to as string | undefined) ??
+      (raw.recipientFingerprint
+        ? `fingerprint:${String(raw.recipientFingerprint).slice(0, 12)}`
+        : ''),
     subject: (raw.subject as string | undefined) ?? '(no subject)',
     templateType: (raw.templateType as string | undefined) ?? 'unknown',
     status,

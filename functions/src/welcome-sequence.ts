@@ -65,15 +65,46 @@ export interface WelcomeRecipient {
   welcomeEmailsSent: number;
 }
 
+export const SCHEDULER_CURSOR_COLLECTION = "_schedulerCursors";
+const WELCOME_CURSOR_DOC = "welcomeSequence";
+const WELCOME_PAGE_SIZE = 200;
+
 export async function loadWelcomeRecipients(): Promise<WelcomeRecipient[]> {
   const db = admin.firestore();
-  // Process at most 200 enrolled users per run. The daily schedule naturally
-  // continues the queue, avoiding an unbounded scan and fan-out.
-  const usersSnap = await db
+
+  // Bounded AND advancing. An earlier version took `.limit(200)` with no order
+  // and no cursor, on the theory that "the daily schedule naturally continues
+  // the queue". It does not: Firestore returns the same first 200 documents by
+  // id on every run, so once more than 200 users have depositPaid, everyone
+  // past that first page never enters the sequence at all.
+  //
+  // Ordering by __name__ with a persisted cursor keeps the scan bounded while
+  // actually making progress. A short page means the end was reached, so the
+  // cursor resets and the next run starts from the beginning — users whose
+  // phase has not yet come due are simply skipped downstream, and a filter on
+  // the phase counter is not usable here because Firestore excludes documents
+  // that are missing the field entirely.
+  const cursorRef = db.collection(SCHEDULER_CURSOR_COLLECTION).doc(WELCOME_CURSOR_DOC);
+  const cursorSnap = await cursorRef.get();
+  const cursor = cursorSnap.exists ? (cursorSnap.get("lastUserId") as string | null) : null;
+
+  let query = db
     .collection("users")
     .where("depositPaid", "==", true)
-    .limit(200)
-    .get();
+    .orderBy(admin.firestore.FieldPath.documentId())
+    .limit(WELCOME_PAGE_SIZE);
+  if (cursor) query = query.startAfter(cursor);
+
+  const usersSnap = await query.get();
+
+  const nextCursor =
+    usersSnap.size === WELCOME_PAGE_SIZE
+      ? usersSnap.docs[usersSnap.docs.length - 1].id
+      : null;
+  await cursorRef.set(
+    { lastUserId: nextCursor, updatedAt: admin.firestore.FieldValue.serverTimestamp() },
+    { merge: true }
+  );
   const out: WelcomeRecipient[] = [];
 
   for (const userDoc of usersSnap.docs) {

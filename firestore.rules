@@ -37,6 +37,9 @@ service cloud.firestore {
     match /emailLedger/{ledgerId} {
       allow read, write: if false;
     }
+    match /_schedulerCursors/{cursorId} {
+      allow read, write: if false;
+    }
     match /_migrations/{migrationId} {
       allow read, write: if false;
     }
