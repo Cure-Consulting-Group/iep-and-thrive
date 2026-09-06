@@ -50,14 +50,34 @@ if (existsSync(firebasercPath)) {
     `Found: "${defaultProject || 'not set'}"`
   )
 
-  // Ensure no other projects are configured
+  // Aliases used to be forbidden outright, which was the right rule when the
+  // repo could only ever mean one project. TASK-LP-054 requires named
+  // environments, so the rule becomes: only known aliases may exist, and
+  // anything named production must be the production project. An unrecognized
+  // alias is still a failure — that is how a stray personal project gets
+  // deployed to by accident.
+  const ALLOWED_ALIASES = new Set(['default', 'production', 'staging'])
   const projectAliases = Object.keys(rc.projects || {})
-  const nonDefaultProjects = projectAliases.filter((k) => k !== 'default')
+  const unknownAliases = projectAliases.filter((k) => !ALLOWED_ALIASES.has(k))
   check(
-    'No extra project aliases configured',
-    nonDefaultProjects.length === 0,
-    `Found aliases: ${nonDefaultProjects.join(', ')}`
+    'Only known project aliases are configured',
+    unknownAliases.length === 0,
+    `Unexpected aliases: ${unknownAliases.join(', ')}`
   )
+  if (rc.projects?.production) {
+    check(
+      `"production" alias points at "${EXPECTED_PROJECT_ID}"`,
+      rc.projects.production === EXPECTED_PROJECT_ID,
+      `Found: "${rc.projects.production}"`
+    )
+  }
+  if (rc.projects?.staging) {
+    check(
+      '"staging" alias is not the production project',
+      rc.projects.staging !== EXPECTED_PROJECT_ID,
+      `staging must be a separate project; found "${rc.projects.staging}"`
+    )
+  }
 } else {
   check('.firebaserc file exists', false, 'File not found')
 }
@@ -139,16 +159,27 @@ if (existsSync(storageRulesPath)) {
 
 // ─── 5. Verify Firebase CLI targets the right project ───
 console.log('\n🔗 CLI Verification')
+// The deploy target is pinned by .firebaserc and by the explicit --project flag
+// in the Release workflow, both of which are deterministic. `firebase use`
+// reports an *interactive login's* active project, which does not exist on a CI
+// runner — so a missing active project is a skip, not a failure. It became a
+// failure the moment firebase-tools was pinned as a dependency: before that the
+// command could not resolve at all and fell into the catch below.
 try {
-  const cliOutput = execSync('npx firebase use 2>&1', { cwd: ROOT, encoding: 'utf-8' })
-  const activeProject = cliOutput.match(/Active Project:\s*(\S+)/)?.[1] || cliOutput.trim()
-  check(
-    `Firebase CLI active project is "${EXPECTED_PROJECT_ID}"`,
-    cliOutput.includes(EXPECTED_PROJECT_ID),
-    `CLI output: ${cliOutput.trim().split('\n')[0]}`
-  )
+  const cliOutput = execSync('npx --no-install firebase use 2>&1', { cwd: ROOT, encoding: 'utf-8' })
+  const noActiveProject =
+    /No project (is )?currently active|not logged in|Command requires authentication/i.test(cliOutput)
+  if (noActiveProject) {
+    console.log('  ⏭️  No interactive Firebase login (expected in CI) — target comes from .firebaserc')
+  } else {
+    check(
+      `Firebase CLI active project is "${EXPECTED_PROJECT_ID}"`,
+      cliOutput.includes(EXPECTED_PROJECT_ID),
+      `CLI output: ${cliOutput.trim().split('\n')[0]}`
+    )
+  }
 } catch {
-  console.log('  ⚠️  Could not verify Firebase CLI — run "firebase login" if needed')
+  console.log('  ⏭️  Firebase CLI not runnable here — target comes from .firebaserc')
 }
 
 // ─── 6. Verify no accidental exposure ───
