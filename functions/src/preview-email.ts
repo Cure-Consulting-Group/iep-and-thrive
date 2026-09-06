@@ -18,6 +18,7 @@
 
 import { onRequest } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { z } from "zod";
 import {
   EmailVariables,
   RampPhase,
@@ -33,6 +34,14 @@ import {
   intakeIncompleteReminderTemplate,
 } from "./lifecycle-email-templates";
 import { sendEmailWithResult, logEmail } from "./email-service";
+import {
+  PUBLIC_CORS_ORIGINS,
+  assertBodySize,
+  assertContentType,
+  assertMethod,
+  assertQuota,
+  errorEnvelope,
+} from "./http-guard";
 
 const PROGRAM_START_ISO = "2026-07-07";
 const PROGRAM_END_ISO = "2026-08-15";
@@ -48,6 +57,16 @@ type Kind =
   | "photoRelease"
   | "intakeIncomplete"
   | "ramp";
+
+const previewSchema = z.object({
+  kind: z.enum(["welcome", "balance", "photoRelease", "intakeIncomplete", "ramp"]),
+  phase: z.string().max(16).optional().default(""),
+  uid: z.string().max(128).optional().default(""),
+  sendTo: z.string().max(320).optional().default(""),
+  dryRun: z.union([z.string().max(8), z.boolean()]).optional().default(""),
+}).strict();
+
+const MAX_BODY_BYTES = 8 * 1024;
 
 interface BuildArgs {
   kind: Kind;
@@ -129,39 +148,46 @@ function renderForKind(args: BuildArgs):
 export const previewEmail = onRequest(
   {
     region: "us-east1",
-    cors: false,
+    cors: PUBLIC_CORS_ORIGINS,
   },
   async (req, res) => {
+    if (!assertMethod(req, res, ["GET", "POST"])) return;
+    if (req.method === "POST" && !assertContentType(req, res)) return;
+    if (!assertBodySize(req, res, MAX_BODY_BYTES)) return;
+    if (
+      !(await assertQuota(req, res, "preview-email", {
+        limit: 20,
+        windowSeconds: 10 * 60,
+      }))
+    ) return;
+
     const adminToken = req.headers["x-admin-token"] as string | undefined;
     const expected = process.env.ADMIN_PREVIEW_TOKEN;
     if (!expected || adminToken !== expected) {
-      res.status(403).json({ ok: false, error: "Forbidden" });
+      errorEnvelope(res, 403, "forbidden", "Forbidden.");
       return;
     }
 
     const params = req.method === "GET" ? req.query : req.body || {};
-    const kind = (params.kind as string) || "";
-    const phase = (params.phase as string) || "";
-    const uid = (params.uid as string) || "";
-    const sendTo = (params.sendTo as string) || "";
-    const dryRun = String(params.dryRun || "") === "1" || String(params.dryRun || "") === "true";
-
-    if (!["welcome", "balance", "photoRelease", "intakeIncomplete", "ramp"].includes(kind)) {
-      res
-        .status(400)
-        .json({ ok: false, error: "kind must be one of: welcome, balance, photoRelease, intakeIncomplete, ramp" });
+    const parsed = previewSchema.safeParse(params);
+    if (!parsed.success) {
+      errorEnvelope(res, 400, "invalid_request", "Invalid preview request.");
       return;
     }
+
+    const { kind, phase, uid, sendTo, dryRun: dryRunValue } = parsed.data;
+    const dryRun = String(dryRunValue) === "1" || String(dryRunValue) === "true";
 
     if (!uid || !sendTo) {
-      res.status(400).json({ ok: false, error: "Missing uid or sendTo" });
+      errorEnvelope(res, 400, "invalid_request", "Missing preview recipient details.");
       return;
     }
 
+    let previewRef: admin.firestore.DocumentReference | undefined;
     try {
       const userSnap = await admin.firestore().collection("users").doc(uid).get();
       if (!userSnap.exists) {
-        res.status(404).json({ ok: false, error: "User not found." });
+        errorEnvelope(res, 404, "not_found", "The requested user was not found.");
         return;
       }
       const u = userSnap.data() ?? {};
@@ -187,7 +213,7 @@ export const previewEmail = onRequest(
 
       const rendered = renderForKind(args);
       if (!rendered.ok) {
-        res.status(400).json({ ok: false, error: rendered.error });
+        errorEnvelope(res, 400, "invalid_request", "Invalid preview request.");
         return;
       }
 
@@ -217,6 +243,18 @@ export const previewEmail = onRequest(
         return;
       }
 
+      // Persist the preview delivery attempt before dispatching email so an
+      // upstream failure leaves a durable record for recovery and audit.
+      previewRef = await admin.firestore().collection("previewEmailRequests").add({
+        uid,
+        sendTo,
+        templateId: rendered.templateId,
+        previewKind: kind,
+        previewPhase: phase || null,
+        status: "pending",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
       // Send. Use kind=transactional so sendEmailWithResult bypasses the isTest
       // and unsubscribed filters — this is the founder QA bypass for E13.
       const result = await sendEmailWithResult({
@@ -227,6 +265,16 @@ export const previewEmail = onRequest(
         kind: "transactional",
         recipientUid: uid,
       });
+
+      try {
+        await previewRef.update({
+          status: result.ok ? "sent" : "failed",
+          messageId: result.messageId,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Preview email status update failed:", error);
+      }
 
       await logEmail(sendTo, rendered.subject, "general", result.ok, {
         meta: {
@@ -243,13 +291,24 @@ export const previewEmail = onRequest(
       res.status(200).json({
         ok: result.ok,
         messageId: result.messageId,
-        error: result.error,
+        error: result.ok ? undefined : "Email could not be sent.",
         sentTo: sendTo,
         templateId: rendered.templateId,
       });
     } catch (err) {
+      if (previewRef) {
+        try {
+          await previewRef.update({
+            status: "failed",
+            failureCode: "provider_error",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        } catch (statusError) {
+          console.error("Preview email failure status update failed:", statusError);
+        }
+      }
       console.error("[previewEmail] failed:", err);
-      res.status(500).json({ ok: false, error: String(err) });
+      errorEnvelope(res, 500, "internal_error", "Preview email failed. Please try again.");
     }
   }
 );
