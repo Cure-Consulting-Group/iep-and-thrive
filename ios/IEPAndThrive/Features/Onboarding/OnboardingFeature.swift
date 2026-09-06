@@ -75,7 +75,6 @@ struct OnboardingFeature {
                 // from then on land at that picked path.
                 let studentId = FirestoreSchema.defaultStudentId
                 return .run { [authClient, firestoreClient, database, crashlyticsClient] send in
-                    crashlyticsClient.log("onboarding: continueTapped firstName=\(profile.firstName)")
                     do {
                         try await database.saveProfile(profile)
                     } catch {
