@@ -80,7 +80,13 @@ export function errorEnvelope(
   code: string,
   message: string
 ): void {
-  res.status(status).json({ error: { code, message } });
+  // `error` stays a STRING. Existing clients read it directly —
+  // app/enroll/agreement/page.tsx does `data.error || "..."` and
+  // app/unsubscribe/page.tsx puts it straight into a rendered message — so an
+  // object here surfaces as "[object Object]" to a parent, and React throws
+  // when asked to render one. The machine-readable code goes alongside it
+  // rather than nesting the human-readable text inside a new shape.
+  res.status(status).json({ error: message, code });
 }
 
 export function assertMethod(

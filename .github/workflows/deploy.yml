@@ -176,7 +176,9 @@ jobs:
     #
     # Once TASK-LP-006 has been executed and the owner wants merges to release
     # again, add `github.event_name == 'push' ||` back to this condition.
-    if: github.event_name == 'workflow_dispatch' && inputs.skip_deploy != true
+    # workflow_dispatch lets the caller pick ANY branch, and without a ref check
+    # an unmerged feature branch could deploy every surface to production.
+    if: github.event_name == 'workflow_dispatch' && inputs.skip_deploy != true && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Attach branch/deployment protection rules to this environment in repo
@@ -251,8 +253,13 @@ jobs:
         run: |
           set -euo pipefail
           TOKEN="$(gcloud auth print-access-token)"
+          # Storage rules are published per bucket, under
+          # firebase.storage/<bucket> — not a flat "cloud.storage" release.
+          # Requesting the wrong name returned no ruleset, so this check
+          # finished red on every otherwise-successful deploy.
+          STORAGE_BUCKET="iep-and-thrive.firebasestorage.app"
           fail=0
-          for pair in "cloud.firestore:firestore.rules" "cloud.storage:storage.rules"; do
+          for pair in "cloud.firestore:firestore.rules" "firebase.storage/$STORAGE_BUCKET:storage.rules"; do
             release="${pair%%:*}"; local_file="${pair##*:}"
             ruleset=$(curl -sS -H "Authorization: Bearer $TOKEN" \
               "https://firebaserules.googleapis.com/v1/projects/$PROJECT_ID/releases/$release" \

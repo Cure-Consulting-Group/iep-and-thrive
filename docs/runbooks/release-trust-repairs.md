@@ -40,11 +40,23 @@ failed. Real, but bounded to UI and routing.
       let production be the first environment that sees these rules.
 - [ ] Record the currently deployed rules so you can compare and roll back:
 
+`firebase-tools` has no `rules:get` command — an earlier version of this runbook
+said it did, and an operator following it stalled here. Read the live ruleset
+through the Rules REST API, the same way `.github/workflows/deploy.yml` does:
+
 ```bash
-firebase firestore:rules:get --project iep-and-thrive > /tmp/firestore.rules.deployed
-firebase storage:rules:get   --project iep-and-thrive > /tmp/storage.rules.deployed
-diff /tmp/firestore.rules.deployed firestore.rules   # expect the /users hunk
-diff /tmp/storage.rules.deployed   storage.rules     # expect the signedAgreements hunk
+TOKEN="$(gcloud auth print-access-token)"
+for pair in "cloud.firestore:firestore.rules" "cloud.storage:storage.rules"; do
+  release="${pair%%:*}"; local_file="${pair##*:}"
+  ruleset=$(curl -sS -H "Authorization: Bearer $TOKEN" \
+    "https://firebaserules.googleapis.com/v1/projects/iep-and-thrive/releases/$release" \
+    | python3 -c 'import json,sys; print(json.load(sys.stdin).get("rulesetName",""))')
+  curl -sS -H "Authorization: Bearer $TOKEN" \
+    "https://firebaserules.googleapis.com/v1/$ruleset" \
+    | python3 -c 'import json,sys; print(json.load(sys.stdin)["source"]["files"][0]["content"], end="")' \
+    > "/tmp/deployed.$local_file"
+  diff "$local_file" "/tmp/deployed.$local_file" && echo "$local_file matches"
+done
 ```
 
 If the deployed rules differ from `main` in ways this release did not introduce, **stop**.
@@ -61,6 +73,7 @@ admin data; after this release they also lose the admin shell.
 ### 2a. Audit
 
 ```bash
+GCLOUD_PROJECT=iep-and-thrive \
 GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json \
   node scripts/provision-admin-claims.mjs audit --json | tee ops/evidence/admin-claims-before.json
 ```
@@ -86,9 +99,10 @@ do not claim a breach without evidence either. Record what you find.
 ### 2c. Dry run, then apply
 
 ```bash
-node scripts/provision-admin-claims.mjs grant --allowlist ops/admins.txt
+GCLOUD_PROJECT=iep-and-thrive node scripts/provision-admin-claims.mjs grant --allowlist ops/admins.txt
 # review the GRANT / REVOKE lists, then:
-node scripts/provision-admin-claims.mjs grant --allowlist ops/admins.txt --apply --json \
+GCLOUD_PROJECT=iep-and-thrive \
+  node scripts/provision-admin-claims.mjs grant --allowlist ops/admins.txt --apply --json \
   | tee ops/evidence/admin-claims-granted.json
 ```
 
@@ -98,7 +112,7 @@ to sign out and back in.** Do not wait it out during a release window.
 ### 2d. Confirm
 
 ```bash
-node scripts/provision-admin-claims.mjs audit
+GCLOUD_PROJECT=iep-and-thrive node scripts/provision-admin-claims.mjs audit
 ```
 
 The "role admin but no claim" list should now be empty, or contain only accounts you
@@ -112,11 +126,19 @@ Rules first, then hosting. Rules are the security boundary; the client change is
 comparison and is safe to lag by a few minutes. The reverse order would briefly leave the new
 client running against old permissive rules.
 
+Do not deploy by hand. `.github/workflows/deploy.yml` deploys all four surfaces
+in the required order (indexes → rules → functions → hosting) from one verified
+commit, and reads the rules back afterwards. Hand-deploying skips the gate and,
+as written before, omitted Functions and indexes entirely — which this session
+changed heavily.
+
 ```bash
-firebase deploy --only firestore:rules,storage --project iep-and-thrive
-# verify, then:
-npm run build && firebase deploy --only hosting --project iep-and-thrive
+gh workflow run "Release" --ref main
+gh run watch "$(gh run list --workflow=Release --limit 1 --json databaseId -q '.[0].databaseId')"
 ```
+
+The deploy job is `workflow_dispatch`-only precisely so this step is deliberate.
+It will not fire on a merge.
 
 Record the deployed revision hashes in the TASK-LP-006 evidence section.
 

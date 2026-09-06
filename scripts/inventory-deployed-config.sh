@@ -45,6 +45,23 @@ section() {
   echo '```'
 }
 
+# firebase-tools has no `rules:get`. section() swallows a failed command, so the
+# earlier version silently omitted both rulesets from every inventory while
+# still promising a drift comparison. Read them through the Rules REST API.
+dump_rules() {
+  local token release name
+  token="$(gcloud auth print-access-token 2>/dev/null)" || { echo "no access token"; return 1; }
+  for release in "cloud.firestore" "firebase.storage/${PROJECT}.firebasestorage.app"; do
+    echo "--- $release"
+    name="$(curl -sS -H "Authorization: Bearer $token" \
+      "https://firebaserules.googleapis.com/v1/projects/$PROJECT/releases/$release" \
+      | python3 -c 'import json,sys; print(json.load(sys.stdin).get("rulesetName",""))')"
+    if [ -z "$name" ]; then echo "(no ruleset resolved for $release)"; continue; fi
+    curl -sS -H "Authorization: Bearer $token" "https://firebaserules.googleapis.com/v1/$name" \
+      | python3 -c 'import json,sys; print(json.load(sys.stdin)["source"]["files"][0]["content"])'
+  done
+}
+
 echo "# Deployed configuration inventory"
 echo ""
 echo "- **Project:** \`$PROJECT\`"
@@ -121,11 +138,7 @@ section "Firestore databases" \
 section "Firestore indexes (deployed)" \
   firebase firestore:indexes --project "$PROJECT"
 
-section "Deployed Firestore rules" \
-  firebase firestore:rules:get --project "$PROJECT"
-
-section "Deployed Storage rules" \
-  firebase storage:rules:get --project "$PROJECT"
+section "Deployed rules (Firestore and Storage)" dump_rules
 
 section "Storage buckets" \
   gcloud storage buckets list --project "$PROJECT" --format=json
