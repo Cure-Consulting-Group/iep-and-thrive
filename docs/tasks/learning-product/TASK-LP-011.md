@@ -4,7 +4,7 @@
 | --- | --- |
 | Epic | [EPIC-LP-02](../../audits/2026-09-05/product-direction/epics.md#epic-lp-02) |
 | Priority / release gate | P0 / G0: protect existing users |
-| Status | Proposed — review required |
+| Status | Implemented — local verification complete |
 | Proposed owner | Security + QA + operations |
 | Estimate | 5 points; planning estimate, not a delivery commitment |
 | Findings | [F23](../../audits/2026-09-05/product-direction/findings.md#f23), [F38](../../audits/2026-09-05/product-direction/findings.md#f38) |
