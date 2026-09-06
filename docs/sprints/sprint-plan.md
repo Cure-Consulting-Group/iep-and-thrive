@@ -14,48 +14,58 @@ graph. Regenerate rather than hand-edit.
 | Sprints 4–6 | 048, 055, 059, 063, 067, 069, 076 |
 | Drafts awaiting approval | 001, 002, 014 |
 
-## The finding that reorders everything
+## Correction — September 6, 2026 (owner decision)
 
-**Paying parents cannot book tutoring sessions.** `lib/booking-service.ts:143` updates
-`availableSlots` from the client; `firestore.rules:97` allows that write only for admins, so
-every parent booking fails with PERMISSION_DENIED. `/book` is linked from the parent portal in
-four places, and `subscription-checkout.ts` bills monthly regardless.
+An earlier revision of this plan led with "paying parents cannot book tutoring sessions" and
+proposed TASK-LP-042a to repair it. **That was the wrong conclusion from a correct observation.**
 
-This is **pre-existing** — not a regression from this session — and the audit already knew:
-[TASK-LP-042](../tasks/learning-product/TASK-LP-042.md)'s first line reads *"Normal parent booking cannot update admin-only slots."* It was
-filed as a correctness improvement rather than an outage, which is why it sat at wave 3.
+The observation stands: `lib/booking-service.ts:143` updates `availableSlots` from the client
+while `firestore.rules:97` allows that write only for admins, so a parent booking fails with
+PERMISSION_DENIED. What was wrong was the framing. I called it a live outage hitting paying
+parents. In fact booking is linked only from the authenticated portal — nothing on the public
+marketing site points at `/book` — and, more to the point, **parent-facing tutoring scheduling is
+not part of this product at all.** The product is the learning app and the web app.
 
-**It is blocked.** [TASK-LP-042](../tasks/learning-product/TASK-LP-042.md) depends on [TASK-LP-050](../tasks/learning-product/TASK-LP-050.md) and [TASK-LP-014](../tasks/learning-product/TASK-LP-014.md); both need [TASK-LP-001](../tasks/learning-product/TASK-LP-001.md), the
-product brief. So the highest-severity live defect in the system sits behind a decision only
-the owner can make.
+The sharper problem was one step over: the public `/tutoring` page still sold weekly,
+twice-weekly and drop-in tutoring through live Stripe checkout. Someone could buy sessions they
+could never book.
 
-I do not think that dependency is real for the *outage*. Restoring booking needs the slot write
-moved server-side under the identity model that exists today. The canonical identity contract is
-required for the rest of [TASK-LP-042](../tasks/learning-product/TASK-LP-042.md) — entitlement ledgers, cross-platform learner references —
-not for stopping the bleeding. Sprint 7 therefore proposes a narrow repair.
+**Owner decision:** remove the booking flow entirely, and take the tutoring purchase CTAs down.
 
-## Sprint 7 — 24 pts · restore service, close the exposure
+This is cheaper than the repair it replaces and removes a payment surface rather than
+maintaining one. The summer-program enrollment deposit in `components/sections/ProgramCards.tsx`
+is untouched — that is the actual business, and it shares the `stripeCheckout` endpoint with the
+tutoring paths, which is exactly the kind of adjacency worth stating before anyone edits there.
+
+`TASK-LP-042`, `TASK-LP-043`, `TASK-LP-044` and `TASK-LP-049` (booking reservation, cancellation,
+booking email delivery, invoice cycle accounting) describe a scheduling product that is not being
+built. They should be closed as out-of-scope rather than carried as G0 debt — 32 points that were
+never going to be spent. Confirm before closing; the audit assumed obligations to existing
+tutoring customers, and that assumption has not been tested against reality.
+
+## Sprint 7 — 21 pts · remove what should not exist, close the exposure
 
 | Ticket | Gate | P | Pts | Title |
 | --- | --- | --- | --- | --- |
+| **Remove booking + tutoring sales** (new) | G0 | P0 | 5 | Delete the booking flow and the public tutoring purchase CTAs |
 | [TASK-LP-007](../tasks/learning-product/TASK-LP-007.md) | G0 | P0 | 8 | Separate all instructor-private notes from parent-readable records |
-| **TASK-LP-042a** (new, carve-out) | G0 | P0 | 8 | Restore parent booking via a server-side reservation |
-| [TASK-LP-060](../tasks/learning-product/TASK-LP-060.md) | G2 | P1 | 8 | Implement privacy-safe observability and actionable service alerts |
+| [TASK-LP-060](../tasks/learning-product/TASK-LP-060.md) | G2 | P1 | 8 | Implement privacy-safe observability and actionable service alerting |
 
-**[TASK-LP-007](../tasks/learning-product/TASK-LP-007.md)** is the highest-value security item left and is startable today. It was blocked
-behind [TASK-LP-076](../tasks/learning-product/TASK-LP-076.md), which shipped in sprint 6 — the migration runner was built
-contract-agnostic, so it did not need the identity RFC after all. Parents can currently read
+**[TASK-LP-007](../tasks/learning-product/TASK-LP-007.md)** is the highest-value security item
+left and is startable today. It was blocked behind
+[TASK-LP-076](../tasks/learning-product/TASK-LP-076.md), which shipped in sprint 6 built
+contract-agnostic, so it never needed the identity RFC. Parents can currently read
 instructor-private notes on attendance and probe records; field hiding is UI-only and does not
 protect a whole-document read.
 
-**TASK-LP-042a** is the carve-out: move the slot claim into a Cloud Function with an atomic
-availability check, using today's identity model. Explicitly *not* the entitlement ledger or the
+**[TASK-LP-060](../tasks/learning-product/TASK-LP-060.md)** stays in this sprint for the reason
+the booking bug went unnoticed: nothing reports a failure. A parent hit PERMISSION_DENIED on
+every booking attempt and no alert fired anywhere, which is why an audit found it rather than a
+dashboard.
 
-**[TASK-LP-060](../tasks/learning-product/TASK-LP-060.md)** last, because nothing currently reports that booking is failing. A parent hits
-PERMISSION_DENIED and no alert fires anywhere.
-
-**Exit:** a parent with an active subscription can book and cancel; instructor-private notes are
-unreadable by parents with a negative test proving it; a failed booking raises an alert.
+**Exit:** no route or CTA offers tutoring scheduling or its purchase; instructor-private notes
+are unreadable by parents with a negative test proving it; a client-side permission failure
+raises an alert.
 
 ## Sprint 8 — 21 pts · the decision, then what it unblocks
 
