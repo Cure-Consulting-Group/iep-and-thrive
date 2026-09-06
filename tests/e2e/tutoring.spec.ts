@@ -15,7 +15,13 @@ import { ACCOUNTS, login } from './fixtures'
  *     SKIP_SUBSCRIBER_TESTS=1 npx playwright test tests/e2e/tutoring.spec.ts
  */
 
-const SKIP_SUBSCRIBER = process.env.SKIP_SUBSCRIBER_TESTS === '1'
+// Also skips when the credential simply is not configured. Before TASK-LP-011
+// removed the fallback formula, these cases signed into a real production
+// account with a guessable password because E2E_SUBSCRIBER_PASSWORD has never
+// existed as a repository secret. Skipping is reported by Playwright, so the
+// gap stays visible; add the secret to restore the coverage.
+const SKIP_SUBSCRIBER =
+  process.env.SKIP_SUBSCRIBER_TESTS === '1' || !process.env.E2E_SUBSCRIBER_PASSWORD
 
 // ───────────────────────────────────────────────────────────────────
 // H1 — Marketing page (anonymous)
