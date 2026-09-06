@@ -16,6 +16,34 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Server-only collections introduced by sprints 4-6. All are written
+    // exclusively through the Admin SDK, which bypasses these rules, so an
+    // explicit deny costs nothing at runtime and states the intent — Firestore
+    // already denies unlisted collections, but a later broad rule would
+    // silently expose these unless they are named.
+    //
+    // _migrationQuarantine is the one that matters most: it stores snapshots of
+    // records the migration could not interpret, which by definition may hold
+    // personal data in an unexpected shape. It must never become client-readable.
+    match /webhookEventLog/{eventId} {
+      allow read, write: if false;
+    }
+    match /webhookOutbox/{taskId} {
+      allow read, write: if false;
+    }
+    match /stripeBillingEffects/{effectId} {
+      allow read, write: if false;
+    }
+    match /emailLedger/{ledgerId} {
+      allow read, write: if false;
+    }
+    match /_migrations/{migrationId} {
+      allow read, write: if false;
+    }
+    match /_migrationQuarantine/{recordId} {
+      allow read, write: if false;
+    }
+
     // Rate-limit counters written by Cloud Functions via the Admin SDK, which
     // bypasses these rules. Firestore already denies unlisted collections, so
     // this is explicit intent rather than a fix: a client that could write here
