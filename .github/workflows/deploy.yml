@@ -146,7 +146,19 @@ jobs:
   deploy:
     name: Deploy all surfaces
     needs: [verify, build]
-    if: github.event_name == 'push' || inputs.skip_deploy != true
+    # Deliberately workflow_dispatch ONLY — a push to main verifies and builds
+    # but does not deploy.
+    #
+    # The previous workflow auto-deployed Hosting on every merge. This one also
+    # deploys rules, Functions and indexes, and the first release carrying the
+    # A01 changes must not go out until admin custom claims have been
+    # provisioned: isAdmin() resolves request.auth.token.admin, so deploying
+    # the tightened rules first locks every administrator out of the admin UI.
+    # See docs/runbooks/release-trust-repairs.md, which orders that explicitly.
+    #
+    # Once TASK-LP-006 has been executed and the owner wants merges to release
+    # again, add `github.event_name == 'push' ||` back to this condition.
+    if: github.event_name == 'workflow_dispatch' && inputs.skip_deploy != true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Attach branch/deployment protection rules to this environment in repo
