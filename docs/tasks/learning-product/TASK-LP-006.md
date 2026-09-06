@@ -42,6 +42,18 @@ Status is implemented locally, pending review and release. Do not roll back to v
 - [lib/auth-context.tsx:86](../../../lib/auth-context.tsx#L86)
 - [functions/src/customer-portal.ts:59](../../../functions/src/customer-portal.ts#L59)
 
+## Correction — September 6, 2026 (post-audit)
+
+Added during pre-merge review of `feature/product-audit-handoff`; the original audit scope above did not cover it.
+
+The release in step 2 must be preceded by admin custom-claim provisioning. `isAdmin()` in `firestore.rules` is claim-based, but the only `setCustomUserClaims` call in the repository is [scripts/seed-test-accounts.mjs:232](../../../scripts/seed-test-accounts.mjs#L232), which seeds a single test account. No production path, migration, or runbook grants the claim.
+
+Consequence if skipped: any production admin holding only a persisted `users/{uid}.role == 'admin'` document loses the admin UI at release, because the client no longer reads that field. Those admins were already denied admin *data* by the existing claim-based rules, so this converts a silent half-lockout into a total one rather than causing a new data regression — but it is user-visible and must be handled before release, not after.
+
+5. Enumerate existing `users/{uid}` documents with `role == 'admin'`, confirm each against an authorized list of current staff, and assign `{ admin: true }` custom claims before releasing rules or the web build. Record the enumeration and the claims granted as release evidence; do not grant claims from the persisted field alone without human confirmation of each account.
+
+- **Given** a confirmed production admin, **when** the release completes, **then** they retain admin UI access and their claim grant is recorded in release evidence.
+
 ## Definition of done
 
 Apply the [shared completion requirements](../../audits/2026-09-05/product-direction/README.md#completion-requirements), including independent review, linked evidence, relevant failure-path tests, migration verification, updated contracts/runbooks, and UI accessibility review where applicable. A completed implementation is not a production-verified release until its release evidence is recorded.

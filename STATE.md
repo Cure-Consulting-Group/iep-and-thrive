@@ -2,11 +2,13 @@
 
 ## Current handoff — September 6, 2026
 
-- **Active branch:** `feature/product-audit-handoff`; pushed checkpoint, not merged into `main`.
-- **Objective/status:** complete audit and portable project memory; audit/backlog is ready for user review.
-- **Next action on resume:** present the proposed first work package from `docs/audits/2026-09-05/product-direction/sequencing.md` and the product decisions in the audit overview for review. If the user selects an implementation task, load that ticket and its dependencies and proceed within the requested scope.
-- **Authorization boundary:** audit, documentation, checkpoint commits and branch push are authorized. The full 76-ticket implementation, merge and production deployment are not authorized by that request.
-- **Latest verification:** September 6 unit rerun: 41 passed; packet links/dependency validation passed. Earlier security/build evidence and its limits are linked below.
+- **Active branch:** `feature/product-audit-handoff`; open as [PR #39](https://github.com/Cure-Consulting-Group/iep-and-thrive/pull/39) into `main`, awaiting CI.
+- **Objective/status:** audit corpus reviewed and cleared for merge. Tri-lane review (Codex correctness, Antigravity system, fresh-context advisor) found one regression in the A01 auth change; fixed in `d23f8ee` on this branch.
+- **Regression fixed:** `onIdTokenChanged` fires on Firebase's ~hourly silent token refresh, which `onAuthStateChanged` did not. The listener reset `loading`/`profile` on every fire, remounting every `ProtectedRoute` child and discarding in-progress form state; a transient refresh failure additionally bounced admins to `/portal`. Reset is now keyed to a real identity change. Two regression tests added, verified to fail without the fix.
+- **Next action on resume:** merge PR #39 once CI is green, then work TASK-LP-006 (release the A01/A02 repairs — note the September 6 correction requiring admin custom-claim provisioning first) and TASK-LP-055 (wire `test:security` into CI; it currently runs in no workflow).
+- **Deferred by owner decision (September 6):** the design-system restoration. `CLAUDE.md` is 842 → 7 lines with the brand/token brief archived to `docs/history/assistant-guides/`. Engineering and technical work comes first; brand is applied last, once the system is further along. Do not re-raise as a blocker.
+- **Authorization boundary:** merge of PR #39 is authorized. Production deployment, the admin-claim grant against real accounts, and the full 76-ticket implementation are not.
+- **Latest verification (September 6, on `d23f8ee`):** `tsc --noEmit` clean; `test:unit` 43/43; `test:security` 17/17 against the emulator. `npm run build` fails locally on `auth/invalid-api-key` with no `.env.local` present — reproduced identically on the unmodified branch, so environmental, not a code defect.
 
 The [full product-direction review](docs/audits/2026-09-05/product-direction/README.md) is the current handoff: 44 findings, 10 epics, and 76 detailed local tickets covering web, native, backend, data, security, curriculum, payments, release, and operations. Review the [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md) and [ticket index](docs/audits/2026-09-05/product-direction/ticket-index.md) before further implementation. The recommended direction is an independently useful focused reading product, with tutoring retained as a separate service and feedback channel; a school remains optional.
 
