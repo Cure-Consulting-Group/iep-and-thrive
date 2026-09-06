@@ -36,6 +36,11 @@ concurrency:
 
 env:
   E2E_BASE_URL: https://iep-and-thrive.web.app
+  # Explicit acknowledgement that this targets production. tests/e2e/target.ts
+  # refuses to run without it (TASK-LP-069), and mutating specs refuse even
+  # with it — they belong on staging, which is why the full suite is
+  # non-gating until TASK-LP-054's staging project exists.
+  E2E_ALLOW_PRODUCTION: '1'
 
 jobs:
   pr-gate:
@@ -142,8 +147,21 @@ jobs:
 
       - run: npx playwright install --with-deps chromium
 
-      - name: Run full Playwright suite
-        run: npx playwright test
+      # The three mutating specs (admin-curriculum, photo-release,
+      # enrollment-agreement) are excluded here, not skipped by accident. They
+      # write real records, and tests/e2e/target.ts now refuses to run them
+      # against production at all (TASK-LP-069). They move into this job the
+      # moment TASK-LP-054's staging project exists; until then they run
+      # nowhere, which is the honest state and is tracked on those tickets.
+      - name: Run full Playwright suite (read-only specs)
+        run: |
+          npx playwright test \
+            --ignore-snapshots \
+            tests/e2e/marketing.spec.ts \
+            tests/e2e/tutoring.spec.ts \
+            tests/e2e/auth-personas.spec.ts \
+            tests/e2e/portal-state.spec.ts \
+            tests/e2e/email-lifecycle.spec.ts
 
       - name: Upload Playwright report on failure
         if: failure()

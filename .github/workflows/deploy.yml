@@ -1,39 +1,121 @@
-name: Deploy to Firebase
+name: Release
+
+# TASK-LP-055. Replaces a workflow that built the web app and deployed Hosting
+# only — no rules, no Functions, no indexes, and no test gate of any kind. A
+# green build was not a release of the application's authorization or behavior,
+# and a failing security test could not stop a deploy because nothing consulted
+# it.
+#
+# The graph is: verify -> build -> deploy, with deploy ordered
+# indexes -> rules -> functions -> hosting, all from one commit.
+#
+# Why that order. Indexes must exist before a query that needs them, or the
+# first request after deploy fails. Rules go before Functions and Hosting
+# because they are the security boundary: tightening them early is safe, while
+# shipping a client that assumes new rules against old permissive ones is the
+# window an attacker wants. Hosting is last because it is the easiest to roll
+# back and the least dangerous to lag.
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_deploy:
+        description: 'Run verification only, do not deploy'
+        type: boolean
+        default: false
+
+# One release at a time. Two concurrent deploys can interleave rules and
+# Functions from different commits, which is exactly the mismatch this
+# workflow exists to prevent. Do not cancel in progress — a half-finished
+# deploy is worse than a queued one.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Matches the `engines.node` declared in functions/package.json. CI previously
+  # ran Node 20 against Functions declaring 22, so CI was not exercising the
+  # runtime that actually executes in production.
+  NODE_VERSION: '22'
+  PROJECT_ID: iep-and-thrive
 
 jobs:
-  build-and-deploy:
+  verify:
+    name: Verify (unit, types, functions, rules)
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
           registry-url: 'https://npm.pkg.github.com'
           scope: '@cure-consulting-group'
 
-      # See e2e.yml — using a classic PAT instead of GITHUB_TOKEN because
-      # the private @cure-consulting-group/* scope can't be read with the
-      # workflow's default token from this repo.
-      - name: Install dependencies
+      # GITHUB_TOKEN cannot read the private @cure-consulting-group/* scope from
+      # this repo; a classic PAT with read:packages is required.
+      - name: Install web dependencies
         run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PACKAGES_READ_TOKEN }}
 
-      - name: Verify Firebase project
+      - name: Install Functions dependencies
+        run: npm --prefix functions ci
+
+      - name: Project lock check
         run: node scripts/verify-firebase.mjs
 
-      - name: Build Next.js
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Web unit tests
+        run: npm run test:unit
+
+      - name: Functions build
+        run: npm --prefix functions run build
+
+      - name: Functions tests
+        run: npm --prefix functions test
+
+      # The gate that did not exist. A rules regression now stops the release
+      # rather than being discovered after deploy.
+      - name: Security rules tests
+        run: |
+          npx firebase emulators:exec \
+            --config firebase.security.json \
+            --project demo-iep-security \
+            "npm run test:security"
+
+  build:
+    name: Build web
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@cure-consulting-group'
+
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PACKAGES_READ_TOKEN }}
+
+      - name: Build Next.js static export
         run: npm run build
         env:
+          # Public Firebase config — safe to commit, and asserted for coherence
+          # at startup by lib/env.ts. NEXT_PUBLIC_FIREBASE_ENV is explicit so a
+          # production build cannot be reclassified by a hostname.
+          NEXT_PUBLIC_FIREBASE_ENV: production
           NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyBI4iQ3G265Yawhbg_lUXQTggJBpYPueww
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: iep-and-thrive.firebaseapp.com
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: iep-and-thrive
@@ -42,16 +124,111 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID: '1:564060847585:web:1b8a235db532454f9166a0'
           NEXT_PUBLIC_SITE_URL: https://iepandthrive.com
 
-      - name: Install Cloud Functions dependencies
-        run: cd functions && npm ci
+      # TASK-LP-035 relies on the export emitting 404.html so Hosting can serve
+      # a real not-found instead of the marketing homepage. Assert it rather
+      # than assuming it.
+      - name: Assert 404 page was exported
+        run: |
+          test -f out/404.html || {
+            echo "::error::out/404.html missing — Hosting will fall back to the"
+            echo "::error::homepage for unknown URLs (TASK-LP-035 regression)."
+            exit 1
+          }
+          echo "out/404.html present ($(wc -c < out/404.html) bytes)"
 
-      - name: Build Cloud Functions
-        run: cd functions && npm run build
-
-      - name: Deploy to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
-          projectId: iep-and-thrive
+          name: web-export-${{ github.sha }}
+          path: out/
+          retention-days: 14
+
+  deploy:
+    name: Deploy all surfaces
+    needs: [verify, build]
+    if: github.event_name == 'push' || inputs.skip_deploy != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Attach branch/deployment protection rules to this environment in repo
+    # settings to require a human approval before production deploys.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@cure-consulting-group'
+
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PACKAGES_READ_TOKEN }}
+
+      - name: Install Functions dependencies
+        run: npm --prefix functions ci
+
+      # Promote the exact artifact that was verified, rather than rebuilding
+      # and hoping the second build matches the first.
+      - name: Download verified web artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-export-${{ github.sha }}
+          path: out/
+
+      - name: Authenticate to Firebase
+        run: |
+          printf '%s' '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+
+      - name: Record the revision being released
+        run: |
+          echo "Releasing ${{ github.sha }} to $PROJECT_ID" | tee release-evidence.txt
+          {
+            echo "commit:        ${{ github.sha }}"
+            echo "firestore.rules sha256: $(sha256sum firestore.rules | cut -d' ' -f1)"
+            echo "storage.rules   sha256: $(sha256sum storage.rules | cut -d' ' -f1)"
+            echo "indexes         sha256: $(sha256sum firestore.indexes.json | cut -d' ' -f1)"
+          } | tee -a release-evidence.txt
+
+      # Ordered deliberately. See the header comment.
+      - name: 1/4 Deploy Firestore indexes
+        run: npx firebase deploy --only firestore:indexes --project "$PROJECT_ID" --non-interactive
+
+      - name: 2/4 Deploy rules
+        run: npx firebase deploy --only firestore:rules,storage --project "$PROJECT_ID" --non-interactive
+
+      - name: 3/4 Deploy Functions
+        run: npx firebase deploy --only functions --project "$PROJECT_ID" --non-interactive
+
+      - name: 4/4 Deploy Hosting
+        run: npx firebase deploy --only hosting --project "$PROJECT_ID" --non-interactive
+
+      # Confirms the second acceptance criterion: what is deployed matches the
+      # revision that was reviewed and verified.
+      - name: Verify deployed rules match this commit
+        run: |
+          npx firebase firestore:rules:get --project "$PROJECT_ID" > /tmp/deployed.firestore.rules || true
+          npx firebase storage:rules:get   --project "$PROJECT_ID" > /tmp/deployed.storage.rules   || true
+          fail=0
+          if ! diff -q firestore.rules /tmp/deployed.firestore.rules >/dev/null 2>&1; then
+            echo "::error::Deployed Firestore rules differ from this commit."; fail=1
+          fi
+          if ! diff -q storage.rules /tmp/deployed.storage.rules >/dev/null 2>&1; then
+            echo "::error::Deployed Storage rules differ from this commit."; fail=1
+          fi
+          [ "$fail" -eq 0 ] && echo "Deployed rules match ${{ github.sha }}." | tee -a release-evidence.txt
+          exit $fail
+
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-evidence-${{ github.sha }}
+          path: release-evidence.txt
+          retention-days: 90
+
+      - name: Revoke credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { login } from './fixtures'
+import { assertSafeTargetForMutation } from './target'
 
 // E3 — Enrollment agreement e-signature flow.
 //
@@ -11,6 +12,11 @@ import { login } from './fixtures'
 // runs against the live web URL).
 
 test.describe('E3 enrollment agreement signing', () => {
+  // These specs write real records — never against production.
+  test.beforeAll(({ }, testInfo) => {
+    assertSafeTargetForMutation(testInfo.project.use.baseURL)
+  })
+
   test('inquiry persona can render and submit a signed agreement', async ({ page }) => {
     await login(page, 'inquiry')
     await page.goto('/enroll/agreement?inquiryId=test-e2e-inquiry-id&program=full')

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { login } from './fixtures'
+import { assertSafeTargetForMutation } from './target'
 
 // B6 - Photo/video release e-signature flow.
 //
@@ -19,6 +20,11 @@ import { login } from './fixtures'
 // the unsigned flow, manually delete users/{uid}/legalDocs/photoRelease.
 
 test.describe('Photo/video release e-signature', () => {
+  // These specs write real records — never against production.
+  test.beforeAll(({ }, testInfo) => {
+    assertSafeTargetForMutation(testInfo.project.use.baseURL)
+  })
+
   test('enrolled persona can sign release and download PDF', async ({ page }) => {
     await login(page, 'enrolled')
     await page.goto('/portal/photo-release')
