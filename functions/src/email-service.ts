@@ -79,6 +79,7 @@ export interface EmailSendDependencies {
   ) => Promise<{ ok: boolean; messageId: string | null; error?: string } | boolean>;
 }
 
+
 // ─── Gmail API Setup ───
 
 function getGmailClient() {
