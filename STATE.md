@@ -1,12 +1,18 @@
 # IEP & Thrive — Build State
 
-## Current handoff — September 5, 2026
+## Current handoff — September 6, 2026
+
+- **Active branch:** `feature/product-audit-handoff`; pushed checkpoint, not merged into `main`.
+- **Objective/status:** complete audit and portable project memory; audit/backlog is ready for user review.
+- **Next action on resume:** present the proposed first work package from `docs/audits/2026-09-05/product-direction/sequencing.md` and the product decisions in the audit overview for review. If the user selects an implementation task, load that ticket and its dependencies and proceed within the requested scope.
+- **Authorization boundary:** audit, documentation, checkpoint commits and branch push are authorized. The full 76-ticket implementation, merge and production deployment are not authorized by that request.
+- **Latest verification:** September 6 unit rerun: 41 passed; packet links/dependency validation passed. Earlier security/build evidence and its limits are linked below.
 
 The [full product-direction review](docs/audits/2026-09-05/product-direction/README.md) is the current handoff: 44 findings, 10 epics, and 76 detailed local tickets covering web, native, backend, data, security, curriculum, payments, release, and operations. Review the [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md) and [ticket index](docs/audits/2026-09-05/product-direction/ticket-index.md) before further implementation. The recommended direction is an independently useful focused reading product, with tutoring retained as a separate service and feedback channel; a school remains optional.
 
 The [original build audit](docs/audits/2026-09-05/build-audit.md) supersedes historical launch-readiness claims. A01 (billing/profile trust and token-based UI roles) and A02 (signed-PDF access) remain implemented and tested locally, not deployed; see [repair progress](docs/audits/2026-09-05/repair-progress.md). The expanded audit added documentation and synthetic emulator probes, not further product repairs. Current verification: 41 web unit tests and 17 security regressions pass; 12 diagnostic rules observations reproduce additional exposures/denials; Functions compiles. First work is current-user protection and isolated operations alongside product/data contracts, followed by the narrow reading slice and a gated consented pilot. All new tickets remain proposals for review; no external issues were created.
 
-**Portable handoff — September 6, 2026:** Start with [AGENTS.md](AGENTS.md), this current section, and the selected ticket; the full audit need not be reloaded. Current next action is review and prioritize the proposed backlog. No additional feature implementation or deployment has occurred since the audit. Repository handoff files, audit evidence, tickets, and the existing local security repair are included in the checkpoint; local debug logs and credentials are excluded.
+**Portable handoff — September 6, 2026:** Start with [AGENTS.md](AGENTS.md), this current section, and the selected ticket; the full audit need not be reloaded. Current next action is review and prioritize the proposed backlog. No additional feature implementation or deployment has occurred since the audit. Repository handoff files, audit evidence, tickets, and the existing local security repair are included in the checkpoint; local debug logs and credentials are excluded. AGENTS.md now requires automatic context recovery; CLAUDE.md and GEMINI.md are short entry points to the same procedure, with obsolete guides archived to avoid consuming startup context.
 
 The sprint history below is retained as historical context, not a current readiness decision.
 

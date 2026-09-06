@@ -1,11 +1,16 @@
 # IEP & Thrive — repository handoff
 
-## Start here
+## Required session startup
 
-1. Read only the **Current handoff** section at the top of [STATE.md](STATE.md).
-2. For backlog review, read [the audit overview](docs/audits/2026-09-05/product-direction/README.md) and [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md).
-3. For implementation, read the selected `docs/tasks/learning-product/TASK-LP-NNN.md`, its dependencies, and linked source/evidence. Do not load all 76 tickets or repeat the full audit by default.
-4. Check `git status` and the current branch before editing. Distinguish historical observations from current code and deployed behavior.
+Follow this procedure at the start of every new session and after context loss, without waiting for the user to name these files or provide a special resume prompt:
+
+1. Read the **Current handoff** section at the top of [STATE.md](STATE.md), stopping at the next level-two heading. It is the current checkpoint; the sprint history below is historical.
+2. Check the current branch and `git status`. Preserve uncommitted work. If the checkout differs from the handoff branch, inspect the difference before assuming work is missing; do not switch branches or discard work blindly.
+3. Recover the active objective, completed work, remaining work, authorization boundary, and next action from that checkpoint. Treat “continue” or “resume” as a request to continue that recorded work; do not ask the user to recap information already recorded.
+4. Load only the selected ticket, its necessary dependencies, and linked source/evidence. For a backlog-review checkpoint, read the audit overview and sequencing first. Do not load every ticket, historical guide, or evidence log, or repeat the full audit by default.
+5. Proceed with the next authorized action. If the checkpoint is awaiting user review, present the concrete review decisions and recommended order; do not silently start implementing the proposed backlog. Ask only for genuinely missing information that prevents progress.
+
+The latest user instruction controls scope. These startup steps establish context; they do not authorize deployment, merging, purchases, or additional implementation.
 
 ## Durable context
 
@@ -24,4 +29,4 @@ Use feature/hotfix branches and the repository review workflow. Pushing a branch
 
 ## Handoff maintenance
 
-After meaningful work, update the current section of `STATE.md` with the ticket/decision, exact verification and limits, remaining work, and the next useful action. Keep that section concise; link detailed evidence instead of copying it. Mark implementation, local verification, staging verification and deployment separately. Preserve historical audit evidence and label later corrections.
+Before ending a meaningful work session, update the current section of `STATE.md` with the active branch, objective, ticket/decision, completed work, exact verification and limits, remaining work, authorization boundary, and the next executable action. Keep that section concise; link detailed evidence instead of copying it. Mark implementation, local verification, staging verification and deployment separately. Preserve historical audit evidence and label later corrections.
