@@ -2,27 +2,15 @@
 
 ## Current handoff — September 6, 2026 (evening)
 
-- **Active branch:** `feat/sprint-1-3-containment`, 9 commits ahead of `main`, not yet merged.
-- **Objective/status:** Phase A containment (sprints 1-3 of [the sprint plan](docs/sprints/sprint-plan.md)) implemented via cure-tri-lane. All eight tickets have code; two are operationally blocked (below).
-- **Ticket outcomes:**
-  - TASK-LP-006 — `scripts/provision-admin-claims.mjs` + [release runbook](docs/runbooks/release-trust-repairs.md). **Prepared, not executed:** granting claims and deploying rules need production credentials, outside the authorization boundary.
-  - TASK-LP-010 — bounded input, Firestore quotas and safe error envelopes across all six public endpoints. Fixed a pre-existing unanchored `/localhost/` CORS entry that matched any attacker host containing the substring.
-  - TASK-LP-011 — credential fallbacks removed; **and** `reset-test-accounts.mjs`, which deletes accounts, no longer defaults to production when no env var is set.
-  - TASK-LP-035 — real 404, `safeNextPath` open-redirect guard, hosting rewrites narrowed from `**` to six dynamic-route prefixes.
-  - TASK-LP-054 — `lib/env.ts` single resolver; startup refuses contradictory config. `127.0.0.1` no longer silently calls production Functions.
-  - TASK-LP-057 — functions 22 → 14 advisories, root 23 → 10; **every critical and high cleared** in both. Remaining two highs need `next@16`.
-  - TASK-LP-058 — read-only `scripts/inventory-deployed-config.sh`. **Prepared, not executed.**
-  - TASK-LP-064 — child-name and state logging removed; GA gated off authenticated routes; analytics values allowlisted.
-- **Verification:** test:unit 62/62 · functions test 5/5 · test:security 17/17 · tsc clean · 16 deterministic production E2E green. `npm run build` still fails locally on `auth/invalid-api-key` with no `.env.local` — environmental, reproduces on unmodified `main`.
-- **Next action on resume:** land the review findings, open the PR, merge. Then Phase A is done and **Phase B stalls until TASK-LP-001 (the product brief) is approved** — it gates 014 → 076, and 10 of the 22 remaining G0 tickets including the private-notes exposure (007).
-- **Authorization boundary:** implementation and merge are authorized. Production deployment, the admin-claim grant against real accounts, and creating the staging project are not.
-- **Known gaps, deliberately open:** staging project does not exist (TASK-LP-054 is half-done by necessity); `out/404.html` generation unverified without env vars; five E2E specs remain non-gating pending the admin claim.
+- **Active branch:** `lane/lp063-email-ledger`; worktree implementation is uncommitted and not deployed.
+- **Objective/status:** TASK-LP-063 email delivery correctness implemented for guide capture/drip and welcome sequence. Added the Firestore `emailLedger` outbox with deterministic template/recipient/program/phase keys, leased claims, retry attempts, provider IDs, redacted errors, and `pending`/`delivered`/`failed`/`skipped` states. Added adjacent template classification metadata and fail-closed lifecycle/marketing consent handling; service mail continues on preference-read failure.
+- **Verification:** `npm --prefix functions run build` passes; `npm --prefix functions test` passes 5/5; existing `http-guard` test passes 5/5 when invoked directly. No deployment or staging verification performed.
+- **Remaining work:** Review the diff, commit/PR through the repository workflow, and separately add a Firestore rule for `emailLedger` before production use. Do not replay skipped historical marketing without an approved consent policy.
+- **Authorization boundary:** implementation and local verification are authorized. Production deployment, rule changes, staging creation, and real-recipient delivery are not authorized in this lane.
 
-The [full product-direction review](docs/audits/2026-09-05/product-direction/README.md) is the current handoff: 44 findings, 10 epics, and 76 detailed local tickets covering web, native, backend, data, security, curriculum, payments, release, and operations. Review the [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md) and [ticket index](docs/audits/2026-09-05/product-direction/ticket-index.md) before further implementation. The recommended direction is an independently useful focused reading product, with tutoring retained as a separate service and feedback channel; a school remains optional.
+The [full product-direction review](docs/audits/2026-09-05/product-direction/README.md) remains the broader project handoff: 44 findings, 10 epics, and 76 detailed local tickets. Review the [sequencing](docs/audits/2026-09-05/product-direction/sequencing.md) and [ticket index](docs/audits/2026-09-05/product-direction/ticket-index.md) before unrelated implementation. The recommended direction is an independently useful focused reading product, with tutoring retained as a separate service and feedback channel; a school remains optional.
 
-The [original build audit](docs/audits/2026-09-05/build-audit.md) supersedes historical launch-readiness claims. A01 (billing/profile trust and token-based UI roles) and A02 (signed-PDF access) remain implemented and tested locally, not deployed; see [repair progress](docs/audits/2026-09-05/repair-progress.md). The expanded audit added documentation and synthetic emulator probes, not further product repairs. Current verification: 41 web unit tests and 17 security regressions pass; 12 diagnostic rules observations reproduce additional exposures/denials; Functions compiles. First work is current-user protection and isolated operations alongside product/data contracts, followed by the narrow reading slice and a gated consented pilot. All new tickets remain proposals for review; no external issues were created.
-
-**Portable handoff — September 6, 2026:** Start with [AGENTS.md](AGENTS.md), this current section, and the selected ticket; the full audit need not be reloaded. Current next action is review and prioritize the proposed backlog. No additional feature implementation or deployment has occurred since the audit. Repository handoff files, audit evidence, tickets, and the existing local security repair are included in the checkpoint; local debug logs and credentials are excluded. AGENTS.md now requires automatic context recovery; CLAUDE.md and GEMINI.md are short entry points to the same procedure, with obsolete guides archived to avoid consuming startup context.
+**Portable handoff — September 6, 2026:** Start with [AGENTS.md](AGENTS.md), this current section, and TASK-LP-063. The email ledger collection is intentionally not covered by a rules change in this implementation; record that gap before deployment. Credentials, recipient addresses, and message bodies remain outside logs and commits.
 
 The sprint history below is retained as historical context, not a current readiness decision.
 
