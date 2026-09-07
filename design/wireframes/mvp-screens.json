@@ -1,0 +1,250 @@
+{
+  "product": "IEP & Thrive",
+  "platform": "ios",
+  "fidelity": "mid",
+  "nav_items": [],
+  "screens": [
+    {
+      "id": "first-item",
+      "name": "Cold launch, first item",
+      "purpose": "A child who has never opened the app is being taught within fifteen seconds, having read nothing",
+      "nav": "none",
+      "primary_action": "Hear the sound again",
+      "regions": [
+        { "type": "toolbar", "label": "Exit (icon only, top-left, always present)", "fixed": true },
+        { "type": "hero", "label": "The grapheme, very large, instructional letterform (single-story a and g)" },
+        { "type": "card", "label": "Speaker button: replays the phoneme. Large, centre, obviously tappable" },
+        { "type": "text", "label": "No title. No welcome. No name field. No age field. No account." },
+        { "type": "cta", "label": "Continue: a forward chevron, icon-only, thumb-height", "fixed": true }
+      ],
+      "notes": [
+        "Replaces the shipped OnboardingView, which opens 'Welcome, Parent!' and collects name and age - a child alone cannot get past it",
+        "Phoneme audio autoplays once on entry, then waits. It never loops unprompted",
+        "First-run: identical to every later run. There is no first-run variant, deliberately",
+        "Offline is the normal state, not an error. Nothing on this screen implies a connection"
+      ]
+    },
+    {
+      "id": "sound-intro",
+      "name": "Sound introduction",
+      "purpose": "Introduce one phoneme and its spelling, replayable without limit",
+      "nav": "none",
+      "primary_action": "Replay",
+      "regions": [
+        { "type": "toolbar", "label": "Exit  |  progress dots (position only, no percentage, no timer)", "fixed": true },
+        { "type": "hero", "label": "Grapheme at display size with the mouth-shape cue beside it" },
+        { "type": "card", "label": "Speaker button, primary. Tapping anywhere else also interrupts audio" },
+        { "type": "text", "label": "Example word, spoken and shown, using only graphemes already taught" },
+        { "type": "cta", "label": "Continue (icon-only chevron)", "fixed": true }
+      ],
+      "notes": [
+        "Any tap interrupts narration immediately - this is the incumbent's single loudest complaint",
+        "Reduced motion: mouth-shape cue is a static illustration rather than an animation",
+        "No text is load-bearing. A child who reads nothing on this screen can still proceed"
+      ]
+    },
+    {
+      "id": "trace",
+      "name": "Tracing canvas",
+      "purpose": "Child traces the grapheme with guided stroke order and forgiving tolerance",
+      "nav": "none",
+      "primary_action": "Trace the letter",
+      "regions": [
+        { "type": "toolbar", "label": "Exit  |  replay sound  |  progress dots", "fixed": true },
+        { "type": "hero", "label": "Trace target: glyph scaled to fit the canvas, stroke-order ghost, start dot" },
+        { "type": "text", "label": "Stroke counter as dots, not numerals" },
+        { "type": "cta", "label": "Skip this item (always available, never penalised)", "fixed": true }
+      ],
+      "notes": [
+        "Fixes the shipped defect: makeLetterPath hardcodes 300pt and centres but never scales, so a two-glyph blend renders ~1236pt on a ~350pt canvas",
+        "Multi-glyph targets (sh, bl, ai) must fit the same canvas as a single glyph",
+        "Tolerance is forgiving by design; motor difficulty frequently co-occurs and is not what we are assessing",
+        "Success animation is brief and quiet. No confetti, no fanfare, no score"
+      ]
+    },
+    {
+      "id": "blend",
+      "name": "Blending",
+      "purpose": "Push taught sounds together into a word at a pace the child controls",
+      "nav": "none",
+      "primary_action": "Blend the sounds",
+      "regions": [
+        { "type": "toolbar", "label": "Exit  |  progress dots", "fixed": true },
+        { "type": "hero", "label": "Graphemes laid out separately, each individually tappable to hear its sound" },
+        { "type": "card", "label": "Blend control: child drags the sounds together, controlling speed with the gesture" },
+        { "type": "text", "label": "The assembled word, revealed only after the child completes the blend" },
+        { "type": "cta", "label": "Continue", "fixed": true }
+      ],
+      "notes": [
+        "New surface. The engine is pure Domain (BlendingEngine) per ADR-000 D9",
+        "The child sets the tempo. No automatic blending animation the child has to sit through",
+        "Each grapheme remains tappable throughout, so a child can re-hear one sound without restarting"
+      ]
+    },
+    {
+      "id": "build",
+      "name": "Word building, Elkonin boxes",
+      "purpose": "Child places graphemes into one box per phoneme, making the sound-to-spelling map visible",
+      "nav": "none",
+      "primary_action": "Place the letters",
+      "regions": [
+        { "type": "toolbar", "label": "Exit  |  replay word  |  progress dots", "fixed": true },
+        { "type": "hero", "label": "Elkonin boxes: one box per phoneme, sized to the grapheme they take" },
+        { "type": "list", "label": "Grapheme tray: draggable tiles including plausible distractors", "rows": 2 },
+        { "type": "text", "label": "Spoken word prompt, replayable" },
+        { "type": "cta", "label": "Check", "fixed": true }
+      ],
+      "notes": [
+        "New surface. Boxes are the standard multisensory apparatus and must read as boxes, not as a spelling test",
+        "A wrong tile returns to the tray without commentary. No red, no buzzer, no shake",
+        "Distractors are phonologically plausible, never arbitrary"
+      ]
+    },
+    {
+      "id": "check",
+      "name": "Mastery check",
+      "purpose": "Confirm a skill is held without the screen reading as a test",
+      "nav": "none",
+      "primary_action": "Answer",
+      "regions": [
+        { "type": "toolbar", "label": "Exit  |  progress dots", "fixed": true },
+        { "type": "hero", "label": "The item, presented identically to ordinary practice" },
+        { "type": "list", "label": "Response options, large targets, icon and audio supported", "rows": 3 },
+        { "type": "cta", "label": "Continue", "fixed": true }
+      ],
+      "notes": [
+        "Must be visually indistinguishable from practice. A child who knows they are being tested performs worse and this population has been tested constantly",
+        "No score, no percentage, no 'quiz' framing, no results summary",
+        "Mastery is inferred across items by PacingEngine, never announced on a single answer"
+      ]
+    },
+    {
+      "id": "retry",
+      "name": "After a wrong answer",
+      "purpose": "The highest-stakes screen in the product: recover from an error without implying deficiency",
+      "nav": "none",
+      "primary_action": "Try again",
+      "regions": [
+        { "type": "toolbar", "label": "Exit  |  progress dots", "fixed": true },
+        { "type": "hero", "label": "The same item, with one targeted cue added - not a restatement of the lesson" },
+        { "type": "card", "label": "A single scaffold: the first sound, or one box pre-filled" },
+        { "type": "cta", "label": "Try again", "fixed": true }
+      ],
+      "notes": [
+        "The incumbent's defining failure is a remedial lecture triggered by two wrong answers. We add one cue and return control",
+        "No error colour, no error sound, no 'not quite', no counter of attempts",
+        "After a second miss the item is set aside for spaced review and the session moves on. The child is never stuck"
+      ]
+    },
+    {
+      "id": "complete",
+      "name": "Session complete",
+      "purpose": "End a session on a satisfying, brief, entirely unmonetised note",
+      "nav": "none",
+      "primary_action": "Done",
+      "regions": [
+        { "type": "hero", "label": "What was learned this session, shown as the graphemes themselves" },
+        { "type": "text", "label": "One short line of specific, earned acknowledgement" },
+        { "type": "cta", "label": "Done", "fixed": true }
+      ],
+      "notes": [
+        "No upsell. No paywall. No account prompt. No 'save your progress'. No streak. No next-session countdown",
+        "Deletes the shipped behaviour where a paywall auto-presents to the child after three missions",
+        "Brief by design - a child who wants to stop should be able to leave in one tap"
+      ]
+    },
+    {
+      "id": "exit",
+      "name": "Pause and exit",
+      "purpose": "Leave from anywhere, in one action, at no cost",
+      "nav": "none",
+      "primary_action": "Leave",
+      "regions": [
+        { "type": "card", "label": "Sheet: Keep going  |  Leave  |  Parent area (small, low contrast, bottom)" },
+        { "type": "text", "label": "No warning, no confirmation, no progress-loss message" }
+      ],
+      "notes": [
+        "Reachable from every child screen via the persistent top-left control",
+        "Progress is saved continuously, so there is genuinely nothing to lose and nothing to warn about",
+        "The parent entry point lives here and is deliberately unattractive to a child"
+      ]
+    },
+    {
+      "id": "gate",
+      "name": "Parental gate",
+      "purpose": "Keep a child out of the adult area without administering a reading test",
+      "nav": "none",
+      "primary_action": "Enter the answer",
+      "regions": [
+        { "type": "header", "label": "Close (returns straight to learning)", "fixed": true },
+        { "type": "hero", "label": "Arithmetic challenge rendered as numerals: 13 x 4" },
+        { "type": "form", "label": "Number pad, numerals only", "rows": 1 },
+        { "type": "text", "label": "One line explaining this is for a grown-up" }
+      ],
+      "notes": [
+        "Numeric, never the conventional spelled-out-word gate. Dyslexia is strongly heritable, so a reading gate is a literacy test on a parent who may share the diagnosis",
+        "A wrong answer regenerates a new problem silently. No lockout, no attempt counter",
+        "Required for App Store Kids Category; no gate exists in the shipped app today"
+      ]
+    },
+    {
+      "id": "parent-info",
+      "name": "Parent area",
+      "purpose": "Tell an adult what this is, what it teaches, what it costs, and what it collects",
+      "nav": "none",
+      "primary_action": "Read",
+      "regions": [
+        { "type": "header", "label": "< Back to learning", "fixed": true },
+        { "type": "text", "label": "What this teaches, in plain language, no jargon and no diagnosis claims" },
+        { "type": "card", "label": "Cost: free. All of it. Forever. Stated without qualification" },
+        { "type": "card", "label": "Data: nothing leaves this device. No account, no analytics, no network" },
+        { "type": "list", "label": "Settings: audio volume, reduced motion, reset progress", "rows": 3 },
+        { "type": "card", "label": "Research study: join with a code (optional, off by default)" }
+      ],
+      "notes": [
+        "This is the screen a teacher reads before deciding whether to recommend the app",
+        "The zero-collection statement must be literally true per ADR-000 D1, not a summary of a policy",
+        "Reset progress is destructive and irreversible with no cloud copy - confirm, and say so plainly",
+        "No diagnosis language anywhere. We teach; we do not identify dyslexia"
+      ]
+    },
+    {
+      "id": "cohort-consent",
+      "name": "Research study consent",
+      "purpose": "The one consented path where anything leaves the device",
+      "nav": "none",
+      "primary_action": "Join the study",
+      "regions": [
+        { "type": "header", "label": "< Back", "fixed": true },
+        { "type": "text", "label": "Exactly what is sent: sessions started, skills reached, days since first open" },
+        { "type": "text", "label": "Exactly what is never sent: name, age, voice, drawings, device id, anything identifying" },
+        { "type": "form", "label": "Study code from the teacher or the study team", "rows": 1 },
+        { "type": "card", "label": "Leave the study: one tap, deletes the token, stops all uploads" },
+        { "type": "cta", "label": "Join the study", "fixed": true }
+      ],
+      "notes": [
+        "Off by default. ADR-000 D6 - the sole exception to the zero-network rule",
+        "Written for a parent, at a reading level that does not assume the parent reads fluently either",
+        "Revocation must be as prominent as joining, and take effect immediately"
+      ]
+    }
+  ],
+  "flows": [
+    { "from": "first-item", "to": "sound-intro", "label": "continue" },
+    { "from": "sound-intro", "to": "trace", "label": "continue" },
+    { "from": "trace", "to": "blend", "label": "traced or skipped" },
+    { "from": "blend", "to": "build", "label": "blended" },
+    { "from": "build", "to": "check", "label": "built" },
+    { "from": "check", "to": "retry", "label": "wrong answer" },
+    { "from": "retry", "to": "check", "label": "try again" },
+    { "from": "retry", "to": "blend", "label": "second miss: set aside for review, move on" },
+    { "from": "check", "to": "complete", "label": "session length reached" },
+    { "from": "complete", "to": "first-item", "label": "next session" },
+    { "from": "trace", "to": "exit", "label": "exit control" },
+    { "from": "blend", "to": "exit", "label": "exit control" },
+    { "from": "build", "to": "exit", "label": "exit control" },
+    { "from": "exit", "to": "gate", "label": "parent area" },
+    { "from": "gate", "to": "parent-info", "label": "correct answer" },
+    { "from": "parent-info", "to": "cohort-consent", "label": "research study" }
+  ]
+}
