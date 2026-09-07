@@ -1,5 +1,15 @@
 # Pivot research — synthesis
 
+
+> **SUPERSEDED, September 6, 2026.** This document concluded the wedge was the practitioner
+> with the app as instrument, and argued against the parent-direct path. The owner reviewed that
+> and decided otherwise: build the platform, because a practice monetizes her time and the
+> day-job incompatibility point is roughly September 2027. Later research also corrected two of
+> the premises below — the ~$175 band is *not* empty (Lexia $175/yr and Nessy ~$186/yr occupy it),
+> and a verified product gap exists that this document did not know about. See
+> **[PRD-LP-001](2026-09-06-product-brief.md)** for the operative direction. Retained for the
+> market evidence, which stands.
+
 **September 6, 2026.** Two parallel investigations: an internal map of the existing strategy
 corpus, and external market intelligence on the SPED learning-platform market. Raw reports sit
 beside this file. This is the synthesis and the decision it implies.
