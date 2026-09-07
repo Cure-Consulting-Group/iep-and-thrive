@@ -51,7 +51,7 @@ that consumes it.
 | [TASK-MVP-033](TASK-MVP-033.md) | Record aggregate on-device measurement counters | M8 | 5 | 9 | None |
 | [TASK-MVP-034](TASK-MVP-034.md) | Add the consent artifact and cohort enrollment flow | M8 | 5 | 12 | Cohort consent and code entry |
 | [TASK-MVP-035](TASK-MVP-035.md) | Implement the single consented cohort upload Function | M8 | 8 | 12 | None |
-| [TASK-MVP-036](TASK-MVP-036.md) | Approve the retention measurement plan | M8 | 3 | 12 | None |
+| [TASK-MVP-036](TASK-MVP-036.md) | Approve the retention measurement plan | M8 | 3 | 2 | None |
 | [TASK-MVP-037](TASK-MVP-037.md) | Recruit and instrument a 30–50-child cohort | M8 | 3 | 13 | None |
 | [TASK-MVP-038](TASK-MVP-038.md) | Reduce the web to five static pages | M9 | 8 | 8 | Static five-page information architecture and wireframes |
 | [TASK-MVP-039](TASK-MVP-039.md) | Delete removed web routes and client services | M9 | 5 | 9 | None |

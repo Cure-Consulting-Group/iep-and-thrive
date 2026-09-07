@@ -32,7 +32,7 @@ an automatic access interruption, or a level that lies about its engine?
 **Point total:** 31  
 **Critical path:** Yes
 
-**Tickets:** TASK-MVP-003, TASK-MVP-008, TASK-MVP-009, TASK-MVP-010, TASK-MVP-011, TASK-MVP-022, TASK-MVP-023.
+**Tickets:** TASK-MVP-003, TASK-MVP-008, TASK-MVP-009, TASK-MVP-010, TASK-MVP-011, TASK-MVP-022, TASK-MVP-023, TASK-MVP-036.
 
 **Single question:** Does first launch reach a truthful first item while content and audio work can
 now proceed as validated data and bundled assets?
@@ -182,7 +182,7 @@ launch, relaunch, lesson, failure, and exit path?
 **Point total:** 16  
 **Critical path:** Yes
 
-**Tickets:** TASK-MVP-034, TASK-MVP-035, TASK-MVP-036.
+**Tickets:** TASK-MVP-034, TASK-MVP-035.
 
 **Single question:** Can a recruited parent give explicit consent and unlock one validated,
 write-only weekly aggregate upload without changing the default free path?
@@ -217,6 +217,41 @@ ready for a March App Store release?
 
 **Design before sprint:** `design-studio — App Store listing screenshots and review-safe metadata,
 1 package` for 044.
+
+## Recommended amendment — an earlier, cheaper retention read
+
+**Status: proposed, needs the owner's decision.** It resequences Sprints 8-11 and is recorded here
+rather than applied silently.
+
+The plan as written produces its first retention signal in May 2027, roughly nine months after work
+starts. That is a long time to wait for the number the whole project exists to produce, and the
+content floor -- the thing a retention study actually needs -- lands on **18 December 2026** at the
+end of Sprint 7, not in February. The gap between "we could measure" and "we do measure" is about
+seven weeks of avoidable delay.
+
+**The change.** Build the consent artifact and the cohort upload Function (TASK-MVP-034, -035) in
+Sprint 8 rather than Sprint 12, then recruit 8-12 families and start a TestFlight pilot at the top
+of Sprint 9 on 4 January 2027. Eight weeks from mid-January puts a first retention read in **early
+March 2027**, before App Store review in Sprint 14, with three sprints still in hand to react to
+what it shows.
+
+**What the pilot is and is not.** At 8-12 families it establishes nothing about a retention rate --
+see the power discussion in [success metrics](../product/success-metrics.md). It is worth running
+for the things a tiny sample does answer well:
+
+- where the content cliff falls, which is a within-child observation and needs almost no n;
+- whether a child alone can get from launch to a completed session without an adult, which is a
+  pass/fail we would rather learn in January than in May;
+- whether the consent flow and the aggregate upload actually work end to end, before they carry the
+  study that matters.
+
+**The cost.** Sprints 8-11 lose roughly five points of slack and the cohort machinery is built
+before the pacing work is fully settled, so some of it may need revision. That is the trade: a
+7-week-earlier read on the riskiest assumption, against some rework on infrastructure that is not on
+the critical path for App Store submission.
+
+**The risk of not doing it.** If the March 2027 build turns out to have a week-three cliff, the
+plan as written discovers that in May, after submission, with no sprints left.
 
 ## Stage gates and milestones
 

@@ -8,9 +8,50 @@ These definitions are written before the cohort data exists. They are the measur
 
 The study must report the denominator, numerator, cohort dates, missing uploads, and any exclusions before comparing the result. The cohort path is the narrow parent-consented aggregate upload described in ADR-000 D6: sessions started, skills reached, and days since first open under a random participant token, with no name, account, or device identifier. The study does not create a learner record.
 
-**Benchmark.** Compare the result with the category baseline of roughly 7% monthly churn. This is a comparison point, not a claim that the MVP has already achieved a target or that eight-week retention is identical to monthly subscription churn. The interpretation and confidence limits are owned by the study owner and founder before the readout.
+**Benchmark.** Compare the result with the category baseline of roughly 7% monthly churn. This is a
+comparison point, not a target, and eight-week retention is not identical to monthly subscription
+churn.
 
-**Decision.** If the cohort does not clear the pre-registered retention gate or the pattern shows an early content/agency cliff, stop and fix the product. Do not market harder, buy attention, or expand distribution to hide a retention failure.
+**What a cohort of 30-50 can and cannot establish.** This has to be stated before enrolment because
+it determines what the readout is allowed to conclude. For a single proportion at n=40, the 95%
+Wilson interval is roughly +/-15 points at its widest. An observed 12/40 carries the interval
+[18.1%, 45.4%]; an observed 16/40 carries [26.3%, 55.4%]. Those overlap, so **this study cannot
+distinguish a 30% retention product from a 45% one.** Estimating a rate to +/-10 points would need
+n of about 97, and to +/-7 points about 196. We are not going to recruit that through an
+uncompensated teacher network for an unlaunched app, and pretending otherwise would produce a
+number with a false claim of precision attached.
+
+What n=40 does establish reliably is the two things that actually change what we build.
+
+**The pre-registered decision rule.** Fixed now, before Sprint 1, and not revisable after seeing
+results. Expressed as proportions so it holds at any cohort size between 30 and 50.
+
+| Observed week-eight retention | 95% interval at n=40 | Decision |
+| --- | --- | --- |
+| **20% or below** (<=8/40) | upper bound 34.8% | **Stop and fix.** The interval excludes an acceptable product. This is a real kill signal and we act on it. |
+| **21% to 59%** | intervals overlap everything | **Ambiguous, declared in advance.** The study did not answer the rate question. Decide on the secondary evidence below, or fund a second cohort of ~100. Do not rationalise a number in this band into a pass. |
+| **60% or above** (>=24/40) | lower bound 44.6% | **Proceed** to the record phase. |
+
+Clearing the floor is not evidence of success. It is the absence of catastrophe, and the readout
+must say so in those words.
+
+**The secondary evidence, which is well powered at this n** because it is measured within each
+child rather than across children:
+
+1. **The session at which each child hits the content cliff.** Forty children give forty independent
+   observations of where the content ran out. This is the single most actionable number in the
+   study and it does not depend on the retention rate at all.
+2. **The shape of the curve.** Where the drop falls -- week one, week three, week five -- tells us
+   whether we have an onboarding problem, a difficulty-ramp problem, or a depth problem. Shape is
+   far more informative here than level, and it survives a small n.
+3. **Whether children return unprompted.** There are no notifications and no streaks by decision, so
+   any return at all is signal rather than a response to a nudge.
+4. **Parent-reported exit reasons**, gathered by follow-up from the consented cohort. Qualitative,
+   small-n appropriate, and the only route to why rather than whether.
+
+**Decision.** Apply the rule above. If the result lands in the ambiguous band, say "the study did
+not answer this" out loud rather than picking the reading that justifies continuing. Do not market
+harder, buy attention, or expand distribution in response to a retention failure.
 
 ## Supporting metrics
 
@@ -43,7 +84,20 @@ Revenue is also not the first gate. The paid parent record is a post-retention h
 
 ## Stopping rule
 
-Stop and fix the product if week-eight retention fails the pre-registered gate, if session completion drops materially as content becomes harder, if the cohort reaches the content floor before week eight, or if the measurement path cannot produce a trustworthy denominator and numerator. “Market harder” is not an acceptable response to any of those results. The product may proceed to distribution testing only after the founder and study owner can explain the retention curve and the content/agency changes made in response.
+Stop and fix the product if any of these hold:
+
+1. Week-eight retention is **20% or below**, per the pre-registered rule above.
+2. Session completion drops materially as content gets harder -- a difficulty-ramp failure, which
+   the curve shape will show before the endpoint does.
+3. The cohort reaches the content floor before week eight, in which case the study measured our
+   content plan rather than our product and the gate must be re-run after the floor is raised.
+4. The measurement path cannot produce a trustworthy denominator and numerator -- unclear consent,
+   missing uploads, or an ambiguous exclusion rule. An untrustworthy number is worse than no number
+   because it will be acted on.
+
+"Market harder" is not an acceptable response to any of these. Distribution testing begins only
+after the founder and study owner can explain the retention curve and name the content and agency
+changes made in response to it.
 
 ## Owners and open decisions
 
