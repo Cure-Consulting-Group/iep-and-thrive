@@ -145,8 +145,8 @@ system measures its usefulness through week-two continuation, not a displayed ac
 
 ## 4. Consented cohort measurement
 
-This is the only MVP network flow. The code is issued only for a signed cohort consent artifact.
-The participant token is generated randomly on the device and has no account, name, advertising
+This is the only MVP network flow. A per-family single-use enrollment code is issued only for a
+signed cohort consent artifact. The participant token is generated randomly on the device and has no account, name, advertising
 identifier, vendor identifier, or Firebase UID.
 
 ```mermaid
@@ -160,40 +160,49 @@ sequenceDiagram
     participant Ingest as cohortIngest Function
     participant DB as cohortMeasurements
 
-    Parent->>Gate: Enter issued cohort code
+    Parent->>Gate: Enter per-family single-use enrollment code
     alt Code fails local format check
         Gate-->>Parent: Invalid format; remain off
     else Code format is valid
-        Gate->>Keychain: Store code and device-generated random token
-        Gate-->>Parent: Study mode on, visible, revocable
+        Gate->>Keychain: Create device-generated random token
+        Gate->>Ingest: POST /v1/cohort/enroll with code and token
+        alt Code invalid, expired, or already used
+            Ingest-->>Gate: 401/409 bounded error
+            Gate-->>Parent: Enrollment failed; remain off
+        else Single-use exchange accepted
+            Ingest-->>Gate: 200 enrolled receipt; code and token not echoed
+            Gate->>Keychain: Store enrolled token; discard enrollment code
+            Gate-->>Parent: Study mode on, visible, revocable
+        end
     end
     loop Each completed local week while enabled
-        Aggregate->>Aggregate: Count sessions started, skills reached, days since first open
-        Client->>Keychain: Read active code and token
+        Aggregate->>Aggregate: Count sessions, skills, and wide first-open bucket
+        Client->>Keychain: Read active token
+        Client->>Client: Schedule upload with random jitter of at least +/-24 hours
         Client->>Ingest: POST weeklyBatch with aggregate counters
         alt Offline or timeout
             Ingest--xClient: No accepted response
             Client->>Aggregate: Keep one idempotent batch and schedule bounded retry
-        else Code invalid, expired, or revoked
-            Ingest-->>Client: 401 cohort_code_invalid
+        else Token invalid or revoked
+            Ingest-->>Client: 401 participant_token_invalid
             Client->>Aggregate: Keep batch; stop automatic retries
             Client-->>Gate: Show parent action required
-        else Rate limited
-            Ingest-->>Client: 429 rate_limited with retryAfterSeconds
+        else Authentication backoff or rate limited
+            Ingest-->>Client: 429 bounded backoff or participant quota error
             Client->>Aggregate: Keep batch until allowed time
         else Valid request
-            Ingest->>DB: Transactionally write batch and quota document
+            Ingest->>DB: Transactionally write batch and per-participant quota document
             DB-->>Ingest: Committed or already exists
-            Ingest-->>Client: 202 accepted with nextUploadAfter
+            Ingest-->>Client: 202 accepted with jittered nextUploadAfter
             Client->>Aggregate: Delete accepted local batch
         end
     end
     Parent->>Gate: Revoke study participation
     Gate->>Client: Cancel in-flight task
     Gate->>Aggregate: Delete queued cohort batches
-    Gate->>Keychain: Read credential once, then delete persisted code and token
+    Gate->>Keychain: Read token once, then delete persisted token
     opt Network is available at revocation
-        Client->>Ingest: POST revoke using the in-memory credential
+        Client->>Ingest: POST revoke using the in-memory participant token
         Ingest->>DB: Mark token revoked and delete its retained batches per study policy
         Ingest-->>Client: 202 revocation accepted
     end
@@ -203,7 +212,10 @@ sequenceDiagram
 
 If the best-effort remote revocation cannot run, local revocation still takes effect immediately
 and no further upload occurs. The consent artifact defines the contact path for server-side
-deletion. Study close destroys code hashes, participant-token hashes, and retained batches.
+deletion. Failed enrollment authentication is rate-limited by source address at the edge with
+exponential backoff; the edge strips that address before forwarding to the Function. Accepted
+batch quota is keyed by participant-token hash, never by a shared cohort identifier. Study close
+destroys code hashes, participant-token hashes, and retained batches.
 
 ## 5. Post-MVP parent record upgrade and local-history migration
 
@@ -220,7 +232,7 @@ sequenceDiagram
     participant AppleID as Sign in with Apple
     participant Local as SwiftData record repository
     participant API as Record API
-    participant Stage as Firestore migration staging
+    participant Merge as Migration merge service
     participant Cloud as Firestore learner record
 
     Parent->>App: Open paid record
@@ -242,32 +254,44 @@ sequenceDiagram
                 AppleID-->>App: Firebase ID token
                 App->>Local: Export versioned snapshot and checksum before migration
                 Local-->>App: Immutable local migration package
-                App->>API: Begin migration with manifest and idempotency key
-                API->>Stage: Create household-scoped staging record
+                App->>API: POST /v1/migration/merge with manifest and idempotency key
+                API->>Merge: Validate household, entitlement, schema, and UUID records
                 loop Bounded upload chunks
-                    App->>API: Upload sessions, attempts, mastery plus checksums
-                    API->>Stage: Validate schema, ownership, and idempotency
+                    App->>API: Upload SESSION and ATTEMPT records
+                    API->>Merge: Set-union by immutable UUID; duplicate is a no-op
                 end
-                API->>Stage: Compare manifest counts and checksums
-                alt Upload, validation, entitlement, or checksum fails
-                    Stage-->>API: Reject or quarantine staging set
-                    API-->>App: Migration not committed with retry token
+                Merge->>Cloud: Commit union without deleting existing attempts
+                Cloud-->>Merge: Active generation and server manifest
+                Merge->>Cloud: Recompute MASTERY_STATE from merged event stream
+                alt Upload, validation, entitlement, or merge fails
+                    Merge-->>API: Reject or quarantine invalid/conflicting record
+                    API-->>App: Migration not committed; local retry remains safe
                     App->>Local: Keep local store authoritative and export intact
                     App-->>Parent: Explain retry; no history was moved or deleted
-                else Staged record matches local manifest
-                    Stage-->>API: Verified
-                    API->>Cloud: Atomically commit staging generation as active learner record
-                    Cloud-->>API: Commit generation ID
+                else Union and derived state commit
+                    Merge-->>API: Committed generation and server manifest
                     API-->>App: Migration committed with server manifest
                     App->>Local: Verify server manifest, then enable incremental sync
                     App-->>Parent: Record ready; local history retained
+                end
+                alt Acknowledgement received
+                    App->>Local: Persist committed generation and manifest
+                else Network fails after cloud commit and before acknowledgement
+                    App->>API: GET /v1/migration/status
+                    API->>Cloud: Read active generation and server manifest
+                    Cloud-->>API: Current union manifest and derived mastery checksum
+                    API-->>App: Return true committed state; do not replace or subtract records
+                    App->>Local: Persist recovered generation and manifest
                 end
             end
         end
     end
 ```
 
-Rollback means abandoning or quarantining the uncommitted cloud staging generation and continuing
-to read the untouched local database. The implementation never "moves" records by deleting them
-locally. A later, separately authorized retention policy may compact synchronized local data, but
-not as part of account creation or the first migration.
+The merge is idempotent: replaying a batch or calling `GET /v1/migration/status` changes nothing.
+`MASTERY_STATE` is recomputed from the merged event stream and is never accepted as transferred
+client truth. Rollback means quarantining invalid input and continuing to read the untouched local
+database. The implementation never "moves" records by deleting them locally. For every migration,
+the server invariant is plain: **the set of attempts held after migration is a superset of the set
+held before migration**. A later, separately authorized retention policy may compact synchronized
+local data, but not as part of account creation or the first migration.

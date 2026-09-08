@@ -7,36 +7,47 @@ post-MVP account code to remain in the MVP target.
 
 ## Module graph and one-way rule
 
-Create three build targets so the compiler, rather than convention, owns the boundary. The
-arrows below mean "may import." They point inward. Domain has no outgoing import edge.
+Create four build targets so the compiler, rather than convention, owns the boundary. The
+arrows below mean "may import." They point inward. Domain has no outgoing import edge. The thin
+TCA bridge is the only target that knows both the Domain protocols and TCA's dependency
+infrastructure.
 
 ```mermaid
 flowchart LR
     Presentation["IEPAndThrivePresentation<br/>SwiftUI + TCA<br/>screens, reducers, navigation"]
     Data["IEPAndThriveData<br/>SwiftData, bundle I/O, AVFoundation,<br/>MetricKit, CohortUploadClient"]
     Domain["IEPAndThriveDomain<br/>Swift + Foundation only<br/>entities, ports, pure engines"]
+    Bridge["IEPAndThriveTCA<br/>thin bridge: TCA DependencyKey<br/>conformances and live wiring"]
     AppleUI["Apple UI frameworks<br/>SwiftUI, CoreText, CoreHaptics"]
     AppleData["Apple data frameworks<br/>SwiftData, AVFoundation, MetricKit"]
 
     Presentation -->|"imports Domain types"| Domain
     Presentation -->|"composes Data implementations"| Data
+    Presentation -->|"resolves dependency values through"| Bridge
+    Bridge -->|"conforms Domain ports to TCA DependencyKey"| Domain
+    Bridge -->|"wires live implementations"| Data
     Presentation -->|"renders with"| AppleUI
     Data -->|"implements Domain ports"| Domain
     Data -->|"persists, plays, and diagnoses with"| AppleData
 ```
 
-`IEPAndThriveDomain` imports nothing beyond Foundation. It must not import SwiftUI, TCA,
+`IEPAndThriveDomain` imports nothing beyond Foundation. It defines abstract repository/effect
+protocols and pure value types; it does not define TCA conformances. It must not import SwiftUI, TCA,
 SwiftData, CoreGraphics, CoreText, UIKit, AVFoundation, MetricKit, Firebase, or networking
-frameworks. Data may depend on Domain; Presentation may compose both. Domain never depends on
-Data or Presentation, and Data never depends on Presentation.
+frameworks. The `IEPAndThriveTCA` bridge imports TCA, Domain, and the Data implementations; it
+conforms the Domain protocols to `DependencyKey` and exposes the live/test values to Presentation.
+Data may depend on Domain; Presentation may compose both. Domain never depends on Data,
+Presentation, or the bridge, and Data never depends on Presentation.
 
 Add a pre-compilation CI/build phase named `Enforce Domain Imports`. It enumerates Swift files
 belonging to the Domain target, extracts every `import` declaration, and fails unless the import
 is exactly `Foundation`. A second check fails if a Domain source is accidentally assigned to the
 Data or app target, or if Data/Presentation source membership is added to the Domain target.
-The same job inspects the generated target dependency graph and requires exactly
-`Presentation -> Data -> Domain`, with Presentation's direct Domain import allowed for value
-types. This is the D9 release gate.
+The same job inspects the generated target dependency graph and requires
+`Presentation -> Data -> Domain` plus `Presentation -> TCA bridge -> Data -> Domain`, with
+Presentation's direct Domain import allowed for value types. This keeps dependency registration
+out of Presentation without weakening the Foundation-only Domain rule. This is the D9 release
+gate.
 
 ## Domain engines
 

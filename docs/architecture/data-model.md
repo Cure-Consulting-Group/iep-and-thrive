@@ -160,6 +160,19 @@ and coverage; blending persists completed phoneme count and independent completi
 building persists correct-position count and independent completion. Raw touch points, haptic
 events, narration timing, audio, voice, and UI event streams are neither fields nor blobs.
 
+### Post-MVP only: incremental sync state
+
+The MVP does not sync and builds none of the following fields. When post-MVP sync is introduced,
+`SDSession` and `SDAttempt` add `syncState: String` and `syncedAt: Date?`. `syncState` is a
+server-independent local state machine such as `pending`, `inFlight`, `synced`, or `failed`; it
+does not replace the immutable UUID or the server's idempotency key. `syncedAt` records the last
+successful acknowledgement for diagnostics and retry selection. The migration to these fields
+follows expand-migrate-contract and preserves all existing records.
+
+The post-MVP sync adapter may also use an `SDSyncQueue` outbox for bounded retry metadata, but it
+must not use a whole-store diff as its source of truth. The MVP intentionally has no `syncState`,
+`syncedAt`, or `SDSyncQueue` implementation because the MVP does not sync.
+
 The record repository commits an attempt, affected mastery states, and the session checkpoint in
 one `ModelActor` transaction. If the transaction fails, none of the three advances. A retry uses
 the same UUID, making it idempotent.
@@ -254,5 +267,9 @@ runner's migration contract rather than introduce ad hoc scripts.
 - Mastery can be recomputed from attempts under a named pacing-policy version; rewards cannot
   affect it.
 - Cohort aggregates cannot be joined to a household or learner model.
-- Cloud migration commits only after local and staged-cloud counts and checksums agree.
+- Cloud migration commits only after the server validates the local manifest, applies a UUID
+  set-union merge, recomputes mastery from the merged event stream, and returns the committed
+  generation and server manifest.
+- No migration path may reduce the set of attempts the server holds; the post-migration attempt
+  set is a superset of the pre-migration set.
 - No migration deletes the only readable copy of a local record.

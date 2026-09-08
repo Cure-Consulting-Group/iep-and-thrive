@@ -44,15 +44,29 @@ The `Enforce Network Boundary` build phase and CI job perform all of these check
 3. Inspect the linked binary/framework manifest. Network-capable third-party SDKs fail the build,
    even if source scanning finds no call.
 4. Run a first-launch-through-full-session integration test with cohort state absent and a
-   `FailOnUseTransport`. The test asserts zero transport calls while launching, loading content,
-   hearing all narration, completing correct and incorrect items, saving, exiting, and resuming.
+   `FailOnUseTransport`. The test asserts zero calls through **our injected transport** while
+   launching, loading content, hearing all narration, completing correct and incorrect items,
+   saving, exiting, and resuming. It cannot observe a system framework or daemon opening a
+   socket; it proves only that the normal dependency composition did not call the transport we
+   supplied.
 5. Run the same session with a valid cohort capability but a week not due. It still asserts zero
    calls. A separate D6 contract test proves only a due batch or explicit revocation can call the
    one endpoint.
+6. As the **fourth enforcement layer**, on the CI runner run an OS-level network check for the
+   complete first-launch-through-resume
+   session across **all processes**. A packet capture, loopback firewall, or
+   `NEFilterDataProvider` must assert zero socket binds, zero DNS queries, and zero outbound
+   packets for the run. This is the release gate that can actually fail a release. The
+   `FailOnUseTransport` test is its fast local approximation, not a proof that the operating
+   system opened no socket.
+7. Specify the exact `Info.plist` App Transport Security keys and network entitlements for the
+   MVP target, including the intentional absence of any exception or client entitlement. F0 is
+   not closed until that manifest is explicit and the OS-level check covers the resulting target.
 
 Together the static allowlist prevents another type from acquiring a socket API, the link audit
-prevents an SDK side door, and the runtime invariant proves the normal dependency composition
-does not invoke the one permitted transport. These are release gates under D1, not advisory lint.
+prevents an SDK side door, the mock runtime invariant proves only that the normal dependency
+composition did not invoke our injected transport, and the OS-level check covers sockets opened
+outside that mock. These are release gates under D1, not advisory lint.
 
 ## Data classes
 
@@ -66,7 +80,7 @@ does not invoke the one permitted transport. These are release gates under D1, n
 | Local MetricKit payload and bounded diagnostic summary | Delivered by the operating system | Device-local diagnostic store | Local app and device owner through an explicit export | Rotate by count/size; clear on local reset; no app-operated upload |
 | Declared age-range result | Returned by Apple's API for the immediate age-appropriate branch | Memory only | Parent-gate coordinator | Convert to the minimum Boolean/range decision, then discard before the flow ends; never log or persist the signal |
 | Cohort consent state | Issued study code plus device-generated participant token | Keychain | Parent-gated cohort feature and `CohortUploadClient` | Delete immediately on revocation and at study close |
-| Cohort aggregate batch | Sessions started, skills reached, days since first open | SwiftData queue, then write-only Firestore collection | Local cohort client before acceptance; privileged study operator under the consent artifact after receipt | Local copy deleted on acceptance/revocation; server expiry comes from the signed study retention date, then batch and token hash are destroyed |
+| Cohort aggregate batch | Sessions started, skills reached, and a wide bucket for days since first open | SwiftData queue, then write-only Firestore collection | Local cohort client before acceptance; privileged study operator under the consent artifact after receipt | Local copy deleted on acceptance/revocation; server expiry comes from the signed study retention date, then batch and token hash are destroyed |
 | Network metadata at cohort ingress | Transport metadata necessarily received by hosting infrastructure | Provider request logs, not Firestore application documents | Restricted infrastructure operators | Configure the shortest operational retention supported and document it in the study artifact before recruitment; never copy it into cohort records |
 | Parent identity and consent | Post-MVP only; Sign in with Apple subject/private relay and consent facts | Firebase Auth and household record | Parent and authorized record services | Account deletion/retention workflow defined before record-phase launch |
 | Learner profile and synchronized record | Post-MVP, entered/selected by the parent | Device plus household-scoped Firestore | Household owner and authorized export service | Parent-controlled deletion and export; exact statutory/business retention requires approved policy before launch |
@@ -77,6 +91,28 @@ No MVP table row contains a child name, email, Firebase UID, advertising identif
 identifier, device identifier, IP address, raw touch path, or voice sample. The D6 batch contains
 only its three approved counters, period, schema version, idempotency ID, and keyed participant
 token hash.
+
+## MetricKit boundary and permitted claims
+
+Registering an `MXMetricManager` subscriber does not cause our binary to transmit anything. The
+operating system may send device analytics to Apple under the user's own **Share Analytics**
+setting, independently of whether this app exists. Xcode Organizer data that reaches us is a
+consequence of that operating-system setting, not a request made by our app and not an app-owned
+upload path.
+
+For the un-enrolled free teaching path, the product and privacy copy may make these two claims
+verbatim:
+
+- **“The app makes zero network requests.”** The separately consented D6 cohort upload is an
+  explicit parent-enabled exception, not part of the un-enrolled teaching path.
+- **“We receive nothing about this child that we requested.”** The app does not request child
+  analytics, crash uploads, identifiers, or learning records.
+
+The copy must not claim **“no data about this child reaches anyone.”** OS-managed device
+analytics may reach Apple under the user's setting, outside the app's request and control. The
+parent-facing copy and App Store listing must use only the permitted wording above. Review and
+test the exact strings in the parent-info and cohort-consent screens in
+`design/wireframes/mvp-screens.json` against this rule before release.
 
 ## MetricKit instead of remote crash reporting
 
@@ -127,9 +163,19 @@ birth date from the child, or become a placement input.
 D7 permits authenticated network traffic only after the parent passes the gate, purchase and
 consent requirements are satisfied, and a household exists. The sync adapter receives a
 short-lived Firebase ID token and a household scope; it cannot write an owner UID supplied by
-the caller. Local history remains authoritative until staged cloud counts and checksums match.
-Revoking record sync stops new traffic without corrupting local learning. D6 cohort identity and
-D7 household identity remain separate namespaces and are never joined.
+the caller. Revoking record sync stops new traffic without corrupting local learning. D6 cohort identity and
+D7 household identity remain separate namespaces and are never joined. Local history remains
+authoritative until the server returns the committed merged manifest and its checksums, rather
+than until a replacement staging generation becomes active.
+
+For the consented cohort path, the participant token is an opaque study handle, not an anonymity
+guarantee. It prevents the application record from containing a name, account, or device
+identifier and prevents a direct join to the D7 household namespace. It does not protect against
+an operator or provider correlating provider metadata, timing, or outside information. The
+cohort path therefore uses wide `daysSinceFirstOpen` buckets, random upload jitter of at least
+24 hours in either direction, and edge stripping of the client address before the Function sees
+the request. Those controls reduce cadence and address linkage; they do not permit a claim of
+perfect anonymity.
 
 ## Open counsel questions from ADR-000
 
